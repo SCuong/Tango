@@ -4,8 +4,8 @@
 
 /* Base Spacing & Sizing */
 :root {
-  --font-ui: "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
-  --font-japanese: "Noto Sans JP", "Hiragino Sans", sans-serif;
+  --font-ui: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-japanese: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
 
   --radius-sm: 6px;
   --radius-md: 10px;
