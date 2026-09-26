@@ -485,7 +485,7 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 - Dismiss CTA: Full-width button `[ Đã hiểu — Tiếp tục ]` (triggers on `Enter`/`Space`).
 
 ### 16.5 Settings Screen
-- Minimalist modal or sheet.
+- Full-screen route on mobile; centered modal card (`max-w-lg`) on tablet and desktop (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)).
 - **Language Section:** Segmented clay toggle: `[ Tiếng Việt ]` | `[ English ]`.
 - **Theme Section:** 3 visual clay swatches with live color previews:
   - `[ Sáng / Light ]`

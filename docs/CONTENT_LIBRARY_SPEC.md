@@ -150,7 +150,7 @@ Every card or button on the Home study area leads toward **browsing, reading, or
 ```
 
 - **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
-- **GIÁO TRÌNH:** Horizontal scroll or grid of responsive book cards. Tapping a card opens the **Book Study View**.
+- **GIÁO TRÌNH:** Stacked tactile cards with 1:1 thumbnails on mobile, responsive 2-4 column grid on desktop/tablet (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)). Tapping a card opens the **Book Study View**.
 - **HỌC THEO LOẠI:** Direct entry to browse lessons by category across all books.
 - **Kiểm tra tổng hợp:** Direct access to global multi-lesson quiz selection.
 
@@ -884,14 +884,15 @@ Chuyển sang:
 ---
 
 ## 21. Responsive Layout Adaptations
+*(See [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md) for full screen-by-screen wireframes and interaction specs)*
 
 | Screen / Area | Mobile (< 640px) | Desktop / Tablet (>= 640px) |
 |---|---|---|
-| **Home: Study Books** | Single row horizontal scroll or compact cards with thumbnails | 2 to 4-column responsive card grid with 3:4 cover ratio |
+| **Home: Study Books** | Vertical stacked tactile cards with 1:1 thumbnails | 2 to 4-column responsive card grid with 3:4 cover ratio |
 | **Book Study View** | Centered vertical stack, compact cover banner | Centered canvas (`max-w-2xl`), rich cover presentation |
-| **Category Inside Book** | Full-width lesson list with 56px touch rows | Clean 2-column or structured table (`max-w-4xl`) |
-| **Content Management** | Stacked list with clear button targets (>= 48px) | Structured master-detail or 2-column management layout |
-| **Delete Dialog** | Full-width stacked buttons with 16px separation | Centered modal with safe horizontal button separation |
+| **Category Inside Book** | Full-width lesson list with 56px touch rows | Structured 2-column grid (`max-w-4xl`) |
+| **Content Management** | Stacked vertical list with sub-routes (touch targets >= 48px) | Structured 2-column management layout (`max-w-4xl`) |
+| **Delete Dialog** | Full-width stacked buttons with 16px separation (Cancel on top) | Centered modal with safe horizontal button separation |
 
 ---
 

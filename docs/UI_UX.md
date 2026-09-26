@@ -3,6 +3,8 @@
 This document defines the functional UX flows, screen layouts, interaction patterns, and ergonomics for Tango across mobile and desktop form factors.
 
 > **Visual Design System Reference:** For the complete, authoritative design token architecture, Soft Claymorphism specifications, Light/Dark/Sakura palettes, typography, and Tabler Icons, see [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
+>
+> **Screen-by-Screen Specification Reference:** For the exhaustive, authoritative 27-screen wireframes, routes, responsive layouts (Mobile, Tablet, Desktop), touch targets, and keyboard shortcuts, see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md).
 
 ---
 
