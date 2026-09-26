@@ -57,26 +57,40 @@ The quiz pipeline is designed to be completely decoupled from lesson categorizat
 
 ## 4. Client-Side Persistence Strategy
 
-All user progress, weak-word markers, and session histories are stored in browser `localStorage` keyed by `StudyItem.id`.
+All user progress, weak-word markers, session histories, and book metadata are stored in browser local persistence.
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                   Tango Storage Layer                  │
-├──────────────────────────┬─────────────────────────────┤
-│ Storage Key              │ Purpose                     │
-├──────────────────────────┼─────────────────────────────┤
-│ tango_v1_progress        │ StudyItem error/pass counts,│
-│                          │ weak status keyed by itemId │
-│ tango_v1_history         │ Recent quiz session records │
-│ tango_v1_preferences     │ App settings: theme, lang,  │
-│                          │ soundEnabled (default: false│
-│ tango_v1_custom_lessons  │ Custom user-imported lessons│
-└──────────────────────────┴─────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                       Tango Storage Layer                       │
+├──────────────────────────┬──────────────────────────────────────┤
+│ Storage Key / Database   │ Purpose & Storage Technology         │
+├──────────────────────────┼──────────────────────────────────────┤
+│ tango_v1_books           │ StudyBook metadata (id, title,       │
+│                          │ coverImageId) in localStorage        │
+│ tango_v1_covers_idb      │ Cover image binary Blobs             │
+│                          │ in browser IndexedDB (object store)  │
+│ tango_v1_progress        │ StudyItem error/pass counts,         │
+│                          │ weak status keyed by itemId          │
+│ tango_v1_history         │ Recent quiz session records          │
+│ tango_v1_preferences     │ App settings: theme, lang,           │
+│                          │ soundEnabled (default: false)        │
+│ tango_v1_custom_lessons  │ Custom user-imported lessons         │
+└──────────────────────────┴──────────────────────────────────────┘
 ```
 
 Because `StudyItem.id` is globally unique across both Vocabulary and Kanji lessons, the progress store operates uniformly regardless of which lesson or category an item originated from.
 
-### 4.1 Audio Feedback Architecture (Optional, Off by Default)
+### 4.1 Book Cover Binary Storage (IndexedDB)
+- **Zero Base64 in `localStorage`:** Book covers are user-uploaded binary images (`.jpg`, `.png`, `.webp`). Storing them in `localStorage` as base64 strings quickly exhausts the browser's 5MB quota and degrades serialization performance.
+- **IndexedDB Blob Store:** Cover images are stored directly as binary `Blob` objects in an IndexedDB database (`tango_v1_covers_idb`).
+- **Hard Delete Cascade:** When a `StudyBook` is permanently deleted (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)), Tango executes an atomic cascade:
+  1. Deletes the cover blob from `tango_v1_covers_idb`.
+  2. Removes the `StudyBook` entry from `tango_v1_books`.
+  3. Deletes all associated lessons and `StudyItem` entries.
+  4. Purges all `ItemProgress` records for those items from `tango_v1_progress`.
+  5. Cleans stale quiz session references in `tango_v1_history`.
+
+### 4.2 Audio Feedback Architecture (Optional, Off by Default)
 - **Engine:** Pure client-side Web Audio API synthesizer or lightweight tiny audio buffers (< 20KB total).
 - **Decoupled Playback:** Audio triggers asynchronously without blocking UI rendering, auto-advance timers, or state updates.
 - **Strict Default:** Sound is strictly **OFF** (`soundEnabled: false`). Audio context is only initialized/activated upon explicit user action in Settings.
@@ -147,12 +161,20 @@ src/
 │   └── ProgressBar.tsx
 ├── data/                      # Bundled lessons (vocabulary/ & kanji/)
 ├── features/                  # Domain-driven feature modules
-│   ├── lessons/               # Category views, lesson browsers, and importer
-│   │   ├── CategoryCards.tsx  # Dual entry: Vocabulary vs. Kanji cards
-│   │   ├── LessonList.tsx     # List of lessons for selected category
-│   │   ├── LessonDetail.tsx   # Word list inside a single lesson
-│   │   ├── LessonImporter.tsx # Authoritative import interface (see docs/IMPORT_SPEC.md)
+│   ├── books/                 # Study Book cards and Book Study views (see docs/CONTENT_LIBRARY_SPEC.md)
+│   │   ├── BookCard.tsx       # Responsive book card with cover thumbnail
+│   │   ├── BookStudyView.tsx  # Book overview: Vocab & Kanji categories, Test Book CTA
+│   │   └── BookPlaceholder.tsx# Theme-aware fallback cover illustration
+│   ├── lessons/               # Category views, lesson browsers, and detail
+│   │   ├── CategoryBrowser.tsx# "Learn by Type" view grouped by Study Book
+│   │   ├── LessonList.tsx     # List of lessons for selected category inside a book
+│   │   ├── LessonDetail.tsx   # Item preview, Practice, Quick Test, Review
 │   │   └── MixedTestModal.tsx # Multi-lesson selector with checkboxes
+│   ├── content-management/    # Administrative content controls (accessed via Settings)
+│   │   ├── ContentManager.tsx # Main management screen (Books list + Lessons list)
+│   │   ├── BookEditor.tsx     # Add / Edit book modal & cover picker
+│   │   ├── DangerZone.tsx     # Explicit permanent delete dialogs (Hard Delete Only)
+│   │   └── LessonImporter.tsx # Authoritative import interface (see docs/IMPORT_SPEC.md)
 │   ├── quiz/                  # Shared quiz engine (used for all tests)
 │   │   ├── QuizRunner.tsx     # Active session controller
 │   │   ├── QuestionPrompt.tsx # Large typography prompt card
@@ -168,12 +190,12 @@ src/
 │   ├── useProgress.ts         # Persistent progress read/write
 │   └── useKeyboard.ts         # Desktop keyboard shortcut listener (1-4, Enter)
 ├── lib/                       # Pure utility functions (no React dependencies)
-│   ├── storage.ts             # LocalStorage wrapper with schema version guard
+│   ├── storage.ts             # LocalStorage & IndexedDB cover store manager
 │   ├── quizEngine.ts          # Multi-lesson pool aggregator, question generator
 │   ├── importer.ts            # Delimiter detection, parsing, deduplication
 │   └── textNormalization.ts   # Japanese and Vietnamese unicode matchers
 ├── types/                     # Shared TypeScript domain interfaces
-│   ├── study.ts               # StudyItem, Lesson, StudyCategory
+│   ├── study.ts               # StudyBook, Lesson, StudyItem, StudyCategory
 │   └── quiz.ts                # QuizConfig, QuizQuestion, QuizSessionResult, QuestionType
 ├── App.tsx                    # Screen router / navigation coordinator
 ├── index.css                  # Tailwind directives and font stack configurations
@@ -181,8 +203,10 @@ src/
 ```
 
 ### Directory Responsibilities
-- `src/features/lessons/`: Category home view (Từ vựng vs Hán tự), lesson listings, LessonImporter, and the Mixed Test multi-lesson configuration modal.
-- `src/features/quiz/`: The **single, reusable quiz system** that powers Practice Mode, Quick Tests, Mixed Tests, and Review Sessions.
-- `src/lib/quizEngine.ts`: Pure algorithmic logic that takes `lessonIds: string[]`, collects items, deduplicates by normalized Japanese + Kana, shuffles choices, and emits `QuizQuestion[]`.
-- `src/lib/importer.ts`: Pure parsing, delimiter auto-detection, RFC 4180 CSV tokenizer, and duplicate/merge logic.
-- `src/types/`: Centralized interfaces guaranteeing strict data symmetry across both study categories.
+- `src/features/books/`: Study Book cards on Home and the safe Book Study View.
+- `src/features/lessons/`: Category views, Lesson Detail, and multi-lesson quiz configuration.
+- `src/features/content-management/`: Protected management hub accessed via Settings (Add/Edit Book, LessonImporter, Danger Zone hard deletion).
+- `src/features/quiz/`: The **single, reusable quiz system** that powers Practice Mode, Quick Tests, Book Tests, Mixed Tests, and Review Sessions.
+- `src/lib/quizEngine.ts`: Algorithmic engine that takes `lessonIds: string[]`, collects items, deduplicates, and generates questions.
+- `src/lib/storage.ts`: Dual-tier client storage handling `localStorage` metadata and IndexedDB binary cover blobs with cascade cleanup.
+- `src/types/`: Centralized interfaces guaranteeing strict data symmetry across all books and categories.

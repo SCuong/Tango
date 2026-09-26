@@ -20,49 +20,69 @@ Tango is built for focused, daily retention drills. The visual design prioritize
 
 ## 2. Main Screens & Wireframes
 
-### Screen 1: Home / Dual Study Categories
-The home screen clearly presents two distinct learning pathways plus the unified Mixed Test and Import entry points:
+### Screen 1: Home / Study Hub (Safe Study-Only Canvas)
+
+The Home screen is dedicated purely to reading and studying. Administrative, import, or destructive controls are strictly barred from this screen to prevent accidental mis-taps (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)):
 
 ```text
 ┌───────────────────────────────────────────────┐
-│                     TANGO                     │
-│               Bạn muốn học gì?                │
+│ TANGO                          [IconSettings] │
 │                                               │
-│  ┌─────────────────────────────────────────┐  │
-│  │ [IconBook] TỪ VỰNG                      │  │
-│  │ 3 bài · 60 từ                           │  │
-│  └─────────────────────────────────────────┘  │
+│ GIÁO TRÌNH (STUDY BOOKS)                      │
+│ ───────────────────────────────────────────── │
+│ ┌──────────────────────┐ ┌──────────────────┐ │
+│ │ [Cover]              │ │ [Cover]          │ │
+│ │ 中級へ行こう         │ │ Mimikara         │ │
+│ │ 8 bài · 164 mục      │ │ 5 bài · 110 mục  │ │
+│ └──────────────────────┘ └──────────────────┘ │
 │                                               │
-│  ┌─────────────────────────────────────────┐  │
-│  │ [IconWriting] HÁN TỰ                    │  │
-│  │ 3 bài · 55 từ                           │  │
-│  └─────────────────────────────────────────┘  │
+│ HỌC THEO LOẠI (LEARN BY TYPE)                 │
+│ ───────────────────────────────────────────── │
+│ ┌───────────────────────────────────────────┐ │
+│ │ [IconBook] Từ vựng (Vocabulary)           │ │
+│ └───────────────────────────────────────────┘ │
+│ ┌───────────────────────────────────────────┐ │
+│ │ [IconWriting] Hán tự (Kanji)              │ │
+│ └───────────────────────────────────────────┘ │
 │                                               │
-│        [ [IconBolt] Kiểm tra tổng hợp (Mixed) ]│
-│        [ [IconFileImport] Nhập bài mới ]       │
+│        [ [IconBolt] Kiểm tra tổng hợp ]       │
 └───────────────────────────────────────────────┘
 ```
 
-- **[IconBook] Từ vựng Card:** Enters the Vocabulary lesson list.
-- **[IconWriting] Hán tự Card:** Enters the Kanji lesson list.
-- **[IconBolt] Kiểm tra tổng hợp CTA:** Directly opens the multi-lesson selector.
-- **[IconFileImport] Nhập bài mới CTA:** Opens the unified Lesson Importer (see [`docs/IMPORT_SPEC.md`](./IMPORT_SPEC.md)).
+- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (entry to preferences and Content Management).
+- **GIÁO TRÌNH Cards:** Tapping a book opens its **Book Study View**. (Never triggers edit/delete).
+- **HỌC THEO LOẠI:** Browse lessons by category across all textbooks.
+- **[IconBolt] Kiểm tra tổng hợp:** Direct access to the global multi-lesson quiz builder across books.
+- **Strict Safety Rule:** Zero Add, Import, Edit, or Delete controls on Home.
 
 ---
 
-### Screen 2: Lesson List (Vocabulary or Kanji)
+### Screen 2: Book Study View & Category Lists
 
-Both categories use the same clean list layout:
+#### 2.1 Book Study View (e.g. `中級へ行こう`)
+Tapping a Study Book opens its dedicated, distraction-free study canvas:
+- Book cover header, title, and total metrics (e.g. `8 bài học · 164 mục`).
+- **Từ vựng Section:** Lesson count, item count, and `[ Mở Từ vựng ]` action.
+- **Hán tự Section:** Lesson count, item count, and `[ Mở Hán tự ]` action.
+- **[ Kiểm tra giáo trình ]:** Launches a combined quiz across all lessons in this textbook.
 
+#### 2.2 Category View Inside a Book
+Opening a category (e.g. `Hán tự` inside `中級へ行こう`) presents its lessons:
 ```text
-← TỪ VỰNG (hoặc HÁN TỰ)              [ + Nhập bài mới ]
+← 中級へ行こう
+
+HÁN TỰ (5 bài · 82 mục)
 
 ┌───────────────────────────────────────────────┐
-│ Bài 1: Đồ ăn nhanh             20 từ  ·  80%  │
-│ Bài 2: Đồ gia dụng             20 từ  ·  55%  │
-│ Bài 3: Giao thông & Đi lại     20 từ  ·  --   │
+│ Bài 1: Con người & Gia đình     16 mục · 90%  │
+│ Bài 2: Hành động & Đi lại       18 mục · 75%  │
+│ Bài 3: Công việc & Đời sống     14 mục · --   │
 └───────────────────────────────────────────────┘
+
+[ [IconCards] Kiểm tra nhiều bài ]
 ```
+- Tapping a lesson opens **Lesson Detail**.
+- **[ Kiểm tra nhiều bài ]:** Launches multi-lesson quiz selector scoped to this book and category.
 
 Selecting a lesson opens the **Lesson Detail view**, offering:
 - Items preview (Japanese, Kana, Vietnamese, optional Hán Việt)
@@ -200,7 +220,20 @@ A clean, minimalist preferences modal/sheet:
 - **Language (Ngôn ngữ):** Segmented control `[ Tiếng Việt ]` | `[ English ]`.
 - **Theme (Giao diện):** 3 live color swatches `[ Sáng / Light ]` | `[ Tối / Dark ]` | `[ Sakura / Sakura ]`.
 - **Sound Effects (Âm thanh hiệu ứng):** Segmented toggle `[ Off / On ]` (Default: **Off** / Tắt). Never plays sound unless explicitly enabled.
+- **Nội dung học (Study Content):** Dedicated section with row **"Quản lý giáo trình và bài học" (Manage books and lessons)** linking to the Content Management screen.
 - Preferences automatically persist to local storage.
+
+---
+
+### Screen 9: Content Management (Quản lý nội dung) & Safe Deletion
+
+A protected administrative screen accessed intentionally via **Settings → Quản lý giáo trình và bài học**:
+- **Giáo trình (Study Books):** List of textbooks with `[ Quản lý ]` inspector and `[IconPlus] Thêm giáo trình`.
+- **Bài học (Lessons):** `[IconFileImport] Thêm / Nhập bài học mới` (launches lesson importer with target book selector).
+- **Danger Zone (Vùng nguy hiểm):** Located deep inside book/lesson management views.
+- **Hard Delete Only:** Deleting a book or lesson permanently removes records and related data. No soft delete, no recycle bin, no trash folder.
+- **Accidental Tap Safeguards:** Requires explicit modal confirmation clearly stating book/lesson name and total items; delete button is visually separated with error styling and never default focused.
+- See [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md) for full wireframes and cascade behaviors.
 
 ---
 

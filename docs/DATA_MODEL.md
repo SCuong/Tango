@@ -6,10 +6,11 @@ This document defines the core data schemas, TypeScript interfaces, and client-s
 
 ## 1. Architectural Entity Relationship
 
-Vocabulary and Kanji lessons share the exact same item structure and feed into a single unified quiz engine.
+Vocabulary and Kanji lessons share the exact same item structure and feed into a single unified quiz engine. Study Books act as optional organizational containers above lessons (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
 ```mermaid
 erDiagram
+    STUDY_BOOK ||--o{ LESSON : organizes
     LESSON ||--|{ STUDY_ITEM : contains
     STUDY_ITEM ||--o{ ITEM_PROGRESS : tracks
     QUIZ_CONFIG ||--|{ LESSON : selects_multiple
@@ -19,7 +20,7 @@ erDiagram
 
 ---
 
-## 2. Core Study Item & Lesson Models
+## 2. Core Study Models: StudyBook, Lesson, & StudyItem
 
 ### 2.1 TypeScript Interfaces
 
@@ -29,6 +30,18 @@ erDiagram
  * Vocabulary and Kanji share the identical item schema and quiz engine.
  */
 export type StudyCategory = 'vocabulary' | 'kanji';
+
+/**
+ * Organizational container representing a textbook or curriculum.
+ * See docs/CONTENT_LIBRARY_SPEC.md for complete specifications.
+ */
+export interface StudyBook {
+  id: string;              // Stable unique ID, e.g. "book-chukyu-he-ikou"
+  title: string;           // Display title, e.g. "中級へ行こう" (Required, non-empty)
+  coverImageId?: string;   // Reference ID for cover binary Blob in IndexedDB (Optional)
+  createdAt: string;       // ISO 8601 creation timestamp
+  updatedAt: string;       // ISO 8601 last modified timestamp
+}
 
 /**
  * Shared core study item for both Vocabulary and Kanji lessons.
@@ -44,9 +57,11 @@ export interface StudyItem {
 
 /**
  * Standard Lesson container used for both Vocabulary and Kanji categories.
+ * May optionally belong to a StudyBook via bookId.
  */
 export interface Lesson {
   id: string;              // Unique lesson ID, e.g. "vocab-lesson-01" or "kanji-lesson-01"
+  bookId?: string;         // Optional reference to StudyBook.id (unassigned lessons remain valid)
   category: StudyCategory; // 'vocabulary' | 'kanji'
   title: string;           // Display title, e.g. "Bài 1"
   subtitle?: string;       // Optional subtitle, e.g. "Đồ ăn nhanh" or "Giao thông & Đi lại"
@@ -204,10 +219,13 @@ export interface UserPreferences {
 export interface UserStudyState {
   version: number;                // Schema version for future migrations
   preferences: UserPreferences;
+  books: Record<string, StudyBook>; // User-defined textbooks (see docs/CONTENT_LIBRARY_SPEC.md)
   progressByItem: Record<string, ItemProgress>;
   recentResults: QuizSessionResult[];
 }
 ```
+
+*Note: Book covers are stored as binary Blobs in browser IndexedDB (`tango_v1_covers_idb`) referenced via `StudyBook.coverImageId`. They are NEVER stored as large base64 strings in `localStorage`.*
 
 ### Mistake Review Lifecycle
 1. When any question is answered incorrectly, `targetItem.id` is added to `QuizSessionResult.missedItemIds`.

@@ -37,7 +37,7 @@ User immediately begins Practice, Quick Test, or Mixed Test
 
 ---
 
-## 2. One Importer for Both Categories
+## 2. One Importer for Both Categories & All Study Books
 
 Tango features two study categories:
 - **[IconBook] Từ vựng (Vocabulary)**
@@ -46,13 +46,17 @@ Tango features two study categories:
 Both categories share the identical `StudyItem` schema. Consequently, **there is only one unified importer**.
 
 ```text
-Loại bài học
+Giáo trình
+[ 中級へ行こう ▼ ]
 
+Loại bài học
 [ [IconBook] Từ vựng ]   [ [IconWriting] Hán tự ]
 ```
 
+- Selecting the book sets `Lesson.bookId` (or leaves it undefined for `Không thuộc giáo trình`).
 - Selecting the category assigns the `category: 'vocabulary' | 'kanji'` attribute on the resulting `Lesson`.
 - The parser, delimiter detector, header mapper, duplicate engine, and preview interface remain **100% identical**.
+- **Safe Administrative Access:** The importer is launched from **Settings → Quản lý nội dung (Content Management)**, protecting the Home screen from accidental clicks (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 - **Anti-pattern:** Never implement separate `VocabularyImporter` and `KanjiImporter` modules.
 
 ---
@@ -315,16 +319,20 @@ On mobile screens, four-column tables cause horizontal scroll frustration. Tango
 ```text
 THÊM BÀI HỌC MỚI
 
-1. Chọn phân loại
+1. Chọn giáo trình
+   [ 中級へ行こう ▼ ]
+   (Danh sách giáo trình hiện có + "Không thuộc giáo trình")
+
+2. Chọn phân loại
    [ [IconBook] Từ vựng ]   [ [IconWriting] Hán tự ]
 
-2. Tên bài học
+3. Tên bài học
    [ Bài 1: Giao thông & Đi lại                ]
 
-3. Phương thức nhập
+4. Phương thức nhập
    [ Dán văn bản ]   [ Tải file lên ]
 
-4. Phân cách cột
+5. Phân cách cột
    [ Tự động ▼ ]
 
 ┌──────────────────────────────────────────────┐
@@ -338,6 +346,13 @@ THÊM BÀI HỌC MỚI
 
 [ Xem trước & Kiểm tra dữ liệu (CTA) ]
 ```
+
+### Preselection & Safety Rules:
+- **Preselected Book:** If the importer is opened from inside a specific book's management screen (`Content Management → [Book] → Thêm bài`), `bookId` defaults automatically to that book.
+- **Unassigned Option:** Selecting `Không thuộc giáo trình` (`Unassigned`) creates a standalone lesson without a `bookId`.
+- **Preview Confirmation:** The preview confirmation bar explicitly summarizes the destination:
+  `Giáo trình: 中級へ行こう  |  Phân loại: Hán tự  |  Bài: Bài 1  |  39 mục sẵn sàng`
+  This guarantees that learners do not accidentally import lessons into the wrong textbook.
 
 ---
 

@@ -8,11 +8,11 @@
 ## 2. Product Summary
 Tango bridges the natural cognitive affinity between the Japanese language (specifically Kanji) and Sino-Vietnamese roots (Hán Việt). 
 
-The app organizes study into two distinct categories:
+Learners can organize their study materials into multiple **Study Books (Giáo trình)** representing textbooks or curricula (e.g. *中級へ行こう*, *Mimikara*). Within each book, content is structured into two distinct categories:
 - **[IconBook] Từ vựng (Vocabulary):** General vocabulary, word compounds, and phrases.
 - **[IconWriting] Hán tự (Kanji):** Kanji vocabulary compounds and readings.
 
-Both categories share the **exact same item schema** and the **exact same quiz engine**, allowing learners to study lessons individually or combine any mix of Vocabulary and Kanji lessons into a **Mixed Test (Kiểm tra tổng hợp)**.
+Both categories share the **exact same item schema** and the **exact same quiz engine**, allowing learners to study lessons individually, test within a textbook (`Kiểm tra giáo trình`), or combine any mix of lessons across books into a **Mixed Test (Kiểm tra tổng hợp)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
 The application is built for:
 - Mobile phones (primary use case during daily commute and short study breaks)
@@ -45,7 +45,7 @@ Traditional flashcards often encourage passive recognition (flipping cards witho
 The core user journey is rapid, cyclical, and frictionless:
 
 ```
-Import or Select Lesson(s) (Vocabulary, Kanji, or Mixed)
+Browse Study Book or Category → Select Lesson(s)
                     ↓
            Start Practice Session
                     ↓
@@ -79,3 +79,4 @@ Import or Select Lesson(s) (Vocabulary, Kanji, or Mixed)
 7. **Clean Contextual Explanations:** When a mistake occurs, Tango displays the Kana, Vietnamese definition, and Hán Việt (if present). When Hán Việt is absent (e.g. Katakana words), the section is cleanly hidden.
 8. **Zero Clutter:** No intrusive popups, spammy notifications, excessive gamification gimmicks, or visual noise that distracts from learning.
 9. **No Feature Creep:** Maintain an uncompromising focus on vocabulary acquisition. Keep the MVP lean, reliable, and fast.
+10. **Safe Study-First UX:** The Home screen is dedicated purely to reading and studying. Destructive actions, content additions, and book management are safely placed under Settings → Content Management to eliminate accidental taps (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).

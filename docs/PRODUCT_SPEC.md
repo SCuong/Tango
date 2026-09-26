@@ -4,9 +4,20 @@ This specification defines the functional requirements and user experience for t
 
 ---
 
-## 1. Study Categories & Shared Study Item Model
+## 1. Study Hierarchy, Categories & Shared Study Item Model
 
-Tango organizes study content into two primary categories:
+Tango organizes study content under a clean, 4-tier learning hierarchy (detailed in [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)):
+```text
+Study Book / Giáo trình (e.g. 中級へ行こう, Mimikara)
+        ↓
+  Study Category ([IconBook] Từ vựng / [IconWriting] Hán tự)
+        ↓
+     Lesson (e.g. Bài 1, Bài 2)
+        ↓
+    StudyItem (Shared core item model)
+```
+
+Study content is partitioned into two primary categories:
 - **[IconBook] Từ vựng (Vocabulary):** General words, idioms, loanwords, and phrases.
 - **[IconWriting] Hán tự (Kanji):** Kanji vocabulary compounds and readings.
 
@@ -34,15 +45,16 @@ Every study item—whether from a Vocabulary or Kanji lesson—conforms to the e
 
 ---
 
-## 2. Lesson Structure & Organization
+## 2. Lesson Structure & Study Books Organization
 
-Both study categories share the identical `Lesson` model:
+Both study categories share the identical `Lesson` model, optionally associated with a `StudyBook`:
 
 ```typescript
 type StudyCategory = 'vocabulary' | 'kanji';
 
 interface Lesson {
   id: string;
+  bookId?: string;     // Optional reference to StudyBook.id
   category: StudyCategory;
   title: string;       // e.g., "Bài 1"
   subtitle?: string;   // e.g., "Du lịch & Giao thông" or "Chủ đề thức ăn nhanh"
@@ -55,6 +67,7 @@ interface Lesson {
 - **Kanji Section:** Displays Kanji lessons (`Bài 1`, `Bài 2`, `Bài 3`...).
 - Both categories reuse the **exact same** item components, lesson list views, progress models, and quiz engine.
 - Duplicate implementations (e.g., `VocabularyQuiz` vs. `KanjiQuiz`) are strictly prohibited.
+- For complete specifications on Study Books, book cover storage in IndexedDB, and the separate Content Management flow, see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md).
 
 ---
 
@@ -211,6 +224,8 @@ Nghĩa:
 
 Lesson import is a primary, first-class feature of the Tango MVP, enabling learners to immediately import classroom and textbook materials into either study category:
 - **Unified Processing:** Both Vocabulary and Kanji lessons use the identical importer, parser, and validation pipeline.
+- **Target Book Assignment:** Lessons may be assigned to an existing Study Book or left unassigned (`Không thuộc giáo trình`).
+- **Safe Administrative Placement:** The importer is accessed intentionally through Content Management under Settings (keeping the Home screen study-focused).
 - **Flexible Delimiters:** Supports Tab, Semicolon (`;`), Pipe (`|`), and Comma (`,`) with RFC 4180 CSV compliance.
 - **Multiple Formats:** Direct text paste, `.txt`, `.csv`, `.md` (Markdown tables), and `.xlsx` (Excel).
 - **Forgiving & Non-Blocking:** Automatically removes exact duplicates, safely merges complementary items, flags conflicts, and issues non-blocking warnings (`⚠`) for missing optional fields.
@@ -223,6 +238,8 @@ Lesson import is a primary, first-class feature of the Tango MVP, enabling learn
 The following items are strictly out of scope:
 - Individual Kanji character relationship graphs, trees, or radical decompositions
 - Separate quiz engines or duplicated UI components for Vocabulary vs. Kanji
+- Soft delete, recycle bin, trash recovery workflows, or archive systems (Tango uses explicit hard delete only)
+- Social book sharing, public marketplace, or ISBN/metadata lookups
 - AI chatbots, external LLM APIs, or AI content generation
 - Backend servers, authentication, and cloud synchronization
 - Audio synthesis, voice recognition, or handwriting canvas

@@ -440,19 +440,22 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 
 ## 16. Screen Design Specifications
 
-### 16.1 Home Screen (Dual Study Hub)
-- **Top Bar:** Tango wordmark, language toggle (`VI` / `EN`), appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`).
+### 16.1 Home Screen (Safe Study Hub)
+- **Top Bar:** Tango wordmark, appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`), and `IconSettings` (entry to preferences and Content Management).
 - **Hero Area:** Brief study greeting in selected UI language: `"Bạn muốn học gì hôm nay?"` / `"What would you like to learn today?"`.
-- **Category Cards (2 Large Clay Cards):**
-  - **[IconBook] Từ vựng (Vocabulary):** Soft indigo/slate clay elevation, lesson count, total words, overall mastery bar.
-  - **[IconWriting] Hán tự (Kanji):** Soft amber/plum clay elevation, lesson count, total words, overall mastery bar.
+- **Study Books Section (Giáo trình):**
+  - Responsive grid / scroll of textbook cards with cover image thumbnail, title, and lesson counts.
+  - Fallback placeholder uses a theme-aware clay card with `IconBook` (no emojis).
+  - Tapping opens the **Book Study View**. (Never triggers edit/delete).
+- **Learn by Type Section (Học theo loại):**
+  - **[IconBook] Từ vựng (Vocabulary):** Soft indigo/slate clay elevation, lesson count, total words.
+  - **[IconWriting] Hán tự (Kanji):** Soft amber/plum clay elevation, lesson count, total words.
 - **Combined Test Action Bar:**
-  - Full-width clay button: `[IconBolt] Kiểm tra tổng hợp (Mixed Test)`
-- **Secondary Action:**
-  - `[IconFileImport] Nhập bài mới (Import Lesson)` button with subtle border.
+  - Full-width clay button: `[IconBolt] Kiểm tra tổng hợp (Mixed Test)` across books.
+- **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
-### 16.2 Lesson List Screen
-- **Header:** Category title with `IconArrowLeft` back action, and `+ Nhập bài` shortcut.
+### 16.2 Lesson List & Category Screens
+- **Header:** Category / book title with `IconArrowLeft` back action (safe study navigation only; no administrative buttons).
 - **Lesson Rows:** Clean, readable card list displaying lesson number, topic subtitle, item count, and accuracy badge.
 - **Restraint Rule:** Individual list rows use flat surfaces with clean 1px dividers, preserving clay elevation for the primary "Bắt đầu học" button.
 
@@ -491,6 +494,18 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
   - Segmented toggle: `[ Off / On ]` (Tắt / Bật).
   - Default: **Off** (Tắt). Never plays audio until explicitly enabled.
   - Persisted in local storage (`tango_v1_preferences.soundEnabled`).
+- **Nội dung học Section (Study Content):**
+  - Row button linking to Content Management (`Quản lý giáo trình và bài học`).
+
+### 16.6 Content Management & Danger Zone Design
+- **Content Management Surface:** Structured, dense lists with restrained clay buttons (>= 48px touch targets).
+- **Danger Zone (Vùng nguy hiểm):** Bordered with a muted semantic warning/error line.
+- **Destructive Confirmation Dialog:**
+  - High-emphasis modal with semi-opaque backdrop (`backdrop-blur-sm`).
+  - Destructive action button: Semantic error red token (`--accent-red-surface` / `--accent-red-border` / `--accent-red-text`).
+  - Cancel button: Neutral surface, visually distinct, safe spacing from delete button, holds initial focus.
+  - Never default-focus the destructive action; `Enter` does not execute deletion.
+  - See [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md) for UX dialog specifications.
 
 ---
 
