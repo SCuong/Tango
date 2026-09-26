@@ -149,7 +149,7 @@ Every card or button on the Home study area leads toward **browsing, reading, or
 └────────────────────────────────────────────────────────┘
 ```
 
-- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (navigates directly to `Settings / Cài đặt`; Content Management is accessed through Settings).
+- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
 - **GIÁO TRÌNH:** Horizontal scroll or grid of responsive book cards. Tapping a card opens the **Book Study View**.
 - **HỌC THEO LOẠI:** Direct entry to browse lessons by category across all books.
 - **Kiểm tra tổng hợp:** Direct access to global multi-lesson quiz selection.
@@ -177,8 +177,18 @@ Cài đặt → Quản lý nội dung.
 #### Empty Review Screen ("Ôn lại từ sai"):
 - `"Tuyệt vời! Bạn không có từ nào cần ôn lại. Hãy tiếp tục luyện tập bài mới."`
 
-#### Empty Mixed Test:
+#### Empty Mixed Test (No Lessons Available):
 - `"Chưa có bài học nào khả dụng để tạo bài kiểm tra tổng hợp."`
+
+#### Quiz Configuration Empty State (N = 0):
+When no eligible questions can be formed (either no lessons are selected or the enabled question types require fields missing from all selected items):
+- Do NOT render `Tất cả (0)`
+- Do NOT render fixed question count buttons (`10`, `20`, `40`)
+- Disable or hide the Start Test action
+- Show clear explanatory message:
+  - **Vietnamese:** `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."`
+  - **English:** `"No eligible questions for the selected question types."`
+- The user can adjust selected lessons, toggle question types, or navigate back safely. No error dialog is necessary.
 
 *Ergonomic Mandate:* Empty states never inject quick "+ Add" or destructive buttons into the study canvas. The deliberate route through Settings preserves a serene, accidental-click-free learning experience.
 
@@ -356,7 +366,9 @@ Bài 2: Hành động & Đi lại
 
 - Study actions are triggered deliberately at the lesson level.
 - Users are never plunged unexpectedly into a test without first seeing the lesson overview.
-- **Dynamic Candidate Counts Rule:** In Quick Test and multi-lesson quizzes, fixed candidate counts (`10`, `20`, `40`) are displayed dynamically only when `<= N` (total unique items in the pool). The full pool option `Tất cả (N)` is always rendered and presents exactly $N$ questions for $N$ unique items.
+- **Canonical Definition of N:** $N$ is the number of **eligible unique StudyItems** after BOTH deduplication (by `normalized(japanese) + '::' + normalized(kana || '')`) and question-type compatibility filtering against enabled question formats.
+- **Dynamic Candidate Counts Rule:** In Quick Test and multi-lesson quizzes, fixed candidate counts (`10`, `20`, `40`) are displayed dynamically only when `<= N`. When $N > 0$, the full pool option `Tất cả (N)` presents exactly $N$ initial questions for the $N$ eligible unique items (never multiplied by question types).
+- **The N = 0 State:** If $N = 0$, `Tất cả (0)` and fixed count buttons are **never** rendered. The Start Test action is disabled/hidden, and an explanatory empty state is shown ("Không có câu hỏi phù hợp với các loại câu hỏi đã chọn." / "No eligible questions for the selected question types.").
 
 ---
 
@@ -436,9 +448,25 @@ Số câu hỏi:
 
 ### Technical Note:
 1. **Shared Pipeline:** In all scopes (Category, Book, Global), the selector outputs an array of `lessonIds: string[]`.
-2. **Deduplication:** The quiz engine queries `tango_v1_lessons`, collects all underlying `StudyItem` records, and deduplicates them using `normalized(japanese) + '::' + normalized(kana || '')`.
-3. **Dynamic Candidate Slicing:** Candidate fixed buttons (`10`, `20`, `40`) are rendered dynamically only when `<= N` (total unique items). The full pool button `Tất cả (N)` is always rendered.
-4. **Authoritative `questionCount: 'all'` Rule:** Selecting `Tất cả (N)` generates **exactly one initial question per eligible unique StudyItem** ($N$ unique items = $N$ questions). It **NEVER multiplies** the item count by the number of active question types. Each unique item is assigned one compatible question type at runtime, ensuring balanced coverage without repetitive drill fatigue.
+2. **Canonical Pool Resolution Pipeline & Definition of N:**
+   ```text
+   selected lessonIds
+            ↓
+   collect StudyItems from tango_v1_lessons
+            ↓
+   deduplicate by normalized Japanese + Kana
+            ↓
+   filter items against enabled QuestionTypes and available item fields
+            ↓
+   eligible unique StudyItems
+            ↓
+            N
+   ```
+   `N` is strictly the number of **eligible unique StudyItems after both deduplication and compatibility filtering**.
+3. **Dynamic Candidate Slicing:** Candidate fixed buttons (`10`, `20`, `40`) are rendered dynamically only when `<= N`.
+4. **Authoritative `questionCount: 'all'` Rule:** Selecting `Tất cả (N)` generates **exactly one initial question per eligible unique StudyItem** ($N$ eligible unique items = $N$ initial questions). It **NEVER multiplies** item count by the number of active question types. Each unique item is assigned exactly one enabled compatible question type (e.g., items lacking `kana` skip `kana_to_japanese`; items lacking `vietnamese` skip `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`).
+5. **Practice Mode Note:** Practice Mode may requeue missed items after the initial set, so total interactions during practice may exceed $N$.
+6. **The N = 0 State:** If $N = 0$, `Tất cả (0)` and fixed count buttons are **not** rendered, the Start Test action is disabled/hidden, and an explanatory empty state is shown: `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."` / `"No eligible questions for the selected question types."` Users can adjust lesson selections, toggle question types, or go back without error modals.
 
 ---
 
@@ -628,7 +656,7 @@ Thao tác này sẽ xóa vĩnh viễn bài học và toàn bộ 20 mục học b
 
 User capabilities in Lesson Management:
 - Edit lesson title
-- Switch category (`vocab` ↔ `kanji`)
+- Switch category (`vocabulary` ↔ `kanji`)
 - Move lesson to another Study Book (or mark as Unassigned)
 - Inspect underlying study items
 - Permanently delete the individual lesson via its dedicated Danger Zone (triggers explicit confirmation modal)
@@ -751,17 +779,27 @@ Tapping `[ Xóa giáo trình ]` inside the Danger Zone displays a high-contrast 
 
 ### 17.3 Delete Book Cascade Guarantees:
 
-When permanent deletion of a Study Book is confirmed, Tango executes an **ordered, idempotent hard-delete cascade** spanning browser `localStorage` and `IndexedDB`. Because web browsers do not provide atomic transactions across `localStorage` and `IndexedDB`, this sequence is executed deterministically in an order that guarantees consistency and is safe to retry if interrupted:
+When permanent deletion of a Study Book is confirmed, Tango executes an **ordered, idempotent hard-delete cascade** spanning browser `localStorage` and `IndexedDB`. Because web browsers do not provide atomic transactions across `localStorage` and `IndexedDB`, this sequence is executed deterministically in an order that guarantees consistency and is safe to retry if interrupted.
 
-1. **Query Affected Lessons:** Retrieve all `Lesson` records from the mutable store `tango_v1_lessons` where `lesson.bookId === deletedBookId`.
-2. **Collect Affected Study Items:** Extract all `StudyItem.id`s belonging to those identified lessons.
-3. **Purge Item Progress:** In `tango_v1_progress`, delete all `ItemProgress` and mistake-tracking records matching any of the collected `StudyItem.id`s.
-4. **Purge Quiz Histories (Entire Session Deletion Rule):** Scan `tango_v1_history`. If any stored `QuizSessionResult` references any deleted `lessonId` (in its `lessonIds` array) or any deleted `StudyItem.id` (in its question or mistake details), **delete that entire session record**. Partial or corrupt history records are never retained.
-5. **Clear Active Selections:** If any deleted `lessonId` is present in active multi-lesson selector state, navigation state, or in-flight review filters, purge it immediately.
-6. **Remove Lesson Records (Non-Resurrection Guarantee):** Permanently remove the matching `Lesson` records from `tango_v1_lessons`. Because bundled JSON files are one-time initial seed data (marked by `tango_v1_library_init`), deleting lessons from `tango_v1_lessons` guarantees they are never resurrected on app reload, PWA update, or cache refresh.
-7. **Remove Book Record:** Delete the `StudyBook` record from `tango_v1_books`.
-8. **Delete Cover Blob from IndexedDB:** Asynchronously delete the binary image blob from the `covers` object store in `tango_v1_covers_idb` matching `coverImageId` (if one was assigned).
-9. **Idempotence & Fault Tolerance:** Every step checks for existence prior to deletion or gracefully ignores missing records. If IndexedDB or localStorage is interrupted, running the cascade again cleans up any remaining fragments without throwing unhandled exceptions.
+Before mutating any persistent storage, Tango resolves and retains all required identifiers in memory:
+- `deletedBookId`
+- `coverImageId` (resolved from `StudyBook.coverImageId` before deletion)
+- `affectedLessonIds`
+- `affectedStudyItemIds`
+- `affectedHistoryIds`
+
+#### Conceptual Hard-Delete Ordering for Study Book Deletion:
+1. **Resolve Full Deletion Scope & Identifiers in Memory:** Retrieve `deletedBookId`, `coverImageId`, all `affectedLessonIds` where `lesson.bookId === deletedBookId`, all `affectedStudyItemIds` belonging to those lessons, and all `affectedHistoryIds` referencing any affected lesson or item.
+2. **Clear In-Memory & Active References:** Clear any active multi-lesson selector checkboxes, navigation breadcrumbs, or in-flight review filters referencing `affectedLessonIds`.
+3. **Purge Affected ItemProgress:** In `tango_v1_progress`, delete all `ItemProgress` and mistake-tracking records matching `affectedStudyItemIds`.
+4. **Delete Entire Affected QuizSessionResult History Records:** Scan `tango_v1_history`. If any stored `QuizSessionResult` references any deleted `lessonId` (in its `lessonIds` array) or any deleted `StudyItem.id` (in its question or mistake details), **delete that entire session record**. Partial or corrupt history records are never retained.
+5. **Delete Cover Blob from IndexedDB Using the Already-Resolved `coverImageId`:** Asynchronously delete the binary image blob from the `covers` object store in `tango_v1_covers_idb` matching `coverImageId` (if one was assigned). Deleting the cover blob while book metadata is still intact ensures that if an interruption occurs, retry logic can still read `coverImageId`.
+6. **Delete Affected Lesson Records:** Permanently remove all `affectedLessonIds` from `tango_v1_lessons`. Because bundled JSON files are one-time initial seed data (marked by `tango_v1_library_init`), deleting lessons from `tango_v1_lessons` guarantees they are never resurrected on app reload, PWA update, or cache refresh.
+7. **Delete StudyBook Metadata from `tango_v1_books` LAST:** Delete the `StudyBook` record from `tango_v1_books` as the final mutation step.
+8. **Verify No Dangling References Remain:** Confirm that no orphaned lesson, progress, history, or image references remain.
+
+> [!IMPORTANT]
+> **Key Invariant:** `StudyBook` metadata is deleted **last** because it contains the canonical reference needed to locate and verify the cover Blob in IndexedDB.
 
 *Result: Zero orphaned IDs, zero ghost storage, zero broken navigation links, zero resurrection of deleted lessons.*
 
@@ -789,12 +827,12 @@ Lessons can only be deleted individually from within the dedicated **Lesson Mana
 
 ### 18.1 Lesson Cascade Behavior:
 When confirmed, Tango executes the ordered, idempotent lesson deletion cascade:
-1. **Collect Items:** Collect all `StudyItem.id`s belonging to the target lesson.
-2. **Purge Progress:** Delete all records for these item IDs from `tango_v1_progress`.
-3. **Purge Entire Quiz History Sessions:** Remove any `QuizSessionResult` from `tango_v1_history` referencing this `lessonId` or its item IDs.
-4. **Remove Lesson Record:** Remove the lesson from `tango_v1_lessons` (permanent hard delete; will not resurrect).
-5. **Clear Active Filters:** Clear any active multi-lesson selector checkboxes referencing this lesson.
-6. **Parent Book Preserved:** The parent `StudyBook` remains intact, with its lesson count and total item count updated.
+1. **Resolve Scope & Identifiers in Memory:** Resolve `targetLessonId`, its nested `affectedStudyItemIds`, and all `affectedHistoryIds` referencing this lesson or its items.
+2. **Clear In-Memory & Active References:** Clear any active multi-lesson selector checkboxes or active filters referencing `targetLessonId`.
+3. **Purge Affected ItemProgress:** In `tango_v1_progress`, delete all records for `affectedStudyItemIds`.
+4. **Delete Entire Affected Quiz History Records:** Remove any `QuizSessionResult` from `tango_v1_history` matching `affectedHistoryIds`.
+5. **Delete Target Lesson Record from `tango_v1_lessons` LAST:** Remove `targetLessonId` from `tango_v1_lessons` as the final mutation step (permanent hard delete; will not resurrect).
+6. **Verify Parent Study Book:** The parent `StudyBook` remains intact, with its lesson count and total item count updated.
 
 ---
 
@@ -814,16 +852,16 @@ Removing a cover image is an independent, non-destructive operation on book data
 └────────────────────────────────────────────────────────┘
 ```
 
-- Deletes the blob from IndexedDB.
-- Clears `StudyBook.coverImageId = undefined`.
-- Reverts card display to the theme-aware placeholder.
-- **All lessons and study data remain 100% intact.**
+- **Cover Blob Deletion:** Deletes the binary image blob from the `covers` object store in IndexedDB (`tango_v1_covers_idb`).
+- **Metadata Update:** Clears `StudyBook.coverImageId = undefined` in `tango_v1_books`.
+- **Card Fallback:** Reverts card display to the theme-aware ceramic clay placeholder.
+- **Strict Decoupling from Book Deletion:** Removing a cover image is strictly decoupled from book hard-delete semantics. It only affects the cover image blob and property. The `StudyBook` record itself, all its `Lesson` records in `tango_v1_lessons`, nested `StudyItem` records, `ItemProgress` in `tango_v1_progress`, and `QuizSessionResult` records in `tango_v1_history` remain 100% intact and untouched.
 
 ---
 
-## 20. Moving Lessons Between Books
+## 20. Moving Lessons Between Books & Category Switch Safety
 
-In Content Management, a lesson's book assignment can be updated:
+In Content Management (or the dedicated Lesson Management view), a lesson's book assignment or category can be updated:
 
 ```text
 Chuyển giáo trình cho bài học
@@ -836,9 +874,8 @@ Chuyển sang:
 [ Hủy ]                          [ Lưu thay đổi ]
 ```
 
-- Reassigns `Lesson.bookId`.
-- Does **not** duplicate items or reset progress.
-- Explicit save required (no accidental auto-commit on dropdown focus).
+- **Preservation of IDs & Progress:** Reassigning `Lesson.bookId` (or switching category `vocabulary` ↔ `kanji`) modifies only organizational metadata on the existing `Lesson` record. It preserves `Lesson.id`, nested `StudyItem.id`s, `ItemProgress` in `tango_v1_progress`, and quiz histories in `tango_v1_history`. Items and lessons are never recreated or duplicated.
+- **Explicit Save Required:** Changes require an explicit tap on `[ Lưu thay đổi ]` (no accidental auto-commit on dropdown focus).
 
 ---
 

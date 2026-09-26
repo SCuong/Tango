@@ -169,18 +169,56 @@ export interface QuizConfig {
 ```
 
 ### 3.2 Question Count & Pool Generation Rules
-- **Definition of `questionCount: 'all'`:** After aggregating lessons and deduplicating by `normalized(japanese) + '::' + normalized(kana || '')`, every eligible unique `StudyItem` appears **exactly once** in the initial question set.
-  - It does **NOT** multiply by the number of enabled question types (e.g. 52 eligible items = 52 initial questions, never 52 × 4 = 208).
-  - For each unique item, exactly ONE enabled compatible question type is selected.
-  - Missing data skips incompatible types: an item with no `kana` skips `kana_to_japanese`; an item with empty `vietnamese` definitions skips `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`. If an item supports none of the enabled question types, it is excluded.
-  - `Tất cả (N)` / `All (N)` always displays the exact count of eligible unique items (`N`), not raw source item counts.
-  - *Practice Mode Note:* In Practice Mode, missed items may be re-queued after the initial question set until answered correctly, so total interactions in the session may exceed `N`.
-- **Dynamic Fixed Count Options:** Candidate fixed numbers are `10`, `20`, `40`. The UI only displays fixed counts that are `<= N`.
-  - Example `N = 7`: `[ Tất cả (7) ]`
-  - Example `N = 16`: `[ 10 ]  [ Tất cả (16) ]`
-  - Example `N = 27`: `[ 10 ]  [ 20 ]  [ Tất cả (27) ]`
-  - Example `N = 81`: `[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả (81) ]`
-  - Disabled or impossible count buttons are never rendered.
+
+#### Canonical Pool Resolution Pipeline & Definition of N
+```text
+selected lessonIds
+         ↓
+collect StudyItems from tango_v1_lessons
+         ↓
+deduplicate by normalized Japanese + Kana
+         ↓
+filter items against enabled QuestionTypes and available item fields
+         ↓
+eligible unique StudyItems
+         ↓
+         N
+```
+
+> **Canonical Definition of N:**
+> `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering**.
+> 
+> Example: 20 unique items deduplicated across lessons may yield $N = 15$ if 5 items lack required fields (e.g. missing `vietnamese` when only Vietnamese-based questions are enabled).
+
+#### Authoritative `questionCount: 'all'` Rule
+- Selecting `questionCount: 'all'` generates **exactly one initial question per eligible unique StudyItem** ($N$ eligible unique items = $N$ initial questions).
+- It does **NOT** multiply by the number of enabled question types (e.g., 52 eligible items = 52 initial questions, never 52 × 4 = 208).
+- For each unique item, exactly **ONE** enabled compatible QuestionType is selected:
+  - If `kana` is missing: skips `kana_to_japanese`.
+  - If `vietnamese` is empty: skips `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`.
+  - If an item supports none of the enabled question types, it is excluded from `N`.
+- *Practice Mode Note:* In Practice Mode, missed items may be re-queued after the initial question set until answered correctly, so total interactions in the session may exceed `N`.
+
+#### Dynamic Fixed Count Options
+Candidate fixed question count options are `10`, `20`, `40`. The UI only renders fixed count buttons where:
+```text
+candidate <= N
+```
+- Example $N = 7$: `[ Tất cả (7) ]`
+- Example $N = 16$: `[ 10 ]  [ Tất cả (16) ]`
+- Example $N = 27$: `[ 10 ]  [ 20 ]  [ Tất cả (27) ]`
+- Example $N = 81$: `[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả (81) ]`
+- Disabled or impossible count buttons are never rendered.
+
+#### The N = 0 State (Empty / Incompatible Selection)
+If $N = 0$:
+- Do **NOT** render `Tất cả (0)`
+- Do **NOT** render fixed question count buttons
+- Disable or hide the Start Test action appropriately
+- Render a clear, non-blocking explanatory empty state:
+  - **Vietnamese:** `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."`
+  - **English:** `"No eligible questions for the selected question types."`
+- The user can freely toggle question types, change selected lessons, or navigate back safely. No disruptive error modals are used.
 
 > **Cross-Category Pool Deduplication:** When building the study question pool from multiple lessons, items are deduplicated using `normalized(japanese) + '::' + normalized(kana || '')` to ensure the same word appearing in both Vocabulary and Kanji is not tested redundantly.
 

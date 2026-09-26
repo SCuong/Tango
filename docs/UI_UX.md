@@ -49,7 +49,7 @@ The Home screen is dedicated purely to reading and studying. Administrative, imp
 └───────────────────────────────────────────────┘
 ```
 
-- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (entry to preferences and Content Management).
+- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
 - **GIÁO TRÌNH Cards:** Tapping a book opens its **Book Study View**. (Never triggers edit/delete).
 - **HỌC THEO LOẠI:** Browse lessons by category across all textbooks.
 - **[IconBolt] Kiểm tra tổng hợp:** Direct access to the global multi-lesson quiz builder across books.
@@ -87,7 +87,7 @@ HÁN TỰ (5 bài · 82 mục)
 Selecting a lesson opens the **Lesson Detail view**, offering:
 - Items preview (Japanese, Kana, Vietnamese, optional Hán Việt)
 - "Luyện tập" (Practice Mode)
-- "Kiểm tra nhanh" (Quick Test: 10 / 20 / 40 / Tất cả (N); candidate counts `10`, `20`, `40` shown dynamically only when `<= N`)
+- "Kiểm tra nhanh" (Quick Test: 10 / 20 / 40 / Tất cả (N); $N$ = eligible unique StudyItems after deduplication and question-type compatibility filtering; candidate counts `10`, `20`, `40` shown dynamically only when `<= N`; if $N = 0$, count buttons are hidden and the $N = 0$ empty state is shown)
 
 *Kanji lessons display flat lists of StudyItem entries, avoiding complex character trees.*
 
@@ -130,7 +130,11 @@ Loại câu hỏi
 [ Bắt đầu kiểm tra (79 mục đã chọn) ]
 ```
 
-*Note on Question Count:* Candidate count buttons (`10`, `20`, `40`) are shown dynamically only when `<= N` (total unique items in the combined selection). Selecting `Tất cả (N)` presents exactly $N$ questions (one initial question per unique item), never multiplying by question types.
+*Note on Question Count & Canonical Definition of N:*
+- `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering**.
+- Candidate count buttons (`10`, `20`, `40`) are rendered dynamically only when `<= N`.
+- Selecting `Tất cả (N)` presents exactly $N$ initial questions for the $N$ eligible unique items, never multiplying by question types.
+- *The N = 0 State:* If $N = 0$, `Tất cả (0)` and fixed count buttons are **never** rendered. The Start Test button is disabled/hidden, and an explanatory empty state is shown: `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."` / `"No eligible questions for the selected question types."` Users can adjust lessons or question types without modal errors.
 
 ---
 

@@ -67,8 +67,8 @@ All user progress, weak-word markers, session histories, books, and mutable less
 ├──────────────────────────┼──────────────────────────────────────┤
 │ tango_v1_books           │ StudyBook metadata (id, title,       │
 │                          │ coverImageId, timestamps) in LS      │
-│ tango_v1_lessons         │ Canonical mutable Lesson records &   │
-│                          │ nested StudyItems in localStorage    │
+│ tango_v1_lessons         │ Canonical mutable                    │
+│                          │ Record<string, Lesson> in LS         │
 │ tango_v1_progress        │ StudyItem error/pass counts,         │
 │                          │ weak status keyed by itemId in LS    │
 │ tango_v1_history         │ QuizSessionResult records in LS      │
@@ -90,15 +90,32 @@ All user progress, weak-word markers, session histories, books, and mutable less
 - **IndexedDB Blob Store:** Cover images are stored directly as binary `Blob` objects in an IndexedDB database (`tango_v1_covers_idb`) referenced by `StudyBook.coverImageId`.
 
 ### 4.3 Ordered, Idempotent Hard-Delete Cascade
-Browser storage operations span `localStorage` and `IndexedDB`. Because no single browser transaction can span both storage systems atomically, Tango defines an **ordered, idempotent hard-delete cascade** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)). Each step is deterministic and safe to re-run:
-1. **Resolve Scope:** Determine target `Lesson` IDs and all nested `StudyItem` IDs belonging to the book or lesson.
-2. **Clear Active Selections:** Remove target lesson IDs from any active multi-lesson quiz configuration.
-3. **Purge Progress Records:** Delete `ItemProgress` entries for the resolved item IDs from `tango_v1_progress`.
-4. **Purge Quiz History Entries:** Deterministically delete any `QuizSessionResult` record in `tango_v1_history` that references any of the affected lesson IDs or item IDs (preventing corrupt or misleading partial summaries).
-5. **Delete Lesson Records:** Remove target lessons from `tango_v1_lessons`.
-6. **Delete Book Metadata:** Remove `StudyBook` entry from `tango_v1_books` (if deleting a book).
-7. **Delete Cover Blob:** In IndexedDB (`tango_v1_covers_idb`), delete the binary cover blob keyed by `coverImageId` (if present).
+Browser storage operations span `localStorage` and `IndexedDB`. Because no single browser transaction can span both storage systems atomically, Tango defines an **ordered, idempotent hard-delete cascade** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)). To guarantee retry safety if an interruption occurs, all required identifiers are resolved and retained in memory before mutating persistent stores:
+- `deletedBookId`
+- `coverImageId` (resolved from `StudyBook.coverImageId` before deletion)
+- `affectedLessonIds`
+- `affectedStudyItemIds`
+- `affectedHistoryIds`
+
+#### Conceptual Hard-Delete Sequence for Study Books:
+1. **Resolve Full Scope & Identifiers in Memory:** Retrieve `deletedBookId`, `coverImageId`, all `affectedLessonIds` where `lesson.bookId === deletedBookId`, all `affectedStudyItemIds` belonging to those lessons, and all `affectedHistoryIds` referencing any affected lesson or item.
+2. **Clear In-Memory & Active References:** Clear any active multi-lesson quiz selections, navigation breadcrumbs, or in-flight review filters referencing `affectedLessonIds`.
+3. **Purge Affected ItemProgress:** In `tango_v1_progress`, delete all `ItemProgress` entries for `affectedStudyItemIds`.
+4. **Delete Entire Affected QuizSessionResult History Records:** Delete any `QuizSessionResult` in `tango_v1_history` matching `affectedHistoryIds`. Partial histories are never retained.
+5. **Delete Cover Blob from IndexedDB:** Asynchronously delete the binary cover blob from `tango_v1_covers_idb` using the already-resolved `coverImageId` (if present). Deleting the blob while book metadata is still intact guarantees that if an interruption occurs, retry logic can still locate the cover blob.
+6. **Delete Affected Lesson Records:** Remove all `affectedLessonIds` from the `tango_v1_lessons` map.
+7. **Delete StudyBook Metadata LAST:** Delete the `StudyBook` record from `tango_v1_books` as the final mutation step.
 8. **Verify Integrity:** Confirm no dangling references or orphaned IDs remain.
+
+> **Key Invariant:** `StudyBook` metadata is deleted **last** because it contains the canonical reference needed to locate and verify the cover Blob in IndexedDB.
+
+#### Conceptual Hard-Delete Sequence for Individual Lessons:
+1. **Resolve Scope & Identifiers in Memory:** Resolve `targetLessonId`, its nested `affectedStudyItemIds`, and `affectedHistoryIds`.
+2. **Clear In-Memory & Active References:** Remove `targetLessonId` from active quiz selections or filters.
+3. **Purge Affected ItemProgress:** Delete progress records for `affectedStudyItemIds` from `tango_v1_progress`.
+4. **Delete Entire Affected QuizSessionResult Records:** Remove any session referencing `targetLessonId` or its item IDs from `tango_v1_history`.
+5. **Delete Target Lesson Record LAST:** Remove `targetLessonId` from `tango_v1_lessons` as the final step.
+6. **Verify Parent Study Book:** The parent `StudyBook` remains intact, with its lesson and item counters updated.
 
 ### 4.4 Audio Feedback Architecture (Optional, Off by Default)
 - **Engine:** Pure client-side Web Audio API synthesizer or lightweight tiny audio buffers (< 20KB total).
@@ -183,6 +200,7 @@ src/
 │   ├── content-management/    # Administrative content controls (accessed via Settings)
 │   │   ├── ContentManager.tsx # Main management screen (Books list + Lessons list)
 │   │   ├── BookEditor.tsx     # Add / Edit book modal & cover picker
+│   │   ├── LessonManager.tsx  # Dedicated lesson inspector, title/category/book editing & Danger Zone
 │   │   ├── DangerZone.tsx     # Explicit permanent delete dialogs (Hard Delete Only)
 │   │   └── LessonImporter.tsx # Authoritative import interface (see docs/IMPORT_SPEC.md)
 │   ├── quiz/                  # Shared quiz engine (used for all tests)
@@ -215,7 +233,7 @@ src/
 ### Directory Responsibilities
 - `src/features/books/`: Study Book cards on Home and the safe Book Study View.
 - `src/features/lessons/`: Category views, Lesson Detail, and multi-lesson quiz configuration.
-- `src/features/content-management/`: Protected management hub accessed via Settings (Add/Edit Book, LessonImporter, Danger Zone hard deletion).
+- `src/features/content-management/`: Protected management hub accessed via Settings. Contains `ContentManager` (overview), `BookEditor` (add/edit books and cover picker), `LessonManager` (dedicated lesson inspector responsible for editing lesson title, subtitle, switching category `vocabulary` ↔ `kanji`, reassigning parent Study Book or Unassigned, inspecting lesson items, and launching hard-delete confirmation), `LessonImporter` (authoritative import interface), and `DangerZone` (reusable hard-delete confirmation dialogs).
 - `src/features/quiz/`: The **single, reusable quiz system** that powers Practice Mode, Quick Tests, Book Tests, Mixed Tests, and Review Sessions.
 - `src/lib/quizEngine.ts`: Algorithmic engine that takes `lessonIds: string[]`, collects items, deduplicates, and generates questions.
 - `src/lib/storage.ts`: Dual-tier client storage handling `localStorage` metadata and IndexedDB binary cover blobs with cascade cleanup.

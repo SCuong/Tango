@@ -442,7 +442,7 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 ## 16. Screen Design Specifications
 
 ### 16.1 Home Screen (Safe Study Hub)
-- **Top Bar:** Tango wordmark, appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`), and `IconSettings` (entry to preferences and Content Management).
+- **Top Bar:** Tango wordmark, appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`), and `IconSettings` (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
 - **Hero Area:** Brief study greeting in selected UI language: `"Bạn muốn học gì hôm nay?"` / `"What would you like to learn today?"`.
 - **Study Books Section (Giáo trình):**
   - Responsive grid / scroll of textbook cards with cover image thumbnail, title, and lesson counts.

@@ -420,7 +420,8 @@ Imported lessons integrate immediately into the shared quiz engine:
 
 Custom imported lessons are stored client-side in browser `localStorage` in the single canonical mutable lesson store:
 - **Storage Key:** `tango_v1_lessons`
-- **Schema:** Array of `Lesson` objects (alongside initialized seed lessons; see [`docs/ARCHITECTURE.md`](./ARCHITECTURE.md) and [`docs/DATA_MODEL.md`](./DATA_MODEL.md)).
+- **Schema:** `Record<string, Lesson>` keyed by unique `Lesson.id` (alongside initialized seed lessons; see [`docs/ARCHITECTURE.md`](./ARCHITECTURE.md) and [`docs/DATA_MODEL.md`](./DATA_MODEL.md)).
+- **Import Write Operation:** The importer persists imported lessons conceptually via `lessons[newLesson.id] = newLesson` into the canonical map.
 - **Offline / PWA Ready:** Zero backend or cloud sync required; immediately available offline.
 
 ---

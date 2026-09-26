@@ -139,10 +139,11 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
 
 > **Deduplication Key:** Because the same Japanese vocabulary expression may appear in both Vocabulary and Kanji lessons (with different item IDs), deduplication must **not** rely solely on `item.id`. Instead, the study pool deduplicates items using `normalized(japanese) + '::' + normalized(kana || '')`.
 
-> **Question Pool Slicing & `questionCount: 'all'`:**
-> - Candidate fixed count buttons (`10`, `20`, `40`) are displayed dynamically only when `<= N` (total unique items in the deduplicated pool).
-> - The full pool button `Tất cả (N)` is always displayed.
-> - Selecting `Tất cả (N)` generates **exactly one initial question per eligible unique StudyItem** ($N$ unique items = $N$ questions). It never multiplies the item count by the number of active question types.
+> **Canonical Definition of N & Pool Slicing:**
+> - `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering**.
+> - Candidate fixed count buttons (`10`, `20`, `40`) are displayed dynamically only when `<= N`.
+> - Selecting `Tất cả (N)` generates **exactly one initial question per eligible unique StudyItem** ($N$ eligible unique items = $N$ initial questions). It never multiplies the item count by the number of active question types.
+> - *The N = 0 State:* If $N = 0$, `Tất cả (0)` and fixed count buttons are **never** rendered. The Start Test action is disabled/hidden, and an explanatory empty state is shown: `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."` / `"No eligible questions for the selected question types."` Users can adjust lessons, toggle question types, or go back safely.
 
 ---
 
@@ -158,7 +159,7 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
 
 ### 5.2 Quick Test (Kiểm tra tính điểm)
 - **Purpose:** Assessment, time-boxed retention check.
-- **Question Counts:** Dynamic candidate options (`10`, `20`, `40` shown only when `<= N`) plus `Tất cả (N)`. Exactly $N$ questions for $N$ unique items when selecting `Tất cả`.
+- **Question Counts:** Dynamic candidate options (`10`, `20`, `40` shown only when `<= N`) plus `Tất cả (N)`. Exactly $N$ questions for $N$ eligible unique items when selecting `Tất cả`. If $N = 0$, count buttons are hidden and the $N = 0$ empty state is shown.
 - **HUD Elements:**
   - Question progress (`4 / 20`)
   - Running score
