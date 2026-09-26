@@ -533,7 +533,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
 /* Base Spacing & Sizing */
 :root {
   --font-ui: "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
-  --font-jp: "Noto Sans JP", "Hiragino Sans", sans-serif;
+  --font-japanese: "Noto Sans JP", "Hiragino Sans", sans-serif;
 
   --radius-sm: 6px;
   --radius-md: 10px;

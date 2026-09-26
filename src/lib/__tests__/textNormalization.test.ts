@@ -5,8 +5,6 @@ import {
   normalizeKana,
   normalizeVietnamese,
   getDeduplicationKey,
-  matchesVietnamese,
-  matchesJapaneseOrKana,
 } from '../textNormalization';
 
 describe('textNormalization', () => {
@@ -106,61 +104,5 @@ describe('textNormalization', () => {
       expect(key1).toBe('ファストフード::ふぁすとふーど');
     });
   });
-
-  describe('matchesVietnamese', () => {
-    const definitions = ['du lịch', 'chuyến đi'];
-
-    it('matches exact case', () => {
-      expect(matchesVietnamese('du lịch', definitions)).toBe(true);
-    });
-
-    it('matches case-insensitively', () => {
-      expect(matchesVietnamese('Du Lịch', definitions)).toBe(true);
-      expect(matchesVietnamese('DU LỊCH', definitions)).toBe(true);
-      expect(matchesVietnamese('Chuyến Đi', definitions)).toBe(true);
-    });
-
-    it('matches despite decomposed NFD input', () => {
-      const nfdInput = 'Du Li\u0323ch'; // Decomposed "Du Lịch"
-      expect(matchesVietnamese(nfdInput, definitions)).toBe(true);
-    });
-
-    it('ignores extraneous leading/trailing whitespace', () => {
-      expect(matchesVietnamese('  du lịch  ', definitions)).toBe(true);
-    });
-
-    it('rejects incorrect definitions', () => {
-      expect(matchesVietnamese('đi bộ', definitions)).toBe(false);
-      expect(matchesVietnamese('', definitions)).toBe(false);
-    });
-  });
-
-  describe('matchesJapaneseOrKana', () => {
-    it('matches exact Japanese compound', () => {
-      expect(matchesJapaneseOrKana('旅行', '旅行', 'りょこう')).toBe(true);
-    });
-
-    it('matches Japanese with half-width katakana input', () => {
-      expect(matchesJapaneseOrKana('ﾌｧｽﾄﾌｰﾄﾞ', 'ファストフード', 'ふぁすとふーど')).toBe(true);
-    });
-
-    it('matches Kana reading', () => {
-      expect(matchesJapaneseOrKana('りょこう', '旅行', 'りょこう')).toBe(true);
-    });
-
-    it('matches with extra surrounding whitespace', () => {
-      expect(matchesJapaneseOrKana('  \u3000旅行  ', '旅行', 'りょこう')).toBe(true);
-      expect(matchesJapaneseOrKana('  りょこう  ', '旅行', 'りょこう')).toBe(true);
-    });
-
-    it('handles target without Kana', () => {
-      expect(matchesJapaneseOrKana('旅行', '旅行')).toBe(true);
-      expect(matchesJapaneseOrKana('りょこう', '旅行')).toBe(false);
-    });
-
-    it('rejects incorrect input', () => {
-      expect(matchesJapaneseOrKana('実際', '旅行', 'りょこう')).toBe(false);
-      expect(matchesJapaneseOrKana('', '旅行', 'りょこう')).toBe(false);
-    });
-  });
 });
+

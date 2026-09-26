@@ -91,36 +91,3 @@ export function getDeduplicationKey(japanese: string, kana?: string | null): str
   return `${normalizeJapanese(japanese)}::${normalizeKana(kana)}`;
 }
 
-/**
- * Case-insensitive, NFC-normalized Vietnamese definition comparison for written quiz evaluation.
- */
-export function matchesVietnamese(input: string, acceptedDefinitions: string[]): boolean {
-  const normalizedInput = normalizeVietnamese(input).toLowerCase();
-  if (!normalizedInput) return false;
-  return acceptedDefinitions.some(
-    (def) => normalizeVietnamese(def).toLowerCase() === normalizedInput
-  );
-}
-
-/**
- * Evaluates written Japanese answer for vi_to_text quiz mode.
- * Learner may provide either the Japanese expression or the Kana reading.
- */
-export function matchesJapaneseOrKana(
-  input: string,
-  targetJapanese: string,
-  targetKana?: string | null
-): boolean {
-  const normalizedInput = normalizeJapanese(input);
-  if (!normalizedInput) return false;
-
-  if (normalizedInput === normalizeJapanese(targetJapanese)) {
-    return true;
-  }
-
-  if (targetKana && normalizedInput === normalizeKana(targetKana)) {
-    return true;
-  }
-
-  return false;
-}
