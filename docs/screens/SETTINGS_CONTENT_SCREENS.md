@@ -82,15 +82,29 @@ The single protected administrative hub for adding, editing, and managing textbo
   - `[IconPlus] Thêm giáo trình mới` $\rightarrow$ [SCREEN 18: Add Study Book](#screen-18-add-study-book-thêm-giáo-trình).
   - `[ Quản lý ]` beside a book $\rightarrow$ [SCREEN 19: Manage Study Book](#screen-19-manage-study-book-quản-lý-giáo-trình).
   - `[IconFileImport] Thêm / Nhập bài học mới` $\rightarrow$ [SCREEN 21: Import Input](./IMPORT_SCREENS.md#screen-21-add--import-lesson-input-stage-bước-1).
+  - `[ Quản lý ]` beside an unassigned lesson $\rightarrow$ [SCREEN 20: Manage Lesson](#screen-20-manage-lesson-quản-lý-bài-học).
 
-#### Architectural Principle: No Duplicate Move-Lesson Workflow
-> **Canonical Lesson Reassignment:** Reassigning a lesson's parent book belongs strictly to **Manage Lesson (SCREEN 20)** via the parent book selector. There is no separate "Move lesson" or "Chuyển giáo trình" quick action in Content Management.
+#### Management Paths & Unassigned Lessons Rules:
+1. **Lessons Assigned to a Study Book:** Managed strictly through: Content Management $\rightarrow$ Manage Study Book (SCREEN 19) $\rightarrow$ Manage Lesson (SCREEN 20). No giant global lesson list is displayed.
+2. **Dedicated Unassigned Section (Không thuộc giáo trình):**
+   - When one or more lessons exist without a parent book (`Lesson.bookId === undefined`), SCREEN 17 displays a dedicated section:
+     ```text
+     KHÔNG THUỘC GIÁO TRÌNH
+     Bài học A     [ Quản lý ]
+     Bài học B     [ Quản lý ]
+     ```
+   - **Conditional Display:** Shown **strictly when at least one unassigned lesson exists**. If all lessons belong to textbooks, this section is completely hidden.
+   - Each unassigned lesson row displays its title, category badge, item count, and a `[ Quản lý ]` action button opening [SCREEN 20: Manage Lesson](#screen-20-manage-lesson-quản-lý-bài-học).
+3. **Canonical Reassignment (No Duplicate Move-Lesson Flow):**
+   - Lesson reassignment (assigning to a book or switching books) is performed **strictly inside SCREEN 20** through the parent Study Book selector.
+   - There is NO duplicate "Move lesson" or "Chuyển giáo trình" quick action in Content Management.
+4. **Home Remains Study-Only:** Administrative management of both assigned and unassigned lessons remains strictly within Settings $\rightarrow$ Content Management.
 
 #### Responsive Layout:
-- **Mobile (< 640px):** Full-screen stacked list. Study Books roster listed first, followed by lesson creation CTA.
+- **Mobile (< 640px):** Full-screen stacked list. Study Books roster listed first, followed by Unassigned Lessons (if any exist), followed by lesson creation CTA.
 - **Tablet / Desktop (>= 640px):** **Structured 2-column management dashboard** (`max-w-4xl`):
   - Left Column (60%): Study Books list with `[ Quản lý ]` actions and `+ Thêm giáo trình mới` CTA.
-  - Right Column (40%): Lessons & Import quick tools (`[IconFileImport] Thêm / Nhập bài học mới`).
+  - Right Column (40%): Lessons & Import quick tools (`[IconFileImport] Thêm / Nhập bài học mới`), plus the Unassigned Lessons roster (if any exist) with `[ Quản lý ]` buttons.
 
 #### Wireframes:
 ```text
@@ -109,7 +123,14 @@ MOBILE (< 640px)
 │                                               │
 │ [ [IconPlus] Thêm giáo trình mới ]            │
 │                                               │
-│ BÀI HỌC (LESSONS)                             │
+│ KHÔNG THUỘC GIÁO TRÌNH (khi có bài lẻ)        │
+│ ┌───────────────────────────────────────────┐ │
+│ │ 20 từ Kanji N3 (20 mục)       [ Quản lý ] │ │
+│ ├───────────────────────────────────────────┤ │
+│ │ Chữ Hán cơ bản (15 mục)       [ Quản lý ] │ │
+│ └───────────────────────────────────────────┘ │
+│                                               │
+│ THAO TÁC BÀI HỌC (LESSONS)                    │
 │ ┌───────────────────────────────────────────┐ │
 │ │ [IconFileImport]                          │ │
 │ │ Thêm / Nhập bài học mới                   │ │
@@ -121,7 +142,7 @@ DESKTOP (> 1024px - max-w-4xl Centered)
 ┌────────────────────────────────────────────────────────────────────────┐
 │ [IconArrowLeft] Quay lại Cài đặt             QUẢN LÝ NỘI DUNG          │
 ├────────────────────────────────────────────────────────────────────────┤
-│ GIÁO TRÌNH (STUDY BOOKS)               BÀI HỌC (LESSONS)               │
+│ GIÁO TRÌNH (STUDY BOOKS)               BÀI HỌC & NHẬP LIỆU             │
 │ ┌────────────────────────────────────┐ ┌─────────────────────────────┐ │
 │ │ [Thumb] 中級へ行こう    [ Quản lý ]│ │ [IconFileImport]            │ │
 │ │         8 bài · 164 mục            │ │ Thêm / Nhập bài học mới     │ │
@@ -129,8 +150,12 @@ DESKTOP (> 1024px - max-w-4xl Centered)
 │ │ [Thumb] Mimikara        [ Quản lý ]│ │ dán văn bản hoặc tải file.  │ │
 │ │         5 bài · 110 mục            │ └─────────────────────────────┘ │
 │ └────────────────────────────────────┘                                 │
-│                                                                        │
-│ [ [IconPlus] Thêm giáo trình mới ]                                     │
+│                                        KHÔNG THUỘC GIÁO TRÌNH          │
+│ [ [IconPlus] Thêm giáo trình mới ]     ┌─────────────────────────────┐ │
+│                                        │ • 20 từ N3      [ Quản lý ] │ │
+│                                        │ • Chữ Hán N4    [ Quản lý ] │ │
+│                                        └─────────────────────────────┘ │
+│                                        (Chỉ hiện khi có bài chưa gán)  │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 

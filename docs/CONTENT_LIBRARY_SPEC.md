@@ -547,11 +547,18 @@ GIÁO TRÌNH (STUDY BOOKS)
 BÀI HỌC (LESSONS)
 ──────────────────────────────────────────────────────────
 [ [IconFileImport] Thêm / Nhập bài học mới ]
-[ [IconArrowsExchange] Di chuyển bài học giữa giáo trình ]
+
+KHÔNG THUỘC GIÁO TRÌNH (Chỉ hiển thị khi có bài lẻ)
+──────────────────────────────────────────────────────────
+• 20 từ Kanji N3 (20 mục)                   [ Quản lý ]
+• Chữ Hán cơ bản (15 mục)                   [ Quản lý ]
 ```
 
 ### Principles:
 - This is the **only** area where adding, editing, or deleting structural content is initiated.
+- Unassigned lessons are managed directly here via `[ Quản lý ]` $\rightarrow$ Lesson Management.
+- Lessons assigned to books are managed via Book `[ Quản lý ]` $\rightarrow$ Lesson `[ Quản lý ]`.
+- Lesson reassignment (moving between books or unassigned) happens strictly within Lesson Management via the parent book selector. No separate global move action exists.
 - Navigation back (`[IconArrowLeft]`) returns safely to Settings.
 
 ---

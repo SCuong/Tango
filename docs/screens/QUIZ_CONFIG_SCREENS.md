@@ -18,7 +18,22 @@
 ### Core Slicing & Eligible Question Rules (Canonical Engine)
 
 All quiz configuration screens operate on the identical canonical question-slicing logic:
-1. **$N$ = Eligible Unique Items:** Calculated by taking the union of unique `StudyItem` records from all checked lessons, deduplicated by item ID and filtered against selected question types (e.g. items lacking `kana` are excluded if only Kana-based question types are selected).
+1. **Canonical Resolution Pipeline & Definition of $N$:**
+   ```text
+   selected lessonIds
+            ↓
+   collect StudyItems from tango_v1_lessons
+            ↓
+   deduplicate by normalized Japanese + Kana:
+   normalized(japanese) + '::' + normalized(kana || '')
+            ↓
+   filter items against enabled QuestionTypes and available item fields
+            ↓
+   eligible unique StudyItems
+            ↓
+            N
+   ```
+   > **Pool Deduplication Key:** The question pool is deduplicated using `normalized(japanese) + '::' + normalized(kana || '')` rather than `StudyItem.id`. This guarantees that identical Japanese expressions appearing across both Vocabulary and Kanji lessons (with different internal item IDs) are not tested redundantly.
 2. **Total vs Eligible Counts:** The interface explicitly communicates both: `X mục đã chọn · Y câu khả dụng`.
 3. **Dynamic Candidate Count Buttons:**
    - Candidate options `10`, `20`, `40` are rendered **strictly when `<= N`**.

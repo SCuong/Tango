@@ -136,6 +136,7 @@ flowchart TD
     ContentMgmt --> AddBook
     ContentMgmt --> ManageBook
     ContentMgmt --> ImportInput
+    ContentMgmt -.->|Unassigned lessons| ManageLesson
 
     ManageBook --> ManageLesson
     ManageBook --> ImportInput
@@ -199,7 +200,7 @@ flowchart TD
 | **SCREEN 14** | Quiz Results Summary | 2x2 grid + stacked buttons | 4-col metric row | 4-col metrics (`max-w-2xl`) | N/A | `Enter` (review), `Esc` (home) | None | [QUIZ_SESSION_SCREENS](./screens/QUIZ_SESSION_SCREENS.md#screen-14-quiz-results-summary) |
 | **SCREEN 15** | Review Missed Words | Reuses quiz runner | Reuses quiz runner | Reuses quiz runner | Message: "Không có từ cần ôn" | `1`-`4` (choice), `Esc` (exit) | None | [QUIZ_SESSION_SCREENS](./screens/QUIZ_SESSION_SCREENS.md#screen-15-review-missed-words-ôn-lại-từ-sai) |
 | **SCREEN 16** | Settings | Full-screen route | Centered modal | Centered modal (`max-w-lg`) | N/A | `Esc` (close) | None | [SETTINGS_CONTENT_SCREENS](./screens/SETTINGS_CONTENT_SCREENS.md#screen-16-settings-cài-đặt) |
-| **SCREEN 17** | Content Management | Full-screen stacked list | 2-col dashboard | 2-col dashboard (`max-w-4xl`) | Empty book list prompt | `Esc` (back) | None | [SETTINGS_CONTENT_SCREENS](./screens/SETTINGS_CONTENT_SCREENS.md#screen-17-content-management-quản-lý-nội-dung) |
+| **SCREEN 17** | Content Management | Stacked list (Books + Unassigned) | 2-col dashboard | 2-col dashboard (`max-w-4xl`) | Empty book list prompt | `Esc` (back) | None | [SETTINGS_CONTENT_SCREENS](./screens/SETTINGS_CONTENT_SCREENS.md#screen-17-content-management-quản-lý-nội-dung) |
 | **SCREEN 18** | Add Study Book | Full-screen form route | Centered modal | Centered modal (`max-w-md`) | N/A | `Esc` (cancel), `Enter` (save) | None | [SETTINGS_CONTENT_SCREENS](./screens/SETTINGS_CONTENT_SCREENS.md#screen-18-add-study-book-thêm-giáo-trình) |
 | **SCREEN 19** | Manage Study Book | Stacked overview + Danger | Centered 2-col | Centered 2-col (`max-w-4xl`) | Message if 0 lessons | `Esc` (back) | Danger Zone | [SETTINGS_CONTENT_SCREENS](./screens/SETTINGS_CONTENT_SCREENS.md#screen-19-manage-study-book-quản-lý-giáo-trình) |
 | **SCREEN 20** | Manage Lesson | Stacked form + Danger | Centered form card | Centered card (`max-w-2xl`) | N/A | `Esc` (back), `Enter` (save) | Danger Zone | [SETTINGS_CONTENT_SCREENS](./screens/SETTINGS_CONTENT_SCREENS.md#screen-20-manage-lesson-quản-lý-bài-học) |
