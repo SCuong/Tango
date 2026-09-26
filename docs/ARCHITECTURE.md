@@ -86,7 +86,7 @@ All user progress, weak-word markers, session histories, books, and mutable less
 - **No Resurrecting Deleted Lessons:** Because runtime queries ignore bundled JSON once initialized, deleting a seeded lesson or textbook permanently removes it; it will never reappear on subsequent launches or PWA cache updates.
 
 ### 4.2 Book Cover Binary Storage (IndexedDB)
-- **Zero Base64 in `localStorage`:** Book covers are user-uploaded binary images (`.jpg`, `.png`, `.webp`). Storing them in `localStorage` as base64 strings quickly exhausts the browser's 5MB quota and degrades serialization performance.
+- **Zero Base64 in `localStorage`:** Book covers are user-uploaded binary images (`.jpg`, `.jpeg`, `.png`, `.webp`). Storing them in `localStorage` as base64 strings quickly exhausts the browser's 5MB quota and degrades serialization performance.
 - **IndexedDB Blob Store:** Cover images are stored directly as binary `Blob` objects in an IndexedDB database (`tango_v1_covers_idb`) referenced by `StudyBook.coverImageId`.
 
 ### 4.3 Ordered, Idempotent Hard-Delete Cascade

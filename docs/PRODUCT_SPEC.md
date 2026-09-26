@@ -163,7 +163,7 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
 - **HUD Elements:**
   - Question progress (`4 / 20`)
   - Running score
-  - Streak counter (`🔥 5`)
+  - Streak counter (`[IconFlame] 5`)
   - Elapsed time counter
 
 ---
@@ -180,7 +180,7 @@ When an incorrect answer is submitted, the study flow pauses to present an educa
 
 **Example A (Item with Hán Việt):**
 ```text
-❌ Chưa chính xác
+[IconX] Chưa chính xác
 
 旅行
 りょこう
@@ -196,7 +196,7 @@ du lịch
 
 **Example B (Item without Hán Việt):**
 ```text
-❌ Chưa chính xác
+[IconX] Chưa chính xác
 
 ファストフード
 ふぁすとふーど

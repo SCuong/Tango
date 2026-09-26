@@ -1,0 +1,299 @@
+# Tango UI Specification — Settings & Content Management Screens (SCREEN 16 – 20)
+
+> **Master Specification Reference:** [`docs/SCREEN_SPEC.md`](../SCREEN_SPEC.md) is the authoritative master index, route map, and responsive foundation for Tango.
+> This domain file is authoritative for the detailed screen layouts, wireframes, and interaction flows of **Settings & Content Management Screens (SCREEN 16 through SCREEN 20)**.
+>
+> **Design Tokens & Components:** Styled exclusively using the Soft Claymorphism design system in [`docs/DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md).
+> **Domain Architecture:** Governed by [`docs/CONTENT_LIBRARY_SPEC.md`](../CONTENT_LIBRARY_SPEC.md).
+
+---
+
+## Screen Inventory
+
+- [SCREEN 16: Settings (Cài đặt)](#screen-16-settings-cài-đặt)
+- [SCREEN 17: Content Management (Quản lý nội dung)](#screen-17-content-management-quản-lý-nội-dung)
+- [SCREEN 18: Add Study Book (Thêm giáo trình)](#screen-18-add-study-book-thêm-giáo-trình)
+- [SCREEN 19: Manage Study Book (Quản lý giáo trình)](#screen-19-manage-study-book-quản-lý-giáo-trình)
+- [SCREEN 20: Manage Lesson (Quản lý bài học)](#screen-20-manage-lesson-quản-lý-bài-học)
+
+---
+
+### SCREEN 16: Settings (Cài đặt)
+
+#### Purpose:
+App preferences management and intentional gateway to administrative content operations.
+
+#### Routes & Navigation:
+- **Route:** `/settings`
+- **Entry:** Top bar `[IconSettings]` button from Home or other main screens.
+- **Exit:**
+  - Mobile: `[IconArrowLeft]` Back $\rightarrow$ Previous screen.
+  - Tablet/Desktop: `[IconX]` Close or `Escape` $\rightarrow$ Closes modal.
+
+#### Canonical Responsive Presentation:
+- **Mobile (< 640px):** **Full-screen route** (`/settings`) with `[IconArrowLeft]` top back button.
+- **Tablet / Desktop (>= 640px):** **Centered modal dialog** (`max-w-lg`) with backdrop blur and `[IconX]` top-right close button.
+
+#### Content Sections:
+1. **Giao diện & Tùy chọn (Appearance & Preferences):**
+   - **Language:** Segmented control `[ Tiếng Việt ]` | `[ English ]`
+   - **Theme:** 3 visual clay swatches `[ Sáng / Light ]` | `[ Tối / Dark ]` | `[ Sakura / Sakura ]`
+   - **Sound Effects:** Segmented control `[ Off / Tắt ]` | `[ On / Bật ]` (Default: **Off**)
+2. **Nội dung học (Study Content):**
+   - Clickable row: `Quản lý giáo trình và bài học` $\rightarrow$ navigates to [SCREEN 17: Content Management](#screen-17-content-management-quản-lý-nội-dung).
+
+#### Wireframe (Mobile Route & Desktop Modal):
+```text
+SETTINGS PANEL
+┌───────────────────────────────────────────────┐
+│ CÀI ĐẶT                              [IconX]  │
+├───────────────────────────────────────────────┤
+│ GIAO DIỆN & TÙY CHỌN                          │
+│                                               │
+│ Ngôn ngữ giao diện                            │
+│ [ (•) Tiếng Việt ]     [ ( ) English ]        │
+│                                               │
+│ Chủ đề màu sắc                                │
+│ [ Sáng ]          [ Tối ]          [ Sakura ] │
+│                                               │
+│ Âm thanh hiệu ứng                             │
+│ [ (•) Tắt (Off) ]      [ ( ) Bật (On) ]       │
+│                                               │
+│ NỘI DUNG HỌC                                  │
+│ ┌───────────────────────────────────────────┐ │
+│ │ Quản lý giáo trình và bài học   [IconChevronRight] │
+│ │ Thêm, sửa, nhập và phân loại nội dung     │ │
+│ └───────────────────────────────────────────┘ │
+└───────────────────────────────────────────────┘
+```
+
+---
+
+### SCREEN 17: Content Management (Quản lý nội dung)
+
+#### Purpose:
+The single protected administrative hub for adding, editing, and managing textbooks and lessons. Keeps administrative controls completely segregated from study screens.
+
+#### Routes & Navigation:
+- **Route:** `/settings/content-management`
+- **Entry:** Settings row "Quản lý giáo trình và bài học".
+- **Exit:** `[IconArrowLeft]` Back $\rightarrow$ [SCREEN 16: Settings](#screen-16-settings-cài-đặt).
+- **Actions:**
+  - `[IconPlus] Thêm giáo trình mới` $\rightarrow$ [SCREEN 18: Add Study Book](#screen-18-add-study-book-thêm-giáo-trình).
+  - `[ Quản lý ]` beside a book $\rightarrow$ [SCREEN 19: Manage Study Book](#screen-19-manage-study-book-quản-lý-giáo-trình).
+  - `[IconFileImport] Thêm / Nhập bài học mới` $\rightarrow$ [SCREEN 21: Import Input](./IMPORT_SCREENS.md#screen-21-add--import-lesson-input-stage-bước-1).
+
+#### Architectural Principle: No Duplicate Move-Lesson Workflow
+> **Canonical Lesson Reassignment:** Reassigning a lesson's parent book belongs strictly to **Manage Lesson (SCREEN 20)** via the parent book selector. There is no separate "Move lesson" or "Chuyển giáo trình" quick action in Content Management.
+
+#### Responsive Layout:
+- **Mobile (< 640px):** Full-screen stacked list. Study Books roster listed first, followed by lesson creation CTA.
+- **Tablet / Desktop (>= 640px):** **Structured 2-column management dashboard** (`max-w-4xl`):
+  - Left Column (60%): Study Books list with `[ Quản lý ]` actions and `+ Thêm giáo trình mới` CTA.
+  - Right Column (40%): Lessons & Import quick tools (`[IconFileImport] Thêm / Nhập bài học mới`).
+
+#### Wireframes:
+```text
+MOBILE (< 640px)
+┌───────────────────────────────────────────────┐
+│ [IconArrowLeft]  Quản lý nội dung             │
+├───────────────────────────────────────────────┤
+│ GIÁO TRÌNH (STUDY BOOKS)                      │
+│ ┌───────────────────────────────────────────┐ │
+│ │ [Thumb] 中級へ行こう          [ Quản lý ] │ │
+│ │         8 bài · 164 mục                   │ │
+│ ├───────────────────────────────────────────┤ │
+│ │ [Thumb] Mimikara              [ Quản lý ] │ │
+│ │         5 bài · 110 mục                   │ │
+│ └───────────────────────────────────────────┘ │
+│                                               │
+│ [ [IconPlus] Thêm giáo trình mới ]            │
+│                                               │
+│ BÀI HỌC (LESSONS)                             │
+│ ┌───────────────────────────────────────────┐ │
+│ │ [IconFileImport]                          │ │
+│ │ Thêm / Nhập bài học mới                   │ │
+│ │ Tạo thủ công hoặc nhập từ tệp/văn bản     │ │
+│ └───────────────────────────────────────────┘ │
+└───────────────────────────────────────────────┘
+
+DESKTOP (> 1024px - max-w-4xl Centered)
+┌────────────────────────────────────────────────────────────────────────┐
+│ [IconArrowLeft] Quay lại Cài đặt             QUẢN LÝ NỘI DUNG          │
+├────────────────────────────────────────────────────────────────────────┤
+│ GIÁO TRÌNH (STUDY BOOKS)               BÀI HỌC (LESSONS)               │
+│ ┌────────────────────────────────────┐ ┌─────────────────────────────┐ │
+│ │ [Thumb] 中級へ行こう    [ Quản lý ]│ │ [IconFileImport]            │ │
+│ │         8 bài · 164 mục            │ │ Thêm / Nhập bài học mới     │ │
+│ ├────────────────────────────────────┤ │ Tạo bài học mới bằng cách   │ │
+│ │ [Thumb] Mimikara        [ Quản lý ]│ │ dán văn bản hoặc tải file.  │ │
+│ │         5 bài · 110 mục            │ └─────────────────────────────┘ │
+│ └────────────────────────────────────┘                                 │
+│                                                                        │
+│ [ [IconPlus] Thêm giáo trình mới ]                                     │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### SCREEN 18: Add Study Book (Thêm giáo trình)
+
+#### Purpose:
+Creates a new `StudyBook` record in local storage.
+
+#### Presentation:
+- **Mobile (< 640px):** Full-screen form route with top `[IconArrowLeft]` cancel and bottom sticky `[ Tạo giáo trình ]`.
+- **Tablet / Desktop (>= 640px):** Centered `Modal` dialog (`max-w-md`).
+
+#### Form Fields & Validation:
+1. `Tên giáo trình *`: Required text input. Real-time validation (cannot be empty). Duplicate titles are explicitly allowed.
+2. `Ảnh bìa (không bắt buộc)`: Native file picker. Supported formats: `.jpg`, `.jpeg`, `.png`, `.webp`. Live preview box with 3:4 aspect ratio.
+3. Actions: `[ Hủy ]` and `[ Tạo giáo trình ]` (disabled when title is empty).
+
+---
+
+### SCREEN 19: Manage Study Book (Quản lý giáo trình)
+
+#### Purpose:
+Inspects and modifies a single Study Book: title rename, cover replace/remove, lesson roster, and book Danger Zone.
+
+#### Routes & Navigation:
+- **Route:** `/settings/content-management/book/:bookId`
+- **Entry:** [SCREEN 17: Content Management](#screen-17-content-management-quản-lý-nội-dung) `[ Quản lý ]` beside a book.
+- **Exit:** `[IconArrowLeft]` Back $\rightarrow$ SCREEN 17.
+
+#### Lesson Row Safety Rule:
+> **No Direct Delete Beside Lesson Rows:** Lesson rows inside the book manager show **only `[ Quản lý ]`**. They **never** include an adjacent inline delete icon. Accidental mis-clicks are prevented by isolating lesson deletion inside [SCREEN 20: Manage Lesson](#screen-20-manage-lesson-quản-lý-bài-học).
+
+#### Responsive Layout:
+- **Mobile (< 640px):** Single-column stacked canvas: Book metadata form at the top, lesson roster in the middle, Add Lesson CTA, and Danger Zone at the bottom.
+- **Tablet / Desktop (>= 640px):** Centered `max-w-4xl` canvas. 2-column layout:
+  - Left Column (40%): Book details card (Title input, 3:4 Cover preview, Change/Remove cover actions, Danger Zone).
+  - Right Column (60%): Lesson roster with `[ Quản lý ]` buttons and `+ Thêm bài vào giáo trình này` CTA.
+
+#### Wireframes:
+```text
+MOBILE (< 640px)
+┌───────────────────────────────────────────────┐
+│ [IconArrowLeft]  Quản lý: 中級へ行こう        │
+├───────────────────────────────────────────────┤
+│ Tên giáo trình                                │
+│ [ 中級へ行こう                              ] │
+│                                               │
+│ Ảnh bìa:                                      │
+│ [Preview 3:4]  [ Thay ảnh ]  [ Xóa ảnh bìa ]  │
+│                                               │
+│ DANH SÁCH BÀI HỌC (8 bài)                     │
+│ • Bài 1: Từ vựng (20 mục)         [ Quản lý ] │
+│ • Bài 2: Từ vựng (22 mục)         [ Quản lý ] │
+│ • Bài 1: Hán tự (16 mục)          [ Quản lý ] │
+│                                               │
+│ [ [IconPlus] Thêm bài vào giáo trình này ]    │
+│                                               │
+│ ───────────────────────────────────────────── │
+│ VÙNG NGUY HIỂM (DANGER ZONE)                  │
+│ Xóa vĩnh viễn giáo trình và toàn bộ bài học.  │
+│ [ [IconTrash] Xóa giáo trình này ]            │
+└───────────────────────────────────────────────┘
+
+DESKTOP (> 1024px - max-w-4xl Centered)
+┌────────────────────────────────────────────────────────────────────────┐
+│ [IconArrowLeft] Quay lại Quản lý nội dung        QUẢN LÝ GIÁO TRÌNH    │
+├────────────────────────────────────────────────────────────────────────┤
+│ THÔNG TIN GIÁO TRÌNH                   DANH SÁCH BÀI HỌC (8 BÀI)       │
+│ ┌────────────────────────────────────┐ ┌─────────────────────────────┐ │
+│ │ Tên giáo trình *                   │ │ • Bài 1: Từ vựng (20 mục)   │ │
+│ │ [ 中級へ行こう                   ] │ │                 [ Quản lý ] │ │
+│ │                                    │ ├─────────────────────────────┤ │
+│ │ Ảnh bìa:                           │ │ • Bài 2: Từ vựng (22 mục)   │ │
+│ │ ┌──────────┐ [ [IconPhoto] Thay ]  │ │                 [ Quản lý ] │ │
+│ │ │ Cover    │                       │ ├─────────────────────────────┤ │
+│ │ │ Preview  │ [ [IconTrash] Xóa ảnh]│ │ • Bài 1: Hán tự (16 mục)    │ │
+│ │ └──────────┘                       │ │                 [ Quản lý ] │ │
+│ │                                    │ └─────────────────────────────┘ │
+│ │ [ Lưu thay đổi tên sách ]          │                                 │
+│ ├────────────────────────────────────┤ [ [IconPlus]                    │
+│ │ VÙNG NGUY HIỂM                     │   Thêm bài vào giáo trình này ] │
+│ │ [ [IconTrash] Xóa giáo trình này ] │                                 │
+│ └────────────────────────────────────┘                                 │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### SCREEN 20: Manage Lesson (Quản lý bài học)
+
+#### Purpose:
+Dedicated administrative screen for a single lesson. Handles renaming, category switching, parent book reassignment, and lesson deletion.
+
+#### Routes & Navigation:
+- **Route:** `/settings/content-management/lesson/:lessonId`
+- **Entry:** Tapping `[ Quản lý ]` beside a lesson row in SCREEN 19 or SCREEN 17.
+- **Exit:**
+  - `[IconArrowLeft]` Back $\rightarrow$ Previous screen.
+  - `[ [IconTrash] Xóa bài học này ]` $\rightarrow$ [SCREEN 26: Delete Lesson Confirmation](./DIALOG_SCREENS.md#screen-26-delete-lesson-confirmation).
+
+#### Capabilities & Safety:
+1. **Rename Title & Subtitle:** Direct input fields for `title` and optional `subtitle`.
+2. **Category Switcher:** Toggle `category: 'vocabulary' | 'kanji'`.
+3. **Parent Book Selector:** Dropdown menu listing all user books plus `Không thuộc giáo trình` (Unassigned).
+4. **Safety Guarantee:** Reassigning parent book or category modifies organizational metadata only; it **never** changes `Lesson.id`, item IDs, or resets quiz progress.
+5. **Save Requirement:** Explicit click on `[ Lưu thay đổi ]` is required (no accidental auto-commits on focus changes).
+
+#### Wireframes:
+```text
+MOBILE (< 640px)
+┌───────────────────────────────────────────────┐
+│ [IconArrowLeft]  Quản lý bài học              │
+├───────────────────────────────────────────────┤
+│ Tên bài học *                                 │
+│ [ Bài 1: Con người & Gia đình               ] │
+│                                               │
+│ Phụ đề chủ đề (không bắt buộc)                │
+│ [ Gia đình và các mối quan hệ               ] │
+│                                               │
+│ Loại bài học                                  │
+│ [ [IconBook] Từ vựng ]   [ (•) [IconWriting] Hán tự ] │
+│                                               │
+│ Giáo trình trực thuộc                         │
+│ [ 中級へ行こう                            ▼ ] │
+│                                               │
+│ Số lượng mục học: 16 mục                      │
+│                                               │
+│ [ [IconDeviceFloppy] Lưu thay đổi ]           │
+│                                               │
+│ ───────────────────────────────────────────── │
+│ VÙNG NGUY HIỂM (DANGER ZONE)                  │
+│ Xóa vĩnh viễn bài học này khỏi giáo trình.    │
+│ [ [IconTrash] Xóa bài học này ]               │
+└───────────────────────────────────────────────┘
+
+DESKTOP (> 1024px - max-w-2xl Centered)
+┌────────────────────────────────────────────────────────┐
+│ [IconArrowLeft] Quay lại danh sách bài học             │
+├────────────────────────────────────────────────────────┤
+│ QUẢN LÝ BÀI HỌC — Bài 1: Con người & Gia đình          │
+│                                                        │
+│ ┌────────────────────────────────────────────────────┐ │
+│ │ Tên bài học *                                      │ │
+│ │ [ Bài 1: Con người & Gia đình                    ] │ │
+│ │                                                    │ │
+│ │ Phụ đề chủ đề (không bắt buộc)                     │ │
+│ │ [ Gia đình và các mối quan hệ                    ] │ │
+│ │                                                    │ │
+│ │ Loại bài học                                       │ │
+│ │ [ [IconBook] Từ vựng ]  [ (•) [IconWriting] Hán tự]│ │
+│ │                                                    │ │
+│ │ Giáo trình trực thuộc                              │ │
+│ │ [ 中級へ行こう                                 ▼ ] │ │
+│ │                                                    │ │
+│ │ Số lượng mục học: 16 mục                           │ │
+│ │                                                    │ │
+│ │ [ [IconDeviceFloppy] LƯU THAY ĐỔI (ENTER) ]        │ │
+│ ├────────────────────────────────────────────────────┤ │
+│ │ VÙNG NGUY HIỂM                                     │ │
+│ │ Xóa vĩnh viễn bài học này và toàn bộ 16 mục học.   │ │
+│ │ [ [IconTrash] Xóa bài học này ]                    │ │
+│ └────────────────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────────┘
+```

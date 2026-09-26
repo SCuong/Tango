@@ -568,7 +568,7 @@ Tên giáo trình *
 [ Nhập tên sách (ví dụ: 中級へ行こう)          ]
 
 Ảnh bìa (không bắt buộc)
-[ [IconPhoto] Chọn ảnh bìa ]  (Hỗ trợ .jpg, .png, .webp)
+[ [IconPhoto] Chọn ảnh bìa ]  (Hỗ trợ .jpg, .jpeg, .png, .webp)
 
 [ Preview: Ảnh bìa đã chọn ]
 
@@ -865,14 +865,13 @@ Removing a cover image is an independent, non-destructive operation on book data
 
 ## 20. Moving Lessons Between Books & Category Switch Safety
 
-In Content Management (or the dedicated Lesson Management view), a lesson's book assignment or category can be updated:
+In Lesson Management (`/settings/content-management/lesson/:lessonId`), a lesson's book assignment or category can be updated via the parent book selector:
 
 ```text
-Chuyển giáo trình cho bài học
+QUẢN LÝ BÀI HỌC — CHUYỂN GIÁO TRÌNH
 Bài 3: Đời sống & Môi trường
 
-Giáo trình hiện tại: 中級へ行こう
-Chuyển sang:
+Giáo trình trực thuộc:
 [ Mimikara ▼ ]
 
 [ Hủy ]                          [ Lưu thay đổi ]

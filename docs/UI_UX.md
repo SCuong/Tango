@@ -150,7 +150,7 @@ Used uniformly for single lessons, multi-lessons, and mixed tests:
   - Cancel / Exit icon (with confirm dialog).
   - Clean progress bar across the top.
   - Counter: `4 / 20`.
-  - Streak indicator: `🔥 4`.
+  - Streak indicator: `[IconFlame] 4`.
 - **Center Prompt Card:**
   - Large prompt text (e.g., `りょこう` or `du lịch`).
   - Centered, generous padding (32px-48px).
@@ -165,7 +165,7 @@ Used uniformly for single lessons, multi-lessons, and mixed tests:
 
 #### 5.1 Correct Answer
 - Selected button highlights with an Emerald Green outline/ring (`#059669`) and an `IconCheck`.
-- Brief confirmation toast: "Chính xác! 👏" showing reading and meaning.
+- Brief confirmation toast: "[IconCheck] Chính xác!" showing reading and meaning.
 - Optional sound: If enabled in Settings (Off by default), plays a short, subtle ceramic chime (<200ms). Never blocks or delays auto-advance.
 - Auto-advances in 750ms or on `Enter`/`Space`/Tap.
 
@@ -177,7 +177,7 @@ Used uniformly for single lessons, multi-lessons, and mixed tests:
 
 **Item with Hán Việt:**
 ```text
-❌ Chưa chính xác
+[IconX] Chưa chính xác
 
 旅行
 りょこう
@@ -193,7 +193,7 @@ du lịch
 
 **Item without Hán Việt:**
 ```text
-❌ Chưa chính xác
+[IconX] Chưa chính xác
 
 ファストフード
 ふぁすとふーど

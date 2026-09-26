@@ -29,7 +29,7 @@ Tango strictly rejects visual clichés commonly associated with low-effort or te
 - **No floating gradient blobs or decorative geometric shapes:** Every element on screen must serve a clear study or navigation function.
 - **No glassmorphism everywhere:** No blurry frosted-glass panels stacked over complex backgrounds that degrade text readability.
 - **No nested cards inside cards inside cards:** Flat, intentional grouping with clean negative space.
-- **No random emoji as primary UI icons:** Emojis are reserved exclusively for contextual study content (e.g. streak indicator `🔥`). System navigation uses clean stroke iconography only.
+- **No random emoji as primary UI icons:** Emojis are reserved exclusively for natural Japanese/Vietnamese study content. System navigation and status indicators use Tabler stroke iconography only (e.g. streak indicator `[IconFlame] 4`).
 - **No excessive pill badges:** Do not turn every word or metadata label into a colored rounded badge.
 - **No uniform 24px border-radius everywhere:** Shape language must be nuanced and scaled according to element size and hierarchy.
 - **No giant empty whitespace:** Layouts must feel comfortable, information-dense where appropriate (word lists, preview tables), and focused during quizzes.
@@ -465,7 +465,7 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
   - Exit `IconX` button.
   - Clean progress bar (indigo primary fill, smooth CSS width transition).
   - Minimalist progress text: `4 / 20`.
-  - Streak flame: `🔥 4`.
+  - Streak flame: `[IconFlame] 4`.
 - **Prompt Stage (Centered):**
   - Generous vertical whitespace.
   - Kanji / Expression: `36px–40px` bold, high-contrast text.
