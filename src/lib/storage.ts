@@ -256,6 +256,8 @@ function openCoversDB(): Promise<IDBDatabase> {
 /**
  * Saves binary book cover Blob to IndexedDB keyed by coverImageId.
  * Out-of-line key storage prevents base64 localStorage bloating.
+ * Resolves ONLY when transaction.oncomplete fires to guarantee commit,
+ * and always closes the IDBDatabase connection.
  */
 export async function saveCoverBlob(coverImageId: string, blob: Blob): Promise<void> {
   if (!coverImageId) {
@@ -263,19 +265,50 @@ export async function saveCoverBlob(coverImageId: string, blob: Blob): Promise<v
   }
   const db = await openCoversDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_CONFIG.STORE_NAME, 'readwrite');
-    const store = tx.objectStore(IDB_CONFIG.STORE_NAME);
-    const request = store.put(blob, coverImageId);
+    try {
+      const tx = db.transaction(IDB_CONFIG.STORE_NAME, 'readwrite');
+      const store = tx.objectStore(IDB_CONFIG.STORE_NAME);
+      const request = store.put(blob, coverImageId);
 
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error || new Error('Failed to save cover blob'));
-    tx.onabort = () => reject(tx.error || new Error('IndexedDB transaction aborted'));
+      let settled = false;
+      const cleanupAndReject = (error: unknown) => {
+        if (!settled) {
+          settled = true;
+          db.close();
+          reject(error);
+        }
+      };
+
+      request.onerror = () => {
+        cleanupAndReject(request.error || new Error('Failed to save cover blob'));
+      };
+
+      tx.oncomplete = () => {
+        if (!settled) {
+          settled = true;
+          db.close();
+          resolve();
+        }
+      };
+
+      tx.onerror = () => {
+        cleanupAndReject(tx.error || new Error('Failed to save cover blob'));
+      };
+
+      tx.onabort = () => {
+        cleanupAndReject(tx.error || new Error('IndexedDB transaction aborted'));
+      };
+    } catch (err) {
+      db.close();
+      reject(err);
+    }
   });
 }
 
 /**
  * Retrieves binary book cover Blob from IndexedDB by coverImageId.
  * Returns null if the cover does not exist or coverImageId is empty.
+ * Always closes the IDBDatabase connection upon completion or failure.
  */
 export async function getCoverBlob(coverImageId: string): Promise<Blob | null> {
   if (!coverImageId) {
@@ -283,21 +316,60 @@ export async function getCoverBlob(coverImageId: string): Promise<Blob | null> {
   }
   const db = await openCoversDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_CONFIG.STORE_NAME, 'readonly');
-    const store = tx.objectStore(IDB_CONFIG.STORE_NAME);
-    const request = store.get(coverImageId);
+    try {
+      const tx = db.transaction(IDB_CONFIG.STORE_NAME, 'readonly');
+      const store = tx.objectStore(IDB_CONFIG.STORE_NAME);
+      const request = store.get(coverImageId);
 
-    request.onsuccess = () => {
-      const result = request.result;
-      resolve((result as Blob) || null);
-    };
-    request.onerror = () => reject(request.error || new Error('Failed to retrieve cover blob'));
+      let settled = false;
+      let result: Blob | null = null;
+
+      request.onsuccess = () => {
+        result = (request.result as Blob) || null;
+      };
+
+      request.onerror = () => {
+        if (!settled) {
+          settled = true;
+          db.close();
+          reject(request.error || new Error('Failed to retrieve cover blob'));
+        }
+      };
+
+      tx.oncomplete = () => {
+        if (!settled) {
+          settled = true;
+          db.close();
+          resolve(result);
+        }
+      };
+
+      tx.onerror = () => {
+        if (!settled) {
+          settled = true;
+          db.close();
+          reject(tx.error || new Error('Failed to retrieve cover blob'));
+        }
+      };
+
+      tx.onabort = () => {
+        if (!settled) {
+          settled = true;
+          db.close();
+          reject(tx.error || new Error('IndexedDB transaction aborted'));
+        }
+      };
+    } catch (err) {
+      db.close();
+      reject(err);
+    }
   });
 }
 
 /**
  * Deletes binary book cover Blob from IndexedDB by coverImageId.
  * Idempotent: succeeds whether the key exists or not.
+ * Resolves on transaction.oncomplete and always closes IDBDatabase connection.
  */
 export async function deleteCoverBlob(coverImageId: string): Promise<void> {
   if (!coverImageId) {
@@ -305,12 +377,42 @@ export async function deleteCoverBlob(coverImageId: string): Promise<void> {
   }
   const db = await openCoversDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_CONFIG.STORE_NAME, 'readwrite');
-    const store = tx.objectStore(IDB_CONFIG.STORE_NAME);
-    const request = store.delete(coverImageId);
+    try {
+      const tx = db.transaction(IDB_CONFIG.STORE_NAME, 'readwrite');
+      const store = tx.objectStore(IDB_CONFIG.STORE_NAME);
+      const request = store.delete(coverImageId);
 
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error || new Error('Failed to delete cover blob'));
-    tx.onabort = () => reject(tx.error || new Error('IndexedDB transaction aborted'));
+      let settled = false;
+      const cleanupAndReject = (error: unknown) => {
+        if (!settled) {
+          settled = true;
+          db.close();
+          reject(error);
+        }
+      };
+
+      request.onerror = () => {
+        cleanupAndReject(request.error || new Error('Failed to delete cover blob'));
+      };
+
+      tx.oncomplete = () => {
+        if (!settled) {
+          settled = true;
+          db.close();
+          resolve();
+        }
+      };
+
+      tx.onerror = () => {
+        cleanupAndReject(tx.error || new Error('Failed to delete cover blob'));
+      };
+
+      tx.onabort = () => {
+        cleanupAndReject(tx.error || new Error('IndexedDB transaction aborted'));
+      };
+    } catch (err) {
+      db.close();
+      reject(err);
+    }
   });
 }

@@ -271,5 +271,51 @@ describe('storage.ts', () => {
       await expect(deleteCoverBlob('')).resolves.toBeUndefined();
       await expect(saveCoverBlob('', new Blob([]))).rejects.toThrow('coverImageId is required');
     });
+
+    it('closes the IDBDatabase connection on saveCoverBlob, getCoverBlob, and deleteCoverBlob', async () => {
+      const closeSpy = vi.spyOn(IDBDatabase.prototype, 'close');
+
+      const coverId = 'cover_connection_cleanup_test';
+      const sampleBlob = new Blob(['lifecycle-data'], { type: 'image/webp' });
+
+      // Save operation
+      await saveCoverBlob(coverId, sampleBlob);
+      expect(closeSpy).toHaveBeenCalledTimes(1);
+
+      // Get operation
+      const retrieved = await getCoverBlob(coverId);
+      expect(retrieved).not.toBeNull();
+      expect(closeSpy).toHaveBeenCalledTimes(2);
+
+      // Delete operation
+      await deleteCoverBlob(coverId);
+      expect(closeSpy).toHaveBeenCalledTimes(3);
+
+      closeSpy.mockRestore();
+    });
+
+    it('closes the IDBDatabase connection and rejects if transaction aborts', async () => {
+      const closeSpy = vi.spyOn(IDBDatabase.prototype, 'close');
+
+      const txSpy = vi.spyOn(IDBDatabase.prototype, 'transaction').mockImplementation(function (
+        this: IDBDatabase,
+        ...args: Parameters<IDBDatabase['transaction']>
+      ) {
+        const tx = IDBDatabase.prototype.transaction.apply(this, args);
+        queueMicrotask(() => {
+          tx.abort();
+        });
+        return tx;
+      });
+
+      await expect(
+        saveCoverBlob('abort_cover', new Blob(['data'], { type: 'image/png' }))
+      ).rejects.toThrow();
+
+      expect(closeSpy).toHaveBeenCalled();
+
+      txSpy.mockRestore();
+      closeSpy.mockRestore();
+    });
   });
 });

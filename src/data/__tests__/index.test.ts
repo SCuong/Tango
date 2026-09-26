@@ -162,4 +162,36 @@ describe('src/data/index.ts (Seed Initialization Pipeline)', () => {
     expect(isLibraryInitialized()).toBe(false);
     expect(localStorage.getItem(STORAGE_KEYS.LIBRARY_INIT)).toBeNull();
   });
+
+  it('preserves existing user-created lessons when later first seed initialization occurs', () => {
+    // 1. User previously created or imported a lesson while seed registry was empty
+    const userLesson: Lesson = {
+      id: 'user-custom-01',
+      category: 'vocabulary',
+      title: 'Bài tự tạo',
+      items: [
+        {
+          id: 'user-item-1',
+          japanese: '勉強',
+          kana: 'べんきょう',
+          vietnamese: ['học tập'],
+        },
+      ],
+    };
+
+    saveLessons({ [userLesson.id]: userLesson });
+    expect(isLibraryInitialized()).toBe(false);
+
+    // 2. Later, approved seed content is bundled and first initialization runs
+    const initResult = initializeLibrary(mockSeedLessons);
+    expect(initResult).toBe(true);
+    expect(isLibraryInitialized()).toBe(true);
+
+    // 3. User's existing lesson is preserved alongside newly added seed lessons
+    const lessons = loadLessons();
+    expect(lessons['user-custom-01']).toEqual(userLesson);
+    expect(lessons['seed-vocab-01']).toEqual(mockSeedLessons[0]);
+    expect(lessons['seed-kanji-01']).toEqual(mockSeedLessons[1]);
+    expect(Object.keys(lessons)).toHaveLength(3);
+  });
 });
