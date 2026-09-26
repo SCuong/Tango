@@ -440,10 +440,12 @@ Không thuộc giáo trình
   Từ vựng
     ☐ Từ vựng du lịch (30 từ)
 
-Số câu hỏi:
-[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả (79) ]
+79 mục đã chọn · 72 câu khả dụng
 
-[ Bắt đầu kiểm tra (79 mục đã chọn) ]
+Số câu hỏi:
+[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả (72) ]
+
+[ Bắt đầu kiểm tra ]
 ```
 
 ### Technical Note:
@@ -463,6 +465,8 @@ Số câu hỏi:
             N
    ```
    `N` is strictly the number of **eligible unique StudyItems after both deduplication and compatibility filtering**.
+   - **Distinction Between Selected Items and Eligible Questions (N):** The selected/raw item count (e.g. `79 mục đã chọn`) represents the total items in the selected lessons before eligibility filtering. `N` represents the eligible unique StudyItems after both deduplication and question-type compatibility filtering (e.g. `72 câu khả dụng`). These values may differ if duplicate words appear across categories or if items lack fields required by enabled question types.
+   - `Tất cả (N)` always uses the eligible count $N$ (e.g. `Tất cả (72)`), never the raw selected count.
 3. **Dynamic Candidate Slicing:** Candidate fixed buttons (`10`, `20`, `40`) are rendered dynamically only when `<= N`.
 4. **Authoritative `questionCount: 'all'` Rule:** Selecting `Tất cả (N)` generates **exactly one initial question per eligible unique StudyItem** ($N$ eligible unique items = $N$ initial questions). It **NEVER multiplies** item count by the number of active question types. Each unique item is assigned exactly one enabled compatible question type (e.g., items lacking `kana` skip `kana_to_japanese`; items lacking `vietnamese` skip `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`).
 5. **Practice Mode Note:** Practice Mode may requeue missed items after the initial set, so total interactions during practice may exceed $N$.
@@ -789,10 +793,10 @@ Before mutating any persistent storage, Tango resolves and retains all required 
 - `affectedHistoryIds`
 
 #### Conceptual Hard-Delete Ordering for Study Book Deletion:
-1. **Resolve Full Deletion Scope & Identifiers in Memory:** Retrieve `deletedBookId`, `coverImageId`, all `affectedLessonIds` where `lesson.bookId === deletedBookId`, all `affectedStudyItemIds` belonging to those lessons, and all `affectedHistoryIds` referencing any affected lesson or item.
+1. **Resolve Full Deletion Scope & Identifiers in Memory:** Retrieve `deletedBookId`, `coverImageId`, all `affectedLessonIds` where `lesson.bookId === deletedBookId`, all `affectedStudyItemIds` belonging to those lessons, and all `affectedHistoryIds` (resolved from `session.lessonIds` matching `affectedLessonIds` or `session.missedItemIds` matching `affectedStudyItemIds`).
 2. **Clear In-Memory & Active References:** Clear any active multi-lesson selector checkboxes, navigation breadcrumbs, or in-flight review filters referencing `affectedLessonIds`.
 3. **Purge Affected ItemProgress:** In `tango_v1_progress`, delete all `ItemProgress` and mistake-tracking records matching `affectedStudyItemIds`.
-4. **Delete Entire Affected QuizSessionResult History Records:** Scan `tango_v1_history`. If any stored `QuizSessionResult` references any deleted `lessonId` (in its `lessonIds` array) or any deleted `StudyItem.id` (in its question or mistake details), **delete that entire session record**. Partial or corrupt history records are never retained.
+4. **Delete Entire Affected QuizSessionResult History Records:** Scan `tango_v1_history`. If any stored `QuizSessionResult` references any deleted `lessonId` (in its `session.lessonIds` array) or any affected `StudyItem.id` (in its persisted `session.missedItemIds` array), **delete that entire session record**. Partial or corrupt history records are never retained.
 5. **Delete Cover Blob from IndexedDB Using the Already-Resolved `coverImageId`:** Asynchronously delete the binary image blob from the `covers` object store in `tango_v1_covers_idb` matching `coverImageId` (if one was assigned). Deleting the cover blob while book metadata is still intact ensures that if an interruption occurs, retry logic can still read `coverImageId`.
 6. **Delete Affected Lesson Records:** Permanently remove all `affectedLessonIds` from `tango_v1_lessons`. Because bundled JSON files are one-time initial seed data (marked by `tango_v1_library_init`), deleting lessons from `tango_v1_lessons` guarantees they are never resurrected on app reload, PWA update, or cache refresh.
 7. **Delete StudyBook Metadata from `tango_v1_books` LAST:** Delete the `StudyBook` record from `tango_v1_books` as the final mutation step.
@@ -827,7 +831,7 @@ Lessons can only be deleted individually from within the dedicated **Lesson Mana
 
 ### 18.1 Lesson Cascade Behavior:
 When confirmed, Tango executes the ordered, idempotent lesson deletion cascade:
-1. **Resolve Scope & Identifiers in Memory:** Resolve `targetLessonId`, its nested `affectedStudyItemIds`, and all `affectedHistoryIds` referencing this lesson or its items.
+1. **Resolve Scope & Identifiers in Memory:** Resolve `targetLessonId`, its nested `affectedStudyItemIds`, and all `affectedHistoryIds` (matching `session.lessonIds` containing `targetLessonId` or `session.missedItemIds` referencing `affectedStudyItemIds`).
 2. **Clear In-Memory & Active References:** Clear any active multi-lesson selector checkboxes or active filters referencing `targetLessonId`.
 3. **Purge Affected ItemProgress:** In `tango_v1_progress`, delete all records for `affectedStudyItemIds`.
 4. **Delete Entire Affected Quiz History Records:** Remove any `QuizSessionResult` from `tango_v1_history` matching `affectedHistoryIds`.

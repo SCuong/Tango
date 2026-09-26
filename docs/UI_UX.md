@@ -118,8 +118,10 @@ Không thuộc giáo trình
   Từ vựng
     ☐ Từ vựng du lịch (30 từ)
 
+79 mục đã chọn · 72 câu khả dụng
+
 Số câu
-[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả (79) ]
+[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả (72) ]
 
 Loại câu hỏi
 ☑ Kana → Japanese
@@ -127,13 +129,13 @@ Loại câu hỏi
 ☑ Vietnamese → Japanese
 ☐ Written Answer
 
-[ Bắt đầu kiểm tra (79 mục đã chọn) ]
+[ Bắt đầu kiểm tra ]
 ```
 
 *Note on Question Count & Canonical Definition of N:*
-- `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering**.
+- **Selected Count vs. Eligible Count:** The raw selected count (e.g. `79 mục đã chọn`) represents the content across selected lessons before eligibility filtering. `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering** (e.g. `72 câu khả dụng`). These values may differ if duplicate words appear across categories or if items lack fields required by enabled question types.
 - Candidate count buttons (`10`, `20`, `40`) are rendered dynamically only when `<= N`.
-- Selecting `Tất cả (N)` presents exactly $N$ initial questions for the $N$ eligible unique items, never multiplying by question types.
+- Selecting `Tất cả (N)` presents exactly $N$ initial questions for the $N$ eligible unique items (e.g. `Tất cả (72)`), never using the raw selected count and never multiplying by question types.
 - *The N = 0 State:* If $N = 0$, `Tất cả (0)` and fixed count buttons are **never** rendered. The Start Test button is disabled/hidden, and an explanatory empty state is shown: `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."` / `"No eligible questions for the selected question types."` Users can adjust lessons or question types without modal errors.
 
 ---

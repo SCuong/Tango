@@ -98,7 +98,7 @@ Browser storage operations span `localStorage` and `IndexedDB`. Because no singl
 - `affectedHistoryIds`
 
 #### Conceptual Hard-Delete Sequence for Study Books:
-1. **Resolve Full Scope & Identifiers in Memory:** Retrieve `deletedBookId`, `coverImageId`, all `affectedLessonIds` where `lesson.bookId === deletedBookId`, all `affectedStudyItemIds` belonging to those lessons, and all `affectedHistoryIds` referencing any affected lesson or item.
+1. **Resolve Full Scope & Identifiers in Memory:** Retrieve `deletedBookId`, `coverImageId`, all `affectedLessonIds` where `lesson.bookId === deletedBookId`, all `affectedStudyItemIds` belonging to those lessons, and all `affectedHistoryIds` (resolved from `session.lessonIds` matching `affectedLessonIds` or `session.missedItemIds` matching `affectedStudyItemIds`).
 2. **Clear In-Memory & Active References:** Clear any active multi-lesson quiz selections, navigation breadcrumbs, or in-flight review filters referencing `affectedLessonIds`.
 3. **Purge Affected ItemProgress:** In `tango_v1_progress`, delete all `ItemProgress` entries for `affectedStudyItemIds`.
 4. **Delete Entire Affected QuizSessionResult History Records:** Delete any `QuizSessionResult` in `tango_v1_history` matching `affectedHistoryIds`. Partial histories are never retained.
@@ -110,10 +110,10 @@ Browser storage operations span `localStorage` and `IndexedDB`. Because no singl
 > **Key Invariant:** `StudyBook` metadata is deleted **last** because it contains the canonical reference needed to locate and verify the cover Blob in IndexedDB.
 
 #### Conceptual Hard-Delete Sequence for Individual Lessons:
-1. **Resolve Scope & Identifiers in Memory:** Resolve `targetLessonId`, its nested `affectedStudyItemIds`, and `affectedHistoryIds`.
+1. **Resolve Scope & Identifiers in Memory:** Resolve `targetLessonId`, its nested `affectedStudyItemIds`, and `affectedHistoryIds` (matching `session.lessonIds` containing `targetLessonId` or `session.missedItemIds` referencing `affectedStudyItemIds`).
 2. **Clear In-Memory & Active References:** Remove `targetLessonId` from active quiz selections or filters.
 3. **Purge Affected ItemProgress:** Delete progress records for `affectedStudyItemIds` from `tango_v1_progress`.
-4. **Delete Entire Affected QuizSessionResult Records:** Remove any session referencing `targetLessonId` or its item IDs from `tango_v1_history`.
+4. **Delete Entire Affected QuizSessionResult Records:** Remove any session matching `affectedHistoryIds` from `tango_v1_history`.
 5. **Delete Target Lesson Record LAST:** Remove `targetLessonId` from `tango_v1_lessons` as the final step.
 6. **Verify Parent Study Book:** The parent `StudyBook` remains intact, with its lesson and item counters updated.
 

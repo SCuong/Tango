@@ -189,6 +189,8 @@ eligible unique StudyItems
 > `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering**.
 > 
 > Example: 20 unique items deduplicated across lessons may yield $N = 15$ if 5 items lack required fields (e.g. missing `vietnamese` when only Vietnamese-based questions are enabled).
+> 
+> **Distinction Between Selected Items and N:** The raw selected count represents all content in the chosen lessons before filtering (e.g. `79 mục đã chọn`). `N` represents the eligible questions after deduplication and type filtering (e.g. `72 câu khả dụng`). Fixed count buttons and `Tất cả (N)` strictly use `N`, never the raw selected count.
 
 #### Authoritative `questionCount: 'all'` Rule
 - Selecting `questionCount: 'all'` generates **exactly one initial question per eligible unique StudyItem** ($N$ eligible unique items = $N$ initial questions).
@@ -303,7 +305,11 @@ export interface UserStudyState {
 - `tango_v1_covers_idb`: Binary book cover `Blob`s in browser IndexedDB (object store)
 
 ### 4.2 Deterministic Quiz History Cleanup Rule
-When a lesson or StudyBook is permanently deleted, any `QuizSessionResult` in `tango_v1_history` that references any of the affected lesson IDs or item IDs is **deleted entirely**. Preserving partial or incomplete summaries with missing lesson context would corrupt score and accuracy records. Unaffected quiz histories remain untouched.
+`QuizSessionResult` records do not store full question details; they persist lightweight summary metadata (`sessionId`, `lessonIds`, `missedItemIds`, score, streak, time, completedAt). When a lesson or StudyBook is permanently deleted, Tango scans `tango_v1_history` and deletes any `QuizSessionResult` where:
+- `session.lessonIds` contains an affected lesson ID, or
+- `session.missedItemIds` contains an affected StudyItem ID.
+
+Any affected history session is **deleted entirely** rather than partially rewritten (preserving partial summaries with missing lesson context would corrupt score and accuracy records). Unaffected quiz histories remain untouched.
 
 ### 4.3 Mistake Review Lifecycle
 1. When any question is answered incorrectly, `targetItem.id` is added to `QuizSessionResult.missedItemIds`.
