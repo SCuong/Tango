@@ -180,7 +180,7 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
 
 ### 5.2 Quick Test (Kiểm tra tính điểm)
 - **Purpose:** Assessment, time-boxed retention check.
-- **Question Counts:** Dynamic candidate options (`10`, `20`, `40` shown only when `<= N`) plus `Tất cả (N)`. Exactly $N$ questions for $N$ eligible unique items when selecting `Tất cả`. If $N = 0$, count buttons are hidden and the $N = 0$ empty state is shown.
+- **Question Counts:** Dynamic candidate options (`10`, `20`, `40` shown only when `<= N`) plus `Tất cả (N)`. Exactly $N$ initial questions for $N$ eligible lexical groups when selecting `Tất cả`. If $N = 0$, count buttons are hidden and the $N = 0$ empty state is shown.
 - **HUD Elements:**
   - Question progress (`4 / 20`)
   - Running score

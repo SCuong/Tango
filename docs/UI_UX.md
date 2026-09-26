@@ -89,7 +89,7 @@ HÁN TỰ (5 bài · 82 mục)
 Selecting a lesson opens the **Lesson Detail view**, offering:
 - Items preview (Japanese, Kana, Vietnamese, optional Hán Việt)
 - "Luyện tập" (Practice Mode)
-- "Kiểm tra nhanh" (Quick Test: 10 / 20 / 40 / Tất cả (N); $N$ = eligible unique StudyItems after deduplication and question-type compatibility filtering; candidate counts `10`, `20`, `40` shown dynamically only when `<= N`; if $N = 0$, count buttons are hidden and the $N = 0$ empty state is shown)
+- "Kiểm tra nhanh" (Quick Test: 10 / 20 / 40 / Tất cả (N); $N$ = deduplicated lexical groups supporting at least one enabled compatible QuestionType, respecting required fields and the 4-distinct-option distractor contract; candidate counts `10`, `20`, `40` shown dynamically only when `<= N`; if $N = 0$, count buttons are hidden and the $N = 0$ empty state is shown)
 
 *Kanji lessons display flat lists of StudyItem entries, avoiding complex character trees.*
 
@@ -135,9 +135,9 @@ Loại câu hỏi
 ```
 
 *Note on Question Count & Canonical Definition of N:*
-- **Selected Count vs. Eligible Count:** The raw selected count (e.g. `79 mục đã chọn`) represents the content across selected lessons before eligibility filtering. `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering** (e.g. `72 câu khả dụng`). These values may differ if duplicate words appear across categories or if items lack fields required by enabled question types.
+- **Selected Count vs. Eligible Count:** The raw selected count (e.g. `79 mục đã chọn`) represents the content across selected lessons before eligibility filtering. `N` is strictly defined as the number of **deduplicated lexical groups supporting at least one enabled compatible QuestionType** (e.g. `72 câu khả dụng`). Lexical groups are deduplicated by `normalized(japanese) + '::' + normalized(kana || '')`. Compatibility requires both required fields and the 4-distinct-option distractor contract for multiple-choice types.
 - Candidate count buttons (`10`, `20`, `40`) are rendered dynamically only when `<= N`.
-- Selecting `Tất cả (N)` presents exactly $N$ initial questions for the $N$ eligible unique items (e.g. `Tất cả (72)`), never using the raw selected count and never multiplying by question types.
+- Selecting `Tất cả (N)` presents exactly $N$ initial questions for the $N$ eligible lexical groups (e.g. `Tất cả (72)`), never using the raw selected count and never multiplying by question types.
 - *The N = 0 State:* If $N = 0$, `Tất cả (0)` and fixed count buttons are **never** rendered. The Start Test button is disabled/hidden, and an explanatory empty state is shown: `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."` / `"No eligible questions for the selected question types."` Users can adjust lessons or question types without modal errors.
 
 ---

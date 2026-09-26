@@ -366,8 +366,8 @@ Bài 2: Hành động & Đi lại
 
 - Study actions are triggered deliberately at the lesson level.
 - Users are never plunged unexpectedly into a test without first seeing the lesson overview.
-- **Canonical Definition of N:** $N$ is the number of **eligible unique StudyItems** after BOTH deduplication (by `normalized(japanese) + '::' + normalized(kana || '')`) and question-type compatibility filtering against enabled question formats.
-- **Dynamic Candidate Counts Rule:** In Quick Test and multi-lesson quizzes, fixed candidate counts (`10`, `20`, `40`) are displayed dynamically only when `<= N`. When $N > 0$, the full pool option `Tất cả (N)` presents exactly $N$ initial questions for the $N$ eligible unique items (never multiplied by question types).
+- **Canonical Definition of N:** $N$ is strictly the number of **deduplicated lexical groups supporting at least one enabled compatible QuestionType** (deduplication key: `normalized(japanese) + '::' + normalized(kana || '')`). See [`docs/DATA_MODEL.md §3.2`](./DATA_MODEL.md#32-authoritative-quiz-engine-pool-resolution-contract) for the canonical contract. Multiple-choice compatibility requires the selected pool to produce 3 distinct distractors from other lexical groups; no synthetic merged StudyItem is created at runtime.
+- **Dynamic Candidate Counts Rule:** In Quick Test and multi-lesson quizzes, fixed candidate counts (`10`, `20`, `40`) are displayed dynamically only when `<= N`. When $N > 0$, the full pool option `Tất cả (N)` presents exactly $N$ initial questions for the $N$ eligible lexical groups (never multiplied by question types).
 - **The N = 0 State:** If $N = 0$, `Tất cả (0)` and fixed count buttons are **never** rendered. The Start Test action is disabled/hidden, and an explanatory empty state is shown ("Không có câu hỏi phù hợp với các loại câu hỏi đã chọn." / "No eligible questions for the selected question types.").
 
 ---
@@ -454,21 +454,26 @@ Số câu hỏi:
    ```text
    selected lessonIds
             ↓
-   collect StudyItems from tango_v1_lessons
+   collect StudyItems from tango_v1_lessons (in deterministic lesson/item order)
             ↓
-   deduplicate by normalized Japanese + Kana
+   deduplicate by normalized Japanese + Kana into lexical groups:
+   normalized(japanese) + '::' + normalized(kana || '')
             ↓
-   filter items against enabled QuestionTypes and available item fields
+   filter groups against enabled QuestionTypes & pool distractors:
+     • Target field availability (non-empty Vietnamese meaning, Kana reading)
+     • Distractor contract for multiple-choice types (must yield 3 distinct distractors from other groups)
             ↓
-   eligible unique StudyItems
+   eligible lexical groups
             ↓
             N
    ```
-   `N` is strictly the number of **eligible unique StudyItems after both deduplication and compatibility filtering**.
-   - **Distinction Between Selected Items and Eligible Questions (N):** The selected/raw item count (e.g. `79 mục đã chọn`) represents the total items in the selected lessons before eligibility filtering. `N` represents the eligible unique StudyItems after both deduplication and question-type compatibility filtering (e.g. `72 câu khả dụng`). These values may differ if duplicate words appear across categories or if items lack fields required by enabled question types.
+   `N` is strictly the number of **deduplicated lexical groups supporting at least one enabled compatible QuestionType** (see [`docs/DATA_MODEL.md §3.2`](./DATA_MODEL.md#32-authoritative-quiz-engine-pool-resolution-contract) for the canonical contract).
+   - **Lexical Groups & No Synthetic Merging:** Items sharing `normalized(japanese) + '::' + normalized(kana || '')` form a single lexical group. Tango does not synthesize merged StudyItems at runtime.
+   - **Compatibility Requirements:** Both field compatibility (e.g. non-empty Vietnamese meaning, Kana reading) and distractor compatibility (pool ability to produce 3 distinct distractors from other lexical groups for multiple-choice types) must be respected. When generating a question, the first compatible real item in deterministic order serves as `targetItem`.
+   - **Distinction Between Selected Items and Eligible Questions (N):** The selected/raw item count (e.g. `79 mục đã chọn`) represents the total items in the selected lessons before eligibility filtering. `N` represents the eligible lexical groups after both deduplication and compatibility filtering (e.g. `72 câu khả dụng`).
    - `Tất cả (N)` always uses the eligible count $N$ (e.g. `Tất cả (72)`), never the raw selected count.
 3. **Dynamic Candidate Slicing:** Candidate fixed buttons (`10`, `20`, `40`) are rendered dynamically only when `<= N`.
-4. **Authoritative `questionCount: 'all'` Rule:** Selecting `Tất cả (N)` generates **exactly one initial question per eligible unique StudyItem** ($N$ eligible unique items = $N$ initial questions). It **NEVER multiplies** item count by the number of active question types. Each unique item is assigned exactly one enabled compatible question type (e.g., items lacking `kana` skip `kana_to_japanese`; items lacking `vietnamese` skip `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`).
+4. **Authoritative `questionCount: 'all'` Rule:** Selecting `Tất cả (N)` generates **exactly one initial question per eligible lexical group** ($N$ eligible groups = $N$ initial questions). It **NEVER multiplies** item count by the number of active question types. Each lexical group is assigned exactly one enabled compatible question type.
 5. **Practice Mode Note:** Practice Mode may requeue missed items after the initial set, so total interactions during practice may exceed $N$.
 6. **The N = 0 State:** If $N = 0$, `Tất cả (0)` and fixed count buttons are **not** rendered, the Start Test action is disabled/hidden, and an explanatory empty state is shown: `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."` / `"No eligible questions for the selected question types."` Users can adjust lesson selections, toggle question types, or go back without error modals.
 
