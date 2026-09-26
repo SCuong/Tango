@@ -11,7 +11,7 @@ This document defines the functional UX flows, screen layouts, interaction patte
 Tango is built for focused, daily retention drills. The visual design prioritizes mental clarity, high legibility, and rapid feedback.
 
 ### 1.1 Core Principles
-- **Soft Claymorphism:** Tactile, friendly, calm, and modern. Avoids cartoonish 3D inflation, heavy gradients, glowing borders, or generic AI/SaaS dashboard clutter.
+- **Soft Claymorphism:** Tactile, friendly, calm, and modern. Avoids cartoonish 3D inflation, heavy gradients, glowing borders, or generic dashboard clutter.
 - **Typographic Prominence:** Japanese characters (Kanji and Kana in `Noto Sans JP`) are the focal point with generous font sizes and ample negative space. Vietnamese and English UI text uses `Be Vietnam Pro`.
 - **Multi-Theme Support:** Operates seamlessly across **Light (Sáng)**, **Dark (Tối)**, and **Sakura** themes via semantic design tokens (detailed in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)).
 - **Unified Icon System:** Powered exclusively by **Tabler Icons** (`@tabler/icons-react`).
@@ -29,24 +29,24 @@ The home screen clearly presents two distinct learning pathways plus the unified
 │               Bạn muốn học gì?                │
 │                                               │
 │  ┌─────────────────────────────────────────┐  │
-│  │ 📘 TỪ VỰNG                              │  │
+│  │ [IconBook] TỪ VỰNG                      │  │
 │  │ 3 bài · 60 từ                           │  │
 │  └─────────────────────────────────────────┘  │
 │                                               │
 │  ┌─────────────────────────────────────────┐  │
-│  │ 漢 HÁN TỰ                               │  │
+│  │ [IconWriting] HÁN TỰ                    │  │
 │  │ 3 bài · 55 từ                           │  │
 │  └─────────────────────────────────────────┘  │
 │                                               │
-│        [ ⚡ Kiểm tra tổng hợp (Mixed) ]        │
-│        [ 📥 Nhập bài mới (Import) ]            │
+│        [ [IconBolt] Kiểm tra tổng hợp (Mixed) ]│
+│        [ [IconFileImport] Nhập bài mới ]       │
 └───────────────────────────────────────────────┘
 ```
 
-- **📘 Từ vựng Card:** Enters the Vocabulary lesson list.
-- **漢 Hán tự Card:** Enters the Kanji lesson list.
-- **⚡ Kiểm tra tổng hợp CTA:** Directly opens the multi-lesson selector.
-- **📥 Nhập bài mới CTA:** Opens the unified Lesson Importer (see [`docs/IMPORT_SPEC.md`](./IMPORT_SPEC.md)).
+- **[IconBook] Từ vựng Card:** Enters the Vocabulary lesson list.
+- **[IconWriting] Hán tự Card:** Enters the Kanji lesson list.
+- **[IconBolt] Kiểm tra tổng hợp CTA:** Directly opens the multi-lesson selector.
+- **[IconFileImport] Nhập bài mới CTA:** Opens the unified Lesson Importer (see [`docs/IMPORT_SPEC.md`](./IMPORT_SPEC.md)).
 
 ---
 

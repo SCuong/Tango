@@ -9,8 +9,8 @@
 Tango bridges the natural cognitive affinity between the Japanese language (specifically Kanji) and Sino-Vietnamese roots (Hán Việt). 
 
 The app organizes study into two distinct categories:
-- **📘 Từ vựng (Vocabulary):** General vocabulary, word compounds, and phrases.
-- **漢 Hán tự (Kanji):** Kanji vocabulary compounds and readings.
+- **[IconBook] Từ vựng (Vocabulary):** General vocabulary, word compounds, and phrases.
+- **[IconWriting] Hán tự (Kanji):** Kanji vocabulary compounds and readings.
 
 Both categories share the **exact same item schema** and the **exact same quiz engine**, allowing learners to study lessons individually or combine any mix of Vocabulary and Kanji lessons into a **Mixed Test (Kiểm tra tổng hợp)**.
 

@@ -7,8 +7,8 @@ This specification defines the functional requirements and user experience for t
 ## 1. Study Categories & Shared Study Item Model
 
 Tango organizes study content into two primary categories:
-- **📘 Từ vựng (Vocabulary):** General words, idioms, loanwords, and phrases.
-- **漢 Hán tự (Kanji):** Kanji vocabulary compounds and readings.
+- **[IconBook] Từ vựng (Vocabulary):** General words, idioms, loanwords, and phrases.
+- **[IconWriting] Hán tự (Kanji):** Kanji vocabulary compounds and readings.
 
 These are distinct in user navigation, but **technically identical** in data representation.
 

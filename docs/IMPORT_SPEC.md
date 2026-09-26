@@ -40,15 +40,15 @@ User immediately begins Practice, Quick Test, or Mixed Test
 ## 2. One Importer for Both Categories
 
 Tango features two study categories:
-- **📘 Từ vựng (Vocabulary)**
-- **漢 Hán tự (Kanji)**
+- **[IconBook] Từ vựng (Vocabulary)**
+- **[IconWriting] Hán tự (Kanji)**
 
 Both categories share the identical `StudyItem` schema. Consequently, **there is only one unified importer**.
 
 ```text
 Loại bài học
 
-[ 📘 Từ vựng ]   [ 漢 Hán tự ]
+[ [IconBook] Từ vựng ]   [ [IconWriting] Hán tự ]
 ```
 
 - Selecting the category assigns the `category: 'vocabulary' | 'kanji'` attribute on the resulting `Lesson`.
@@ -316,7 +316,7 @@ On mobile screens, four-column tables cause horizontal scroll frustration. Tango
 THÊM BÀI HỌC MỚI
 
 1. Chọn phân loại
-   [ 📘 Từ vựng ]   [ 漢 Hán tự ]
+   [ [IconBook] Từ vựng ]   [ [IconWriting] Hán tự ]
 
 2. Tên bài học
    [ Bài 1: Giao thông & Đi lại                ]

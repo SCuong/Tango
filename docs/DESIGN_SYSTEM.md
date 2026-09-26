@@ -19,13 +19,13 @@ Tango must feel like a calm, polished, thoughtfully crafted educational tool des
 
 ---
 
-## 2. Absolute Rule: Avoid AI Slop & Generic SaaS Clichés
+## 2. Absolute Rule: Avoid Generic Template & SaaS Clichés
 
-Tango strictly rejects visual clichés commonly associated with low-effort, AI-generated or template-driven web interfaces.
+Tango strictly rejects visual clichés commonly associated with low-effort or template-driven web interfaces.
 
 ### Anti-Patterns Strictly Prohibited:
-- **No generic AI/SaaS dashboard layouts:** No sidebar menus stuffed with fake productivity stats, "Welcome back, User!" hero banners, or pointless telemetry widgets.
-- **No purple-to-blue AI gradients or neon glowing borders:** No rainbow halos, iridescent chromatic aberrations, or radioactive accent buttons.
+- **No generic template or SaaS dashboard layouts:** No sidebar menus stuffed with fake productivity stats, "Welcome back, User!" hero banners, or pointless telemetry widgets.
+- **No exaggerated neon gradients or glowing borders:** No rainbow halos, iridescent chromatic aberrations, or radioactive accent buttons.
 - **No floating gradient blobs or decorative geometric shapes:** Every element on screen must serve a clear study or navigation function.
 - **No glassmorphism everywhere:** No blurry frosted-glass panels stacked over complex backgrounds that degrade text readability.
 - **No nested cards inside cards inside cards:** Flat, intentional grouping with clean negative space.
@@ -118,7 +118,9 @@ Tango uses **Tabler Icons** (`@tabler/icons-react`) as its exclusive, unified UI
 | Correct Answer | `IconCheck` | Green confirmation checkmark |
 | Incorrect Answer | `IconX` | Red mistake indicator |
 | Warning / Incomplete | `IconAlertTriangle` | Non-blocking data warning |
-| Sound / Audio (Future) | `IconVolume` | Vocabulary pronunciation placeholder |
+| Sound Effects (MVP) | `IconVolume` / `IconVolumeOff` | Settings toggle for subtle tactile feedback (default OFF)* |
+
+*\*Note: Spoken Japanese pronunciation / text-to-speech (TTS) remains out of scope for the MVP and is reserved for future consideration.*
 
 ---
 
@@ -404,7 +406,7 @@ All interactive Clay surfaces (cards, buttons, choices) share a predictable, phy
 
 ## 14. Radius & Shape Hierarchy
 
-To avoid the cliché "everything is 24px" AI aesthetic, border radii are deliberately scaled by component size:
+To avoid the cliché "everything is 24px" template aesthetic, border radii are deliberately scaled by component size:
 
 | Radius Token | Value | Target Components |
 |---|---|---|
@@ -442,12 +444,12 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 - **Top Bar:** Tango wordmark, language toggle (`VI` / `EN`), appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`).
 - **Hero Area:** Brief study greeting in selected UI language: `"Bạn muốn học gì hôm nay?"` / `"What would you like to learn today?"`.
 - **Category Cards (2 Large Clay Cards):**
-  - **📘 Từ vựng (Vocabulary):** Soft indigo/slate clay elevation, lesson count, total words, overall mastery bar.
-  - **漢 Hán tự (Kanji):** Soft amber/plum clay elevation, lesson count, total words, overall mastery bar.
+  - **[IconBook] Từ vựng (Vocabulary):** Soft indigo/slate clay elevation, lesson count, total words, overall mastery bar.
+  - **[IconWriting] Hán tự (Kanji):** Soft amber/plum clay elevation, lesson count, total words, overall mastery bar.
 - **Combined Test Action Bar:**
-  - Full-width clay button: `⚡ Kiểm tra tổng hợp (Mixed Test)`
+  - Full-width clay button: `[IconBolt] Kiểm tra tổng hợp (Mixed Test)`
 - **Secondary Action:**
-  - `📥 Nhập bài mới (Import Lesson)` button with subtle border.
+  - `[IconFileImport] Nhập bài mới (Import Lesson)` button with subtle border.
 
 ### 16.2 Lesson List Screen
 - **Header:** Category title with `IconArrowLeft` back action, and `+ Nhập bài` shortcut.
@@ -641,7 +643,7 @@ When implementing any screen or component in Tango, verify:
 - [ ] Is Vietnamese/English text rendered in `Be Vietnam Pro` with diacritic clearance?
 - [ ] Are all UI icons sourced exclusively from `Tabler Icons`?
 - [ ] Are multiple-choice answer buttons completely free of `A/B/C/D`, `1/2/3/4`, or keyboard hint tags?
-- [ ] Does the element look soft, tactile, and restrained—avoiding bloated cartoon 3D or flat AI slop?
+- [ ] Does the element look soft, tactile, and restrained—avoiding bloated cartoon 3D or generic, flat, template-like styling?
 - [ ] Are mobile touch targets at least 48px high (and quiz answer buttons at least 56px)?
 - [ ] Does the layout work seamlessly across Light, Dark, and Sakura themes?
 - [ ] Is motion restrained (150–220ms) and compliant with `prefers-reduced-motion`?
