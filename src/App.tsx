@@ -7,7 +7,7 @@ export const App: React.FC = () => {
         <h1 className="text-xl font-bold tracking-tight text-text-primary">
           Tango
         </h1>
-        <p className="text-sm text-text-secondary">
+        <p className="text-base text-text-secondary">
           <span className="font-japanese">日本語</span>
           <span> • </span>
           <span>Tiếng Việt</span>
