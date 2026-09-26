@@ -21,7 +21,7 @@ This document details the architectural design, frontend stack selection, multi-
 |---|---|---|
 | **Core Framework** | **React 18 / 19 + TypeScript** with **Vite** | • Instant build and dev feedback loop via Vite.<br>• Zero SSR complexity; pure Static Single-Page Application (SPA).<br>• Predictable component-based model ideal for multi-step interactive quiz states.<br>• Full type safety for `StudyItem`, `Lesson`, and `QuizConfig`. |
 | **Styling** | **Tailwind CSS** | • Zero-runtime CSS with micro bundle size.<br>• Rapid implementation of mobile-first ergonomic spacing, touch targets (min 48px-52px), and typography.<br>• Consistent slate and indigo color tokens. |
-| **Icons** | **Lucide React** | • Modern, lightweight, stroke-based iconography.<br>• Tree-shakeable so only imported icons are bundled. |
+| **Icons** | **Tabler Icons** (`@tabler/icons-react`) | • Consistent, comprehensive stroke-based iconography.<br>• Tree-shakeable, authoritative icon standard (see `docs/DESIGN_SYSTEM.md`). |
 | **State Management** | **React Hooks + Context** (with lightweight store pattern) | • Manages: (1) Active Category & Selected Lessons, (2) Active Quiz Session, (3) Local Progress.<br>• Decoupled custom hooks (`useQuiz`, `useProgress`) provide clean separation without Redux/MobX boilerplate. |
 | **Offline & PWA** | **vite-plugin-pwa** | • Zero-config Service Worker registration with Workbox.<br>• Pre-caches all static assets and lesson bundles for 100% offline study.<br>• Web App Manifest for Android/iOS home screen installation. |
 | **Testing** | **Vitest + Testing Library** | • Lightning-fast test runner sharing Vite's configuration.<br>• Verifies multi-lesson pool building, question generation, and text-matching algorithms. |
@@ -68,12 +68,18 @@ All user progress, weak-word markers, and session histories are stored in browse
 │ tango_v1_progress        │ StudyItem error/pass counts,│
 │                          │ weak status keyed by itemId │
 │ tango_v1_history         │ Recent quiz session records │
-│ tango_v1_preferences     │ Quiz defaults (10/20/all)   │
+│ tango_v1_preferences     │ App settings: theme, lang,  │
+│                          │ soundEnabled (default: false│
 │ tango_v1_custom_lessons  │ Custom user-imported lessons│
 └──────────────────────────┴─────────────────────────────┘
 ```
 
 Because `StudyItem.id` is globally unique across both Vocabulary and Kanji lessons, the progress store operates uniformly regardless of which lesson or category an item originated from.
+
+### 4.1 Audio Feedback Architecture (Optional, Off by Default)
+- **Engine:** Pure client-side Web Audio API synthesizer or lightweight tiny audio buffers (< 20KB total).
+- **Decoupled Playback:** Audio triggers asynchronously without blocking UI rendering, auto-advance timers, or state updates.
+- **Strict Default:** Sound is strictly **OFF** (`soundEnabled: false`). Audio context is only initialized/activated upon explicit user action in Settings.
 
 ---
 

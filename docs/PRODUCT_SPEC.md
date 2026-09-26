@@ -65,29 +65,29 @@ All four question types operate identically on items from either category:
 ### Type 1: Kana → Japanese (`kana_to_japanese`)
 - **Prompt:** `りょこう`
 - **Goal:** Identify the correct Japanese written form.
-- **Options (4 choices):**
-  - A. 実際
-  - B. **旅行** *(Correct)*
-  - C. 礼儀
-  - D. 景観
+- **Options (4 choices — rendered without A/B/C/D indices):**
+  - 実際
+  - **旅行** *(Correct)*
+  - 礼儀
+  - 景観
 
 ### Type 2: Japanese → Vietnamese (`japanese_to_vi`)
 - **Prompt:** `旅行` (`りょこう`)
 - **Goal:** Select the matching Vietnamese meaning.
-- **Options (4 choices):**
-  - A. thực tế
-  - B. **du lịch** *(Correct)*
-  - C. lễ nghi
-  - D. cảnh quan
+- **Options (4 choices — rendered without A/B/C/D indices):**
+  - thực tế
+  - **du lịch** *(Correct)*
+  - lễ nghi
+  - cảnh quan
 
 ### Type 3: Vietnamese → Japanese (`vi_to_japanese`)
 - **Prompt:** `du lịch`
 - **Goal:** Select the corresponding Japanese word.
-- **Options (4 choices):**
-  - A. 景観
-  - B. 礼儀
-  - C. **旅行** *(Correct)*
-  - D. 実際
+- **Options (4 choices — rendered without A/B/C/D indices):**
+  - 景観
+  - 礼儀
+  - **旅行** *(Correct)*
+  - 実際
 
 ### Type 4: Vietnamese → Written Answer (`vi_to_text`)
 - **Prompt:** `du lịch`
@@ -189,6 +189,12 @@ Nghĩa:
 ```
 
 *Note: For Example B, the Hán Việt section disappears entirely. No placeholder text.*
+
+### 6.3 Optional Sound Feedback (Off by Default)
+- **Status:** Disabled (**OFF**) by default. Sounds are never played until explicitly enabled by the user in Settings (`Sound effects: On`).
+- **Characteristics:** Short (< 200ms), soft, non-intrusive tactile tones matching Tango's Soft Claymorphism personality (gentle ceramic/wooden tap for correct, soft low chime for incorrect).
+- **Non-Blocking & Visual Parity:** Sounds never delay question transitions, and visual indicators remain 100% complete and authoritative. No loud arcade sounds, voices, or repetitive navigation clicks.
+- **Persistence:** Stored locally in `tango_v1_preferences.soundEnabled`.
 
 ---
 

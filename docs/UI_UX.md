@@ -1,6 +1,8 @@
 # Tango — UI / UX Design Specification
 
-This document defines the visual system, navigation structure, screen specifications, and ergonomic guidelines for Tango across mobile and desktop form factors.
+This document defines the functional UX flows, screen layouts, interaction patterns, and ergonomics for Tango across mobile and desktop form factors.
+
+> **Visual Design System Reference:** For the complete, authoritative design token architecture, Soft Claymorphism specifications, Light/Dark/Sakura palettes, typography, and Tabler Icons, see [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
 
 ---
 
@@ -9,46 +11,17 @@ This document defines the visual system, navigation structure, screen specificat
 Tango is built for focused, daily retention drills. The visual design prioritizes mental clarity, high legibility, and rapid feedback.
 
 ### 1.1 Core Principles
-- **Clarity Over Decoration:** Avoid heavy gradients, glowing glassmorphism, decorative cards-within-cards, or superfluous animations that distract from study.
-- **Typographic Prominence:** Japanese characters (Kanji and Kana) are the focal point and must be displayed with generous font sizes, balanced line heights, and ample whitespace.
-- **Friendly & Encouraging Tone:** Modern, warm neutral canvas with a confident indigo primary tone. Correct feedback feels rewarding; incorrect feedback feels educational and constructive rather than punitive.
-
-### 1.2 Color Palette
-
-| Token | Hex Value | Semantic Purpose |
-|---|---|---|
-| **Background (Light)** | `#F8FAFC` (Slate 50) | Gentle, glare-free light canvas |
-| **Surface Card** | `#FFFFFF` (Pure White) | Elevated card surface with subtle border |
-| **Border / Divider** | `#E2E8F0` (Slate 200) | Crisp, thin structural borders (1px) |
-| **Primary Brand** | `#4F46E5` (Indigo 600) | Primary actions, progress bars, active highlights |
-| **Primary Hover/Tap**| `#4338CA` (Indigo 700) | Active tap/hover state |
-| **Text Primary** | `#0F172A` (Slate 900) | Maximum contrast for Kanji and main text |
-| **Text Muted** | `#64748B` (Slate 500) | Secondary labels, readings, timestamps |
-| **Success / Correct** | `#059669` (Emerald 600) | Correct answer indicators and accuracy badges |
-| **Success Surface** | `#ECFDF5` (Emerald 50) | Subtle background for correct choice |
-| **Error / Incorrect** | `#DC2626` (Red 600) | Incorrect indicator on mistake |
-| **Error Surface** | `#FEF2F2` (Red 50) | Subtle background for explanation card |
-
-### 1.3 Typography System
-- **Japanese Character Font Stack:**
-  `'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif`
-  - High-precision rendering of stroke details and Kana.
-- **Vietnamese & UI Font Stack:**
-  `'Be Vietnam Pro', 'Inter', system-ui, -apple-system, sans-serif`
-  - Complete support for Vietnamese diacritics without clipping or awkward baseline shifts.
-- **Type Scale:**
-  - Prompt Kanji / Japanese: `32px` to `40px` (font-bold)
-  - Kana Reading: `18px` to `20px` (font-medium, Slate-500)
-  - Vietnamese Meaning: `18px` to `22px` (font-semibold)
-  - Choice Buttons: `16px` to `18px` (font-medium)
-  - Meta & Hán Việt Badges: `13px` to `14px` (font-semibold, tracking-wide)
+- **Soft Claymorphism:** Tactile, friendly, calm, and modern. Avoids cartoonish 3D inflation, heavy gradients, glowing borders, or generic AI/SaaS dashboard clutter.
+- **Typographic Prominence:** Japanese characters (Kanji and Kana in `Noto Sans JP`) are the focal point with generous font sizes and ample negative space. Vietnamese and English UI text uses `Be Vietnam Pro`.
+- **Multi-Theme Support:** Operates seamlessly across **Light (Sáng)**, **Dark (Tối)**, and **Sakura** themes via semantic design tokens (detailed in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)).
+- **Unified Icon System:** Powered exclusively by **Tabler Icons** (`@tabler/icons-react`).
 
 ---
 
 ## 2. Main Screens & Wireframes
 
 ### Screen 1: Home / Dual Study Categories
-The home screen clearly presents two distinct learning pathways plus the unified Mixed Test entry point:
+The home screen clearly presents two distinct learning pathways plus the unified Mixed Test and Import entry points:
 
 ```text
 ┌───────────────────────────────────────────────┐
@@ -73,7 +46,7 @@ The home screen clearly presents two distinct learning pathways plus the unified
 - **📘 Từ vựng Card:** Enters the Vocabulary lesson list.
 - **漢 Hán tự Card:** Enters the Kanji lesson list.
 - **⚡ Kiểm tra tổng hợp CTA:** Directly opens the multi-lesson selector.
-- **📥 Nhập bài mới CTA:** Opens the unified Lesson Importer (see `docs/IMPORT_SPEC.md`).
+- **📥 Nhập bài mới CTA:** Opens the unified Lesson Importer (see [`docs/IMPORT_SPEC.md`](./IMPORT_SPEC.md)).
 
 ---
 
@@ -145,18 +118,24 @@ Used uniformly for single lessons, multi-lessons, and mixed tests:
   - Centered, generous padding (32px-48px).
 - **Bottom Thumb Area — 4 Options:**
   - Stacked full-width buttons (minimum 56px height).
-  - Clear label letters (`A`, `B`, `C`, `D` on mobile; `[1]`, `[2]`, `[3]`, `[4]` hints on desktop).
+  - Positional color identity (Amber, Blue, Violet, Rose) as defined in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
+  - **CRITICAL:** Strictly **NO** visible answer letters (`A/B/C/D`), numbers (`1/2/3/4`), or keyboard hints (`[1]-[4]`) stamped on the buttons. Only the answer content is displayed.
 
 ---
 
 ### Screen 5: Answer Feedback & Explanations
 
 #### 5.1 Correct Answer
-- Selected button highlights in Emerald Green (`#059669`).
+- Selected button highlights with an Emerald Green outline/ring (`#059669`) and an `IconCheck`.
 - Brief confirmation toast: "Chính xác! 👏" showing reading and meaning.
+- Optional sound: If enabled in Settings (Off by default), plays a short, subtle ceramic chime (<200ms). Never blocks or delays auto-advance.
 - Auto-advances in 750ms or on `Enter`/`Space`/Tap.
 
 #### 5.2 Incorrect Answer Explanation
+- The wrongly chosen button receives a Red outline (`#DC2626`) and `IconX`.
+- The true correct choice highlights concurrently in Emerald Green with `IconCheck`.
+- Optional sound: If enabled in Settings (Off by default), plays a gentle low-frequency warm tone (<200ms).
+- An informative educational sheet slides in from the bottom:
 
 **Item with Hán Việt:**
 ```text
@@ -215,6 +194,16 @@ Nghĩa:
 
 ---
 
+### Screen 8: Settings (Cài đặt)
+
+A clean, minimalist preferences modal/sheet:
+- **Language (Ngôn ngữ):** Segmented control `[ Tiếng Việt ]` | `[ English ]`.
+- **Theme (Giao diện):** 3 live color swatches `[ Sáng / Light ]` | `[ Tối / Dark ]` | `[ Sakura / Sakura ]`.
+- **Sound Effects (Âm thanh hiệu ứng):** Segmented toggle `[ Off / On ]` (Default: **Off** / Tắt). Never plays sound unless explicitly enabled.
+- Preferences automatically persist to local storage.
+
+---
+
 ## 3. Mobile Usability (First-Class Requirement)
 
 1. **Thumb-Zone Optimization:**
@@ -235,10 +224,9 @@ Nghĩa:
 1. **Centered Study Canvas:**
    - Study view is centered with a constrained max-width (`max-w-xl` / ~600px) to prevent wide eye scanning.
 2. **Keyboard-First Navigation:**
-   - Number keys `1`, `2`, `3`, `4`: Select choices directly.
+   - Number keys `1`, `2`, `3`, `4`: Select choices directly in the background (no visible numbers on buttons).
    - `Enter` / `Space`: Confirm, dismiss explanation, or advance.
    - `Escape`: Trigger exit confirmation.
-   - Subtle key hints (`[1]`, `[2]`, `[3]`, `[4]`) render beside choices on desktop only.
 3. **Accessibility:**
    - Visible `:focus-visible` rings with high-contrast outlines.
    - Semantic buttons and ARIA labels.
@@ -253,6 +241,6 @@ Nghĩa:
 | **Mixed Test Selector**| Full-screen modal, stacked checkboxes | Centered modal (max-w-lg) | Centered modal (max-w-xl) |
 | **Lesson List** | Single column list | 2-column grid | 2-column grid (max-w-4xl) |
 | **Quiz Container** | Full screen (100% width, 16px padding) | Centered canvas (max-w-lg) | Centered canvas (max-w-xl) |
-| **Option Buttons** | Full width stacked, 56px height | Full width stacked, 58px height | Full width with keyboard hints `[1]-[4]` |
+| **Option Buttons** | Full width stacked, 56px height | Full width stacked, 58px height | Full width stacked (clean content-only, no indices) |
 | **Explanation View** | Bottom sheet sliding up | Centered modal overlay | Centered modal overlay |
 | **Results Summary** | 2x2 compact metrics, stacked buttons | 4-column metrics row | 4-column metrics row, side-by-side buttons |

@@ -192,8 +192,18 @@ export interface ItemProgress {
   isMarkedWeak: boolean;          // Flagged if error rate exceeds threshold
 }
 
+export type AppTheme = 'light' | 'dark' | 'sakura';
+export type AppLanguage = 'vi' | 'en';
+
+export interface UserPreferences {
+  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura'
+  language: AppLanguage;         // 'vi' (default) | 'en'
+  soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
+}
+
 export interface UserStudyState {
   version: number;                // Schema version for future migrations
+  preferences: UserPreferences;
   progressByItem: Record<string, ItemProgress>;
   recentResults: QuizSessionResult[];
 }
