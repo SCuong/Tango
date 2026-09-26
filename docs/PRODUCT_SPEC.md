@@ -132,12 +132,17 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
                          ↓
             Build Question Pool (shuffled)
                          ↓
-       Slice to requested count (10 / 20 / 40 / All)
+     Slice to requested count (10 / 20 / 40 / Tất cả (N))
                          ↓
              Shared Single Quiz Engine
 ```
 
 > **Deduplication Key:** Because the same Japanese vocabulary expression may appear in both Vocabulary and Kanji lessons (with different item IDs), deduplication must **not** rely solely on `item.id`. Instead, the study pool deduplicates items using `normalized(japanese) + '::' + normalized(kana || '')`.
+
+> **Question Pool Slicing & `questionCount: 'all'`:**
+> - Candidate fixed count buttons (`10`, `20`, `40`) are displayed dynamically only when `<= N` (total unique items in the deduplicated pool).
+> - The full pool button `Tất cả (N)` is always displayed.
+> - Selecting `Tất cả (N)` generates **exactly one initial question per eligible unique StudyItem** ($N$ unique items = $N$ questions). It never multiplies the item count by the number of active question types.
 
 ---
 
@@ -153,7 +158,7 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
 
 ### 5.2 Quick Test (Kiểm tra tính điểm)
 - **Purpose:** Assessment, time-boxed retention check.
-- **Question Counts:** `[ 10 câu ]` | `[ 20 câu ]` | `[ 40 câu ]` | `[ Tất cả ]`
+- **Question Counts:** Dynamic candidate options (`10`, `20`, `40` shown only when `<= N`) plus `Tất cả (N)`. Exactly $N$ questions for $N$ unique items when selecting `Tất cả`.
 - **HUD Elements:**
   - Question progress (`4 / 20`)
   - Running score
@@ -242,5 +247,5 @@ The following items are strictly out of scope:
 - Social book sharing, public marketplace, or ISBN/metadata lookups
 - AI chatbots, external LLM APIs, or AI content generation
 - Backend servers, authentication, and cloud synchronization
-- Audio synthesis, voice recognition, or handwriting canvas
+- Speech synthesis, Japanese pronunciation TTS, voice playback, voice recognition, or handwriting canvas (Note: short, subtle Web Audio sound effects for UI feedback are an optional MVP feature, OFF by default)
 - Complex state libraries or unneeded third-party dependencies

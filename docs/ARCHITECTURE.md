@@ -10,7 +10,7 @@ This document details the architectural design, frontend stack selection, multi-
 2. **Flexible Multi-Lesson Aggregation:** The quiz engine is decoupled from individual lessons. It consumes an array of `lessonIds: string[]`, aggregates their items into a unified study pool, deduplicates them by normalized Japanese + Kana, and feeds questions into a single quiz runner.
 3. **Client-Side First (Local-First):** 100% of the application runs directly in the user's browser with zero API latency and complete offline capability.
 4. **Zero Unnecessary Dependencies:** Keep the third-party dependency footprint minimal to guarantee instant cold-start times and long-term maintainability.
-5. **No Premature Backend:** No servers, databases, or microservices are required for MVP. Bundled lesson data is stored in static JSON files.
+5. **No Premature Backend & Seeded Mutable Runtime:** No servers, databases, or microservices are required for MVP. Bundled lesson files under `src/data/` act strictly as **initial seed data**. On first application startup, seed lessons are copied into the canonical mutable local lesson store (`tango_v1_lessons`). The runtime application operates exclusively on this mutable store, ensuring that user edits, reassignments, and permanent hard deletions apply uniformly to all lessons without seed data resurfacing on relaunch.
 6. **Resilient Unicode Support:** Built-in normalization and text comparison to handle complex Japanese script (Kanji, Kana, full-width characters) and Vietnamese diacritical accents cleanly.
 
 ---
@@ -57,7 +57,7 @@ The quiz pipeline is designed to be completely decoupled from lesson categorizat
 
 ## 4. Client-Side Persistence Strategy
 
-All user progress, weak-word markers, session histories, and book metadata are stored in browser local persistence.
+All user progress, weak-word markers, session histories, books, and mutable lessons are stored in client-side persistence.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -66,31 +66,41 @@ All user progress, weak-word markers, session histories, and book metadata are s
 │ Storage Key / Database   │ Purpose & Storage Technology         │
 ├──────────────────────────┼──────────────────────────────────────┤
 │ tango_v1_books           │ StudyBook metadata (id, title,       │
-│                          │ coverImageId) in localStorage        │
-│ tango_v1_covers_idb      │ Cover image binary Blobs             │
-│                          │ in browser IndexedDB (object store)  │
+│                          │ coverImageId, timestamps) in LS      │
+│ tango_v1_lessons         │ Canonical mutable Lesson records &   │
+│                          │ nested StudyItems in localStorage    │
 │ tango_v1_progress        │ StudyItem error/pass counts,         │
-│                          │ weak status keyed by itemId          │
-│ tango_v1_history         │ Recent quiz session records          │
+│                          │ weak status keyed by itemId in LS    │
+│ tango_v1_history         │ QuizSessionResult records in LS      │
 │ tango_v1_preferences     │ App settings: theme, lang,           │
-│                          │ soundEnabled (default: false)        │
-│ tango_v1_custom_lessons  │ Custom user-imported lessons         │
+│                          │ soundEnabled (default: false) in LS  │
+│ tango_v1_library_init    │ Seed initialization marker in LS     │
+│ tango_v1_covers_idb      │ Binary book cover Blobs              │
+│                          │ in browser IndexedDB (object store)  │
 └──────────────────────────┴──────────────────────────────────────┘
 ```
 
-Because `StudyItem.id` is globally unique across both Vocabulary and Kanji lessons, the progress store operates uniformly regardless of which lesson or category an item originated from.
+### 4.1 Canonical Mutable Lesson Store (`tango_v1_lessons`)
+- **Single Source of Truth:** All runtime operations query and mutate `tango_v1_lessons`. There is no separate store for imported vs. seeded lessons.
+- **One-Time Seed Copy:** On initial app launch, bundled lessons (`src/data/`) are copied into `tango_v1_lessons`, and `tango_v1_library_init` is marked. Subsequent app loads exclusively read from `tango_v1_lessons`.
+- **No Resurrecting Deleted Lessons:** Because runtime queries ignore bundled JSON once initialized, deleting a seeded lesson or textbook permanently removes it; it will never reappear on subsequent launches or PWA cache updates.
 
-### 4.1 Book Cover Binary Storage (IndexedDB)
+### 4.2 Book Cover Binary Storage (IndexedDB)
 - **Zero Base64 in `localStorage`:** Book covers are user-uploaded binary images (`.jpg`, `.png`, `.webp`). Storing them in `localStorage` as base64 strings quickly exhausts the browser's 5MB quota and degrades serialization performance.
-- **IndexedDB Blob Store:** Cover images are stored directly as binary `Blob` objects in an IndexedDB database (`tango_v1_covers_idb`).
-- **Hard Delete Cascade:** When a `StudyBook` is permanently deleted (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)), Tango executes an atomic cascade:
-  1. Deletes the cover blob from `tango_v1_covers_idb`.
-  2. Removes the `StudyBook` entry from `tango_v1_books`.
-  3. Deletes all associated lessons and `StudyItem` entries.
-  4. Purges all `ItemProgress` records for those items from `tango_v1_progress`.
-  5. Cleans stale quiz session references in `tango_v1_history`.
+- **IndexedDB Blob Store:** Cover images are stored directly as binary `Blob` objects in an IndexedDB database (`tango_v1_covers_idb`) referenced by `StudyBook.coverImageId`.
 
-### 4.2 Audio Feedback Architecture (Optional, Off by Default)
+### 4.3 Ordered, Idempotent Hard-Delete Cascade
+Browser storage operations span `localStorage` and `IndexedDB`. Because no single browser transaction can span both storage systems atomically, Tango defines an **ordered, idempotent hard-delete cascade** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)). Each step is deterministic and safe to re-run:
+1. **Resolve Scope:** Determine target `Lesson` IDs and all nested `StudyItem` IDs belonging to the book or lesson.
+2. **Clear Active Selections:** Remove target lesson IDs from any active multi-lesson quiz configuration.
+3. **Purge Progress Records:** Delete `ItemProgress` entries for the resolved item IDs from `tango_v1_progress`.
+4. **Purge Quiz History Entries:** Deterministically delete any `QuizSessionResult` record in `tango_v1_history` that references any of the affected lesson IDs or item IDs (preventing corrupt or misleading partial summaries).
+5. **Delete Lesson Records:** Remove target lessons from `tango_v1_lessons`.
+6. **Delete Book Metadata:** Remove `StudyBook` entry from `tango_v1_books` (if deleting a book).
+7. **Delete Cover Blob:** In IndexedDB (`tango_v1_covers_idb`), delete the binary cover blob keyed by `coverImageId` (if present).
+8. **Verify Integrity:** Confirm no dangling references or orphaned IDs remain.
+
+### 4.4 Audio Feedback Architecture (Optional, Off by Default)
 - **Engine:** Pure client-side Web Audio API synthesizer or lightweight tiny audio buffers (< 20KB total).
 - **Decoupled Playback:** Audio triggers asynchronously without blocking UI rendering, auto-advance timers, or state updates.
 - **Strict Default:** Sound is strictly **OFF** (`soundEnabled: false`). Audio context is only initialized/activated upon explicit user action in Settings.
@@ -110,7 +120,7 @@ Tango is designed to be installed on mobile phones and tablets:
   - `background_color`: `#f8fafc`
 - **Caching Strategy:**
   - **Static Assets:** Cache-first, background update (stale-while-revalidate).
-  - **Lesson Bundles:** Precached on install.
+  - **Lesson Bundles (Initial Seed):** Pre-cached on install. Copied to `tango_v1_lessons` on initial library setup. Subsequent app updates or Workbox cache invalidations never overwrite `tango_v1_lessons` or resurrect intentionally deleted lessons.
   - 100% functional offline.
 
 ---
@@ -130,22 +140,22 @@ Written-answer quiz mode (`vi_to_text`) utilizes normalization utilities in `src
 
 ## 7. Proposed Data & Source Tree
 
-### 7.1 Bundled Data Organization
+### 7.1 Bundled Data Organization (Seed Data Only)
 
 ```
 src/data/
-├── vocabulary/                # Vocabulary lessons
+├── vocabulary/                # Initial seed vocabulary lessons
 │   ├── lesson-01.json         # e.g., Bài 1 - Đồ ăn nhanh
 │   ├── lesson-02.json
 │   └── ...
-├── kanji/                     # Kanji lessons (flat StudyItem lists)
+├── kanji/                     # Initial seed Kanji lessons (flat StudyItem lists)
 │   ├── lesson-01.json         # e.g., Bài 1 - Hành động & Đi lại
 │   ├── lesson-02.json
 │   └── ...
-└── index.ts                   # Unified registry exporting getAllLessons(), getLessonById()
+└── index.ts                   # Seed registry exporting getSeedLessons()
 ```
 
-*Both `vocabulary/` and `kanji/` directories strictly conform to the identical `Lesson` and `StudyItem` schemas.*
+*Both `vocabulary/` and `kanji/` directories strictly conform to the identical `Lesson` and `StudyItem` schemas. These bundled files serve strictly as initial seed data on first initialization; runtime queries, edits, and deletions take place exclusively within `tango_v1_lessons`.*
 
 ### 7.2 Source Code Organization
 

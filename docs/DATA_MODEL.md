@@ -10,13 +10,15 @@ Vocabulary and Kanji lessons share the exact same item structure and feed into a
 
 ```mermaid
 erDiagram
-    STUDY_BOOK ||--o{ LESSON : organizes
+    STUDY_BOOK |o--o{ LESSON : organizes
     LESSON ||--|{ STUDY_ITEM : contains
     STUDY_ITEM ||--o{ ITEM_PROGRESS : tracks
     QUIZ_CONFIG ||--|{ LESSON : selects_multiple
     QUIZ_SESSION ||--|{ QUIZ_QUESTION : generates
     QUIZ_QUESTION }|--|| STUDY_ITEM : references
 ```
+
+*Cardinality Note: One `StudyBook` organizes zero or many `Lesson`s (`o{`). One `Lesson` belongs to zero or one `StudyBook` (`|o`). Lessons without a `bookId` belong to the neutral group `Không thuộc giáo trình` (Unassigned).*
 
 ---
 
@@ -36,12 +38,20 @@ export type StudyCategory = 'vocabulary' | 'kanji';
  * See docs/CONTENT_LIBRARY_SPEC.md for complete specifications.
  */
 export interface StudyBook {
-  id: string;              // Stable unique ID, e.g. "book-chukyu-he-ikou"
-  title: string;           // Display title, e.g. "中級へ行こう" (Required, non-empty)
+  id: string;              // Opaque collision-safe unique ID (e.g. "book_" + crypto.randomUUID())
+  title: string;           // Display title, e.g. "中級へ行こう" (Required, non-empty; duplicates allowed)
   coverImageId?: string;   // Reference ID for cover binary Blob in IndexedDB (Optional)
   createdAt: string;       // ISO 8601 creation timestamp
   updatedAt: string;       // ISO 8601 last modified timestamp
 }
+
+/**
+ * ID & Title Independence Rules:
+ * - StudyBook IDs are opaque, collision-safe identifiers (e.g. generated via browser crypto.randomUUID()).
+ * - IDs are NEVER derived from the title. Renaming a book never alters its id or breaks Lesson.bookId links.
+ * - Duplicate titles are explicitly permitted (learners may track separate volumes or editions).
+ * - User-created lessons/items also receive opaque collision-safe IDs; bundled seed files use stable IDs.
+ */
 
 /**
  * Shared core study item for both Vocabulary and Kanji lessons.
@@ -153,14 +163,28 @@ export type QuizMode = 'practice' | 'test';
 export interface QuizConfig {
   lessonIds: string[];            // Array of selected lesson IDs (supports 1 to N lessons)
   mode: QuizMode;                 // 'practice' or 'test'
-  questionCount: number | 'all';  // 10, 20, 40, or 'all'
+  questionCount: number | 'all';  // Candidate fixed counts (10, 20, 40) or 'all'
   allowedTypes: QuestionType[];   // Enabled question formats
 }
 ```
 
+### 3.2 Question Count & Pool Generation Rules
+- **Definition of `questionCount: 'all'`:** After aggregating lessons and deduplicating by `normalized(japanese) + '::' + normalized(kana || '')`, every eligible unique `StudyItem` appears **exactly once** in the initial question set.
+  - It does **NOT** multiply by the number of enabled question types (e.g. 52 eligible items = 52 initial questions, never 52 × 4 = 208).
+  - For each unique item, exactly ONE enabled compatible question type is selected.
+  - Missing data skips incompatible types: an item with no `kana` skips `kana_to_japanese`; an item with empty `vietnamese` definitions skips `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`. If an item supports none of the enabled question types, it is excluded.
+  - `Tất cả (N)` / `All (N)` always displays the exact count of eligible unique items (`N`), not raw source item counts.
+  - *Practice Mode Note:* In Practice Mode, missed items may be re-queued after the initial question set until answered correctly, so total interactions in the session may exceed `N`.
+- **Dynamic Fixed Count Options:** Candidate fixed numbers are `10`, `20`, `40`. The UI only displays fixed counts that are `<= N`.
+  - Example `N = 7`: `[ Tất cả (7) ]`
+  - Example `N = 16`: `[ 10 ]  [ Tất cả (16) ]`
+  - Example `N = 27`: `[ 10 ]  [ 20 ]  [ Tất cả (27) ]`
+  - Example `N = 81`: `[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả (81) ]`
+  - Disabled or impossible count buttons are never rendered.
+
 > **Cross-Category Pool Deduplication:** When building the study question pool from multiple lessons, items are deduplicated using `normalized(japanese) + '::' + normalized(kana || '')` to ensure the same word appearing in both Vocabulary and Kanji is not tested redundantly.
 
-### 3.2 Active Question & Session State
+### 3.3 Active Question & Session State
 
 ```typescript
 export interface QuizQuestion {
@@ -192,7 +216,7 @@ export interface QuizSessionResult {
 
 ---
 
-## 4. Local Learning Progress & Mistake Tracking
+## 4. Local Learning Progress & Persistence Architecture
 
 Tracking user retention is handled via a unified, client-side store keyed by `StudyItem.id`. Because Vocabulary and Kanji items use the same item schema and ID convention, progress tracking is completely uniform.
 
@@ -216,18 +240,34 @@ export interface UserPreferences {
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
 }
 
+/**
+ * Aggregated runtime client-side state in TypeScript memory.
+ * Physical persistence is partitioned across dedicated storage keys.
+ */
 export interface UserStudyState {
   version: number;                // Schema version for future migrations
   preferences: UserPreferences;
-  books: Record<string, StudyBook>; // User-defined textbooks (see docs/CONTENT_LIBRARY_SPEC.md)
+  books: Record<string, StudyBook>; // All textbooks keyed by StudyBook.id
+  lessons: Record<string, Lesson>;  // Canonical mutable Lesson store
   progressByItem: Record<string, ItemProgress>;
   recentResults: QuizSessionResult[];
 }
 ```
 
-*Note: Book covers are stored as binary Blobs in browser IndexedDB (`tango_v1_covers_idb`) referenced via `StudyBook.coverImageId`. They are NEVER stored as large base64 strings in `localStorage`.*
+### 4.1 Physical Storage Keys (Partitioned Persistence)
+`UserStudyState` is an aggregated in-memory model. Browser storage is intentionally partitioned across distinct keys:
+- `tango_v1_books`: `Record<string, StudyBook>` in `localStorage`
+- `tango_v1_lessons`: Canonical mutable `Record<string, Lesson>` in `localStorage` (all seeded, imported, and user-created lessons)
+- `tango_v1_progress`: `Record<string, ItemProgress>` in `localStorage`
+- `tango_v1_history`: `QuizSessionResult[]` in `localStorage`
+- `tango_v1_preferences`: `UserPreferences` in `localStorage`
+- `tango_v1_library_init`: Initialization marker in `localStorage` ensuring bundled seed data is copied only once
+- `tango_v1_covers_idb`: Binary book cover `Blob`s in browser IndexedDB (object store)
 
-### Mistake Review Lifecycle
+### 4.2 Deterministic Quiz History Cleanup Rule
+When a lesson or StudyBook is permanently deleted, any `QuizSessionResult` in `tango_v1_history` that references any of the affected lesson IDs or item IDs is **deleted entirely**. Preserving partial or incomplete summaries with missing lesson context would corrupt score and accuracy records. Unaffected quiz histories remain untouched.
+
+### 4.3 Mistake Review Lifecycle
 1. When any question is answered incorrectly, `targetItem.id` is added to `QuizSessionResult.missedItemIds`.
 2. Clicking **"Ôn lại từ sai" (Review Missed Words)** gathers the corresponding `StudyItem` records across all tested lessons and launches a focused practice session exclusively for those items.
 3. Once an item is answered correctly in subsequent review sessions, `isMarkedWeak` is cleared.

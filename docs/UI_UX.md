@@ -87,7 +87,7 @@ HÁN TỰ (5 bài · 82 mục)
 Selecting a lesson opens the **Lesson Detail view**, offering:
 - Items preview (Japanese, Kana, Vietnamese, optional Hán Việt)
 - "Luyện tập" (Practice Mode)
-- "Kiểm tra nhanh" (Quick Test: 10 / 20 / Tất cả)
+- "Kiểm tra nhanh" (Quick Test: 10 / 20 / 40 / Tất cả (N); candidate counts `10`, `20`, `40` shown dynamically only when `<= N`)
 
 *Kanji lessons display flat lists of StudyItem entries, avoiding complex character trees.*
 
@@ -95,23 +95,31 @@ Selecting a lesson opens the **Lesson Detail view**, offering:
 
 ### Screen 3: Mixed Multi-Lesson Test (Kiểm tra tổng hợp)
 
-A dedicated, mobile-friendly configuration modal/screen allowing users to combine any set of lessons:
+A dedicated, mobile-friendly configuration modal/screen allowing users to combine any set of lessons across textbooks and categories:
 
 ```text
 KIỂM TRA TỔNG HỢP
 
-TỪ VỰNG
-☑ Bài 1 — 20 từ
-☑ Bài 2 — 20 từ
-☐ Bài 3 — 20 từ
+中級へ行こう
+  Từ vựng
+    ☑ Bài 1 (20 từ)
+    ☐ Bài 2 (22 từ)
+  Hán tự
+    ☑ Bài 1 (16 mục)
 
-HÁN TỰ
-☑ Bài 1 — 20 từ
-☐ Bài 2 — 20 từ
-☐ Bài 3 — 20 từ
+Mimikara
+  Từ vựng
+    ☑ Bài 3 (25 từ)
+    ☐ Bài 4 (20 từ)
+  Hán tự
+    ☑ Bài 2 (18 mục)
+
+Không thuộc giáo trình
+  Từ vựng
+    ☐ Từ vựng du lịch (30 từ)
 
 Số câu
-[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả ]
+[ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả (79) ]
 
 Loại câu hỏi
 ☑ Kana → Japanese
@@ -119,8 +127,10 @@ Loại câu hỏi
 ☑ Vietnamese → Japanese
 ☐ Written Answer
 
-[ Bắt đầu kiểm tra (60 từ trong nhóm) ]
+[ Bắt đầu kiểm tra (79 mục đã chọn) ]
 ```
+
+*Note on Question Count:* Candidate count buttons (`10`, `20`, `40`) are shown dynamically only when `<= N` (total unique items in the combined selection). Selecting `Tất cả (N)` presents exactly $N$ questions (one initial question per unique item), never multiplying by question types.
 
 ---
 
@@ -229,10 +239,11 @@ A clean, minimalist preferences modal/sheet:
 
 A protected administrative screen accessed intentionally via **Settings → Quản lý giáo trình và bài học**:
 - **Giáo trình (Study Books):** List of textbooks with `[ Quản lý ]` inspector and `[IconPlus] Thêm giáo trình`.
-- **Bài học (Lessons):** `[IconFileImport] Thêm / Nhập bài học mới` (launches lesson importer with target book selector).
-- **Danger Zone (Vùng nguy hiểm):** Located deep inside book/lesson management views.
-- **Hard Delete Only:** Deleting a book or lesson permanently removes records and related data. No soft delete, no recycle bin, no trash folder.
-- **Accidental Tap Safeguards:** Requires explicit modal confirmation clearly stating book/lesson name and total items; delete button is visually separated with error styling and never default focused.
+- **Bài học (Lessons):** Lesson rows inside book management provide `[ Quản lý ]`, opening a dedicated **Quản lý bài học (Lesson Management)** view. There are **strictly no inline adjacent delete buttons** on lesson rows.
+- **Thêm bài mới:** `[IconFileImport] Thêm / Nhập bài học mới` (launches lesson importer with target book selector).
+- **Danger Zone (Vùng nguy hiểm):** Located deep inside individual book and lesson management views.
+- **Hard Delete Only:** Deleting a book or lesson permanently removes records and related data via an ordered, idempotent cascade. No soft delete, no recycle bin, no trash folder.
+- **Accidental Tap Safeguards:** Requires explicit modal confirmation clearly stating book/lesson name and total items; delete button is visually separated with semantic error styling and never default focused.
 - See [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md) for full wireframes and cascade behaviors.
 
 ---
@@ -270,7 +281,7 @@ A protected administrative screen accessed intentionally via **Settings → Qu�
 
 | Component / Screen | Mobile (< 640px) | Tablet (640px - 1024px) | Desktop (> 1024px) |
 |---|---|---|---|
-| **Home Screen** | Stacked full-width category cards | 2-column category grid | 2-column category grid (max-w-2xl) |
+| **Home Screen** | Stacked Study Book cards, Learn by Type buttons, Mixed Test CTA | 2-column Study Book grid with compact sidebar / action bar | 3 to 4-column Study Book card grid (max-w-4xl), Learn by Type quick links, Mixed Test banner |
 | **Mixed Test Selector**| Full-screen modal, stacked checkboxes | Centered modal (max-w-lg) | Centered modal (max-w-xl) |
 | **Lesson List** | Single column list | 2-column grid | 2-column grid (max-w-4xl) |
 | **Quiz Container** | Full screen (100% width, 16px padding) | Centered canvas (max-w-lg) | Centered canvas (max-w-xl) |

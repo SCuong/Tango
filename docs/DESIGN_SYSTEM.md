@@ -49,7 +49,7 @@ Tango adopts **Soft Claymorphism** as its signature visual language. Claymorphis
 - **Modern & Focused:** Crisp typography and deliberate contrast keep attention anchored on vocabulary acquisition.
 
 ### Where Claymorphism Belongs:
-- Major Home category cards (Từ vựng, Hán tự)
+- Study Book cards and Learn by Type cards (Từ vựng, Hán tự)
 - Lesson selection cards
 - Primary action buttons (CTA, Start Quiz, Next Question)
 - Multiple-choice answer buttons
@@ -208,6 +208,7 @@ Components **never** reference raw hex colors. All components consume semantic C
   --success-surface: ...;
   --error: ...;
   --error-surface: ...;
+  --error-border: ...;
   --warning: ...;
 
   /* 4 Positional Multiple-Choice Answer Identities */
@@ -414,7 +415,7 @@ To avoid the cliché "everything is 24px" template aesthetic, border radii are d
 | `--radius-md` | `10px` | Form inputs, dropdown menus, table preview cells |
 | `--radius-lg` | `16px` | Secondary buttons, modal dialogs, search bars |
 | `--radius-xl` | `20px` | Quiz answer buttons, lesson list cards, stat cards |
-| `--radius-2xl`| `26px` | Major Home Category Cards (Từ vựng, Hán tự) |
+| `--radius-2xl`| `26px` | Study Book cards and Learn by Type cards |
 | `--radius-full`| `9999px`| Pill filters, avatar circles, icon action buttons |
 
 ---
@@ -502,7 +503,7 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 - **Danger Zone (Vùng nguy hiểm):** Bordered with a muted semantic warning/error line.
 - **Destructive Confirmation Dialog:**
   - High-emphasis modal with semi-opaque backdrop (`backdrop-blur-sm`).
-  - Destructive action button: Semantic error red token (`--accent-red-surface` / `--accent-red-border` / `--accent-red-text`).
+  - Destructive action button: Semantic error red token (`--error`, `--error-surface`, `--error-border`).
   - Cancel button: Neutral surface, visually distinct, safe spacing from delete button, holds initial focus.
   - Never default-focus the destructive action; `Enter` does not execute deletion.
   - See [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md) for UX dialog specifications.
@@ -565,6 +566,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --success-surface: #ECFDF5;
   --error: #DC2626;
   --error-surface: #FEF2F2;
+  --error-border: #FCA5A5;
   --warning: #D97706;
 
   /* 4 Positional Answer Choices */
@@ -599,6 +601,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --success-surface: #064E3B;
   --error: #EF4444;
   --error-surface: #7F1D1D;
+  --error-border: #B91C1C;
   --warning: #F59E0B;
 
   /* 4 Positional Answer Choices (Muted Rich Dark Hues) */
@@ -633,6 +636,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --success-surface: #ECFDF5;
   --error: #DC2626;
   --error-surface: #FEF2F2;
+  --error-border: #FCA5A5;
   --warning: #D97706;
 
   /* 4 Positional Answer Choices (Blossom Garden Harmony) */

@@ -49,7 +49,7 @@ Browse Study Book or Category → Select Lesson(s)
                     ↓
            Start Practice Session
                     ↓
-          Take Quiz (10 / 20 / 40 / All)
+          Take Quiz (10 / 20 / 40 / Tất cả (N))
                     ↓
           Immediate Mistake Analysis
                     ↓
