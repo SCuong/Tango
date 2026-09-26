@@ -40,6 +40,7 @@ export interface StudyItem {
   hanViet?: string;        // Optional Sino-Vietnamese reading, e.g. "LỮ HÀNH" (omitted for loanwords)
   vietnamese: string[];    // Array of accepted Vietnamese definitions, e.g. ["du lịch"]
 }
+// Note: See docs/IMPORT_SPEC.md for import data requirements and field optionality considerations.
 
 /**
  * Standard Lesson container used for both Vocabulary and Kanji categories.

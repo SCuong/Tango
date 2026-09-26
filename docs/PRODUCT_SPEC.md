@@ -211,7 +211,7 @@ To support custom content seamlessly without architectural friction:
   ファストフード | ふぁすとふーど | | đồ ăn nhanh
   ```
 - During import, the user selects whether the lesson belongs to **Vocabulary** or **Kanji**.
-- *Status:* Importer is out of scope for the current MVP implementation, but the data schemas are designed to ingest this format cleanly.
+- *Specification:* See [`docs/IMPORT_SPEC.md`](file:///a:/Tango/docs/IMPORT_SPEC.md) for the authoritative import behavior and full specification.
 
 ---
 
