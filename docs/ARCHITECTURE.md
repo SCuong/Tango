@@ -1,15 +1,17 @@
 # Tango — Technical Architecture
 
-This document details the architectural design, frontend stack selection, client-side persistence, PWA roadmap, and source organization for the Tango application.
+This document details the architectural design, frontend stack selection, multi-lesson study engine, client-side persistence, PWA roadmap, and source organization for Tango.
 
 ---
 
 ## 1. Architectural Principles
 
-1. **Client-Side First (Local-First):** 100% of the application runs directly in the user's browser. There are no API round-trips for core study sessions, zero server latency, and full offline capability.
-2. **Zero Unnecessary Dependencies:** Keep the third-party dependency footprint minimal to guarantee instant cold-start times and long-term maintainability.
-3. **No Premature Backend:** No backend servers, databases, or microservices are needed for the MVP. Static assets and bundled vocabulary are served via standard static hosting (e.g. GitHub Pages, Vercel, Cloudflare Pages).
-4. **Resilient Unicode Support:** Built-in normalization and text comparison to handle complex Japanese script (Kanji, Furigana, full-width kana) and Vietnamese diacritical accents cleanly.
+1. **Shared Foundation, Dual Categorization:** Vocabulary and Kanji are two navigation categories backed by the **identical data schema** (`StudyItem`, `Lesson`) and processed by the **exact same quiz engine**. No duplicated quiz runners or category-specific models exist.
+2. **Flexible Multi-Lesson Aggregation:** The quiz engine is decoupled from individual lessons. It consumes an array of `lessonIds: string[]`, aggregates their items into a unified study pool, deduplicates them, and feeds questions into a single quiz runner.
+3. **Client-Side First (Local-First):** 100% of the application runs directly in the user's browser with zero API latency and complete offline capability.
+4. **Zero Unnecessary Dependencies:** Keep the third-party dependency footprint minimal to guarantee instant cold-start times and long-term maintainability.
+5. **No Premature Backend:** No servers, databases, or microservices are required for MVP. Bundled lesson data is stored in static JSON files.
+6. **Resilient Unicode Support:** Built-in normalization and text comparison to handle complex Japanese script (Kanji, Kana, full-width characters) and Vietnamese diacritical accents cleanly.
 
 ---
 
@@ -17,19 +19,43 @@ This document details the architectural design, frontend stack selection, client
 
 | Layer | Choice | Rationale & Trade-offs |
 |---|---|---|
-| **Core Framework** | **React 18 / 19 + TypeScript** with **Vite** | • Extremely fast build and development feedback loop via Vite (ESM).<br>• Zero SSR complexity; pure Static Single-Page Application (SPA).<br>• Predictable component-based model ideal for multi-step interactive quiz states.<br>• Excellent TypeScript type safety for data models. |
-| **Styling** | **Tailwind CSS** | • Zero-runtime CSS with micro bundle size (purges unused styles).<br>• Rapid implementation of mobile-first ergonomic spacing, touch targets (min 48px), and typography.<br>• Native dark mode support if desired in future milestones. |
+| **Core Framework** | **React 18 / 19 + TypeScript** with **Vite** | • Instant build and dev feedback loop via Vite.<br>• Zero SSR complexity; pure Static Single-Page Application (SPA).<br>• Predictable component-based model ideal for multi-step interactive quiz states.<br>• Full type safety for `StudyItem`, `Lesson`, and `QuizConfig`. |
+| **Styling** | **Tailwind CSS** | • Zero-runtime CSS with micro bundle size.<br>• Rapid implementation of mobile-first ergonomic spacing, touch targets (min 48px-52px), and typography.<br>• Consistent slate and indigo color tokens. |
 | **Icons** | **Lucide React** | • Modern, lightweight, stroke-based iconography.<br>• Tree-shakeable so only imported icons are bundled. |
-| **State Management** | **React Hooks + Context** (with lightweight store pattern) | • The MVP's state consists of (1) Selected Vocabulary Set, (2) Active Quiz Session, (3) Local Progress.<br>• Redux, MobX, or complicated external state libraries add unnecessary boilerplate. Native React hooks and Context easily satisfy all requirements. |
-| **Offline & PWA** | **vite-plugin-pwa** | • Zero-config Service Worker registration with Workbox.<br>• Pre-caches all static assets and vocabulary bundles for 100% offline study.<br>• Clean Web App Manifest for Android/iOS home screen installation. |
-| **Testing** | **Vitest + Testing Library** | • Lightning-fast test runner sharing Vite's configuration.<br>• Used to verify quiz generation logic, scoring, and text-matching algorithms. |
+| **State Management** | **React Hooks + Context** (with lightweight store pattern) | • Manages: (1) Active Category & Selected Lessons, (2) Active Quiz Session, (3) Local Progress.<br>• Decoupled custom hooks (`useQuiz`, `useProgress`) provide clean separation without Redux/MobX boilerplate. |
+| **Offline & PWA** | **vite-plugin-pwa** | • Zero-config Service Worker registration with Workbox.<br>• Pre-caches all static assets and lesson bundles for 100% offline study.<br>• Web App Manifest for Android/iOS home screen installation. |
+| **Testing** | **Vitest + Testing Library** | • Lightning-fast test runner sharing Vite's configuration.<br>• Verifies multi-lesson pool building, question generation, and text-matching algorithms. |
 
 ---
 
-## 3. Client-Side Persistence Strategy
+## 3. Multi-Lesson Study Pool Architecture
 
-### 3.1 Local Storage Layer
-All user progress, weak-word markers, and session histories are stored in the browser's `localStorage` (or `IndexedDB` when dataset volume expands).
+The quiz pipeline is designed to be completely decoupled from lesson categorization:
+
+```
+[ User Selection ]
+  • Vocabulary Bài 1
+  • Vocabulary Bài 2
+  • Kanji Bài 1
+          ↓
+[ lessonIds: string[] ]
+          ↓
+[ Pool Aggregator ] ─── Reads lessons from data registry
+          ↓
+[ Deduplication ] ───── Ensures unique StudyItems by item.id
+          ↓
+[ Question Generator ] ─ Generates Type 1-4 questions, shuffles options
+          ↓
+[ Question Slicer ] ─── Limits to 10, 20, 40, or 'all'
+          ↓
+[ Shared Quiz Runner ] ─ Unified UI handling Practice, Test, and Review
+```
+
+---
+
+## 4. Client-Side Persistence Strategy
+
+All user progress, weak-word markers, and session histories are stored in browser `localStorage` keyed by `StudyItem.id`.
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -37,99 +63,114 @@ All user progress, weak-word markers, and session histories are stored in the br
 ├──────────────────────────┬─────────────────────────────┤
 │ Storage Key              │ Purpose                     │
 ├──────────────────────────┼─────────────────────────────┤
-│ tango_v1_progress        │ VocabularyItem error/pass   │
-│                          │ counts, weak status         │
+│ tango_v1_progress        │ StudyItem error/pass counts,│
+│                          │ weak status keyed by itemId │
 │ tango_v1_history         │ Recent quiz session records │
 │ tango_v1_preferences     │ Quiz defaults (10/20/all)   │
 └──────────────────────────┴─────────────────────────────┘
 ```
 
-### 3.2 Schema Versioning & Migrations
-To ensure future application updates never corrupt user study history, all persisted records feature a root `version: number`. An initialization guard checks the version and executes forward migrations if fields change.
+Because `StudyItem.id` is globally unique across both Vocabulary and Kanji lessons, the progress store operates uniformly regardless of which lesson or category an item originated from.
 
 ---
 
-## 4. PWA (Progressive Web App) Implementation
+## 5. PWA (Progressive Web App) Implementation
 
-Tango is designed to be installed on mobile phones and tablets to provide an app-like experience without app store gatekeepers:
+Tango is designed to be installed on mobile phones and tablets:
 
 - **Manifest Configuration:**
   - `name`: "Tango — Japanese for Vietnamese"
   - `short_name`: "Tango"
-  - `display`: `standalone` (removes browser URL bar on mobile)
+  - `display`: `standalone` (removes browser URL chrome)
   - `orientation`: `portrait-primary`
   - `theme_color`: `#4f46e5`
   - `background_color`: `#f8fafc`
 - **Caching Strategy:**
-  - **Static Assets (HTML/JS/CSS/Fonts):** Cache-first, background update (stale-while-revalidate).
-  - **Vocabulary Bundles:** Precached on install.
-  - Zero external network requests needed once installed.
+  - **Static Assets:** Cache-first, background update (stale-while-revalidate).
+  - **Lesson Bundles:** Precached on install.
+  - 100% functional offline.
 
 ---
 
-## 5. Text Processing & Unicode Normalization
+## 6. Text Processing & Unicode Normalization
 
-Japanese and Vietnamese text processing requires precise handling in the written-answer quiz mode (Type 4):
+Written-answer quiz mode (Type 4) utilizes normalization utilities in `src/lib/textNormalization.ts`:
 
 1. **Japanese Kana Normalization:**
-   - Converts full-width alphanumeric to half-width.
-   - Trims whitespace and full-width Japanese spaces (`\u3000`).
-   - Normalizes Hiragana and Katakana where appropriate.
+   - Trims leading/trailing whitespace and full-width Japanese spaces (`\u3000`).
+   - Normalizes half-width Katakana to full-width.
 2. **Vietnamese Text Comparison:**
-   - Normalizes unicode using `String.prototype.normalize('NFC')` to ensure composed and decomposed diacritics match consistently across macOS, Windows, iOS, and Android.
-   - Trims surrounding spaces and case-insensitively compares answers against the `vietnamese` definition array.
+   - Normalizes Unicode using `String.prototype.normalize('NFC')` to ensure composed and decomposed diacritics match consistently across iOS, Android, and desktop browsers.
+   - Case-insensitively compares answers against the `vietnamese` definition array.
 
 ---
 
-## 6. Proposed Source Tree
+## 7. Proposed Data & Source Tree
 
-The future source tree is structured around feature-based cohesion and minimal nesting:
+### 7.1 Bundled Data Organization
+
+```
+src/data/
+├── vocabulary/                # Vocabulary lessons
+│   ├── lesson-01.json         # e.g., Bài 1 - Đồ ăn nhanh
+│   ├── lesson-02.json
+│   └── ...
+├── kanji/                     # Kanji lessons (flat StudyItem lists)
+│   ├── lesson-01.json         # e.g., Bài 1 - Hành động & Đi lại
+│   ├── lesson-02.json
+│   └── ...
+└── index.ts                   # Unified registry exporting getAllLessons(), getLessonById()
+```
+
+*Both `vocabulary/` and `kanji/` directories strictly conform to the identical `Lesson` and `StudyItem` schemas.*
+
+### 7.2 Source Code Organization
 
 ```
 src/
 ├── assets/                    # Static vectors, brand icons, logo SVG
-├── components/                # Reusable UI primitives (agnostic to domain)
+├── components/                # Reusable UI primitives (domain-agnostic)
 │   ├── Button.tsx
 │   ├── Card.tsx
 │   ├── Badge.tsx
 │   ├── Modal.tsx
+│   ├── Checkbox.tsx
 │   └── ProgressBar.tsx
-├── data/                      # Bundled default vocabulary sets
-│   ├── chukyu-lesson-1.json   # Sample lesson data (e.g. Fast Food)
-│   └── index.ts               # Registry of available sets
+├── data/                      # Bundled lessons (vocabulary/ & kanji/)
 ├── features/                  # Domain-driven feature modules
-│   ├── vocabulary/            # Set selector, word listing, detail view
-│   │   ├── SetCard.tsx
-│   │   ├── WordListItem.tsx
-│   │   └── VocabularyDetail.tsx
-│   ├── quiz/                  # Quiz execution engine & UI
+│   ├── lessons/               # Category views and lesson browsers
+│   │   ├── CategoryCards.tsx  # Dual entry: Vocabulary vs. Kanji cards
+│   │   ├── LessonList.tsx     # List of lessons for selected category
+│   │   ├── LessonDetail.tsx   # Word list inside a single lesson
+│   │   └── MixedTestModal.tsx # Multi-lesson selector with checkboxes
+│   ├── quiz/                  # Shared quiz engine (used for all tests)
 │   │   ├── QuizRunner.tsx     # Active session controller
 │   │   ├── QuestionPrompt.tsx # Large typography prompt card
 │   │   ├── OptionList.tsx     # 4-choice button grid (mobile thumb-friendly)
 │   │   ├── TextInputQuiz.tsx  # Type-in answer interface
-│   │   ├── AnswerFeedback.tsx # Instant correct/incorrect explanation modal
+│   │   ├── AnswerFeedback.tsx # Clean explanation sheet (Hán Việt when present)
 │   │   └── QuizSummary.tsx    # Completion screen & metrics
 │   └── review/                # Targeted review of failed words
 │       ├── MissedWordsList.tsx
 │       └── ReviewSession.tsx
-├── hooks/                     # Custom React hooks
-│   ├── useQuiz.ts             # Quiz lifecycle, timers, scoring logic
+├── hooks/                     # Decoupled React hooks
+│   ├── useQuiz.ts             # Multi-lesson quiz state, timers, scoring
 │   ├── useProgress.ts         # Persistent progress read/write
-│   └── useKeyboard.ts         # 1/2/3/4 & Enter desktop shortcut listener
+│   └── useKeyboard.ts         # Desktop keyboard shortcut listener (1-4, Enter)
 ├── lib/                       # Pure utility functions (no React dependencies)
-│   ├── storage.ts             # LocalStorage wrapper with version guard
-│   ├── quizEngine.ts          # Question generator, choice shuffler
-│   └── textNormalization.ts   # Japanese/Vietnamese unicode helpers
-├── types/                     # Shared TypeScript interfaces
-│   ├── vocabulary.ts          # VocabularyItem, VocabularySet, KanjiBreakdown
-│   └── quiz.ts                # QuizQuestion, QuizSessionResult, QuestionType
-├── App.tsx                    # Screen router / navigation state controller
-├── index.css                  # Tailwind directives and custom font stacks
+│   ├── storage.ts             # LocalStorage wrapper with schema version guard
+│   ├── quizEngine.ts          # Multi-lesson pool aggregator, question generator
+│   └── textNormalization.ts   # Japanese and Vietnamese unicode matchers
+├── types/                     # Shared TypeScript domain interfaces
+│   ├── study.ts               # StudyItem, Lesson, StudyCategory
+│   └── quiz.ts                # QuizConfig, QuizQuestion, QuizSessionResult
+├── App.tsx                    # Screen router / navigation coordinator
+├── index.css                  # Tailwind directives and font stack configurations
 └── main.tsx                   # Application entry point & PWA registration
 ```
 
 ### Directory Responsibilities
-- `src/components/`: Pure visual building blocks. Must not know about vocabulary or quiz business logic.
-- `src/features/`: Encapsulates screens and UI logic specific to a domain capability (browsing vocabulary, taking a quiz, reviewing mistakes).
-- `src/lib/`: Pure algorithmic functions with zero React dependencies, enabling 100% unit-test coverage via Vitest.
-- `src/hooks/`: Connects UI components to storage and business logic in a decoupled manner.
+- `src/features/lessons/`: Category home view (Từ vựng vs Hán tự), lesson listings, and the Mixed Test multi-lesson configuration modal.
+- `src/features/quiz/`: The **single, reusable quiz system** that powers Practice Mode, Quick Tests, Mixed Tests, and Review Sessions.
+- `src/lib/quizEngine.ts`: Pure algorithmic logic that takes `lessonIds: string[]`, collects items, shuffles choices, and emits `QuizQuestion[]`.
+- `src/types/`: Centralized interfaces guaranteeing strict data symmetry across both study categories.

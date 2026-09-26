@@ -1,12 +1,18 @@
 # Tango — Project Overview
 
 ## 1. Project Name
-**Tango** (単語) — A focused Japanese vocabulary learning web application tailored specifically for Vietnamese learners.
+**Tango** (単語) — A focused Japanese vocabulary and Kanji learning web application tailored specifically for Vietnamese learners.
 
 ---
 
 ## 2. Product Summary
-Tango is designed to bridge the natural cognitive affinity between the Japanese language (specifically Kanji) and Sino-Vietnamese roots (Hán Việt). 
+Tango bridges the natural cognitive affinity between the Japanese language (specifically Kanji) and Sino-Vietnamese roots (Hán Việt). 
+
+The app organizes study into two distinct categories:
+- **📘 Từ vựng (Vocabulary):** General vocabulary, word compounds, and phrases.
+- **漢 Hán tự (Kanji):** Kanji vocabulary compounds and readings.
+
+Both categories share the **exact same item schema** and the **exact same quiz engine**, allowing learners to study lessons individually or combine any mix of Vocabulary and Kanji lessons into a **Mixed Test (Kiểm tra tổng hợp)**.
 
 The application is built for:
 - Mobile phones (primary use case during daily commute and short study breaks)
@@ -18,7 +24,7 @@ Tango is delivered as a modern, responsive web application with Progressive Web 
 ---
 
 ## 3. Core Learning Concept
-Tango connects four linguistic anchors for every vocabulary item:
+Tango connects four linguistic anchors for every study item:
 
 ```
         Japanese Word / Kanji
@@ -39,19 +45,19 @@ Traditional flashcards often encourage passive recognition (flipping cards witho
 The core user journey is rapid, cyclical, and frictionless:
 
 ```
-Select / Import Vocabulary Set
-              ↓
-     Start Practice Session
-              ↓
-     Take Short Quiz (10 / 20 / All)
-              ↓
-     Immediate Mistake Analysis
-              ↓
-Understand Root Meaning (Hán Việt & Kanji breakdown)
-              ↓
-     Review Missed Words
-              ↓
-     Long-term Retention
+Select Lesson(s) (Vocabulary, Kanji, or Mixed)
+                    ↓
+           Start Practice Session
+                    ↓
+          Take Quiz (10 / 20 / 40 / All)
+                    ↓
+          Immediate Mistake Analysis
+                    ↓
+   Understand Meaning & Hán Việt (if present)
+                    ↓
+           Review Missed Words
+                    ↓
+           Long-term Retention
 ```
 
 ---
@@ -64,10 +70,12 @@ Understand Root Meaning (Hán Việt & Kanji breakdown)
 
 ## 6. Product Principles
 
-1. **Instant Study Start:** No mandatory sign-up walls, onboarding mazes, or complex menus. A user can open the app and be practicing within 3 seconds.
-2. **Bite-Sized Sessions:** Designed around 2 to 5-minute study intervals (10–20 questions) suitable for busy schedules.
-3. **Mobile-First Ergonomics:** UI designed for one-handed thumb interaction on mobile devices, while cleanly expanding into a centered, keyboard-friendly layout on desktop.
-4. **Typographic Clarity:** Japanese characters (Kanji, Furigana, Kana) and Vietnamese diacritical marks must render with impeccable sharpness, appropriate font weights, and clear visual hierarchy.
-5. **Contextual Explanations:** When a mistake occurs, Tango does not simply mark it red—it shows the Kana, the full Vietnamese definition, and the Kanji breakdown with Hán Việt to solidify the memory trace.
-6. **Zero Clutter:** No intrusive popups, spammy notifications, excessive gamification gimmicks, or visual noise that distracts from learning.
-7. **No Feature Creep:** Maintain an uncompromising focus on vocabulary acquisition. Keep the MVP lean, reliable, and fast.
+1. **Two Categories, One Engine:** Vocabulary and Kanji are separated in UX for clean curriculum navigation, but share the identical underlying data schema and quiz machinery.
+2. **Flexible Multi-Lesson Study:** Learners can practice a single lesson or select any arbitrary combination of Vocabulary and Kanji lessons for a combined test.
+3. **Instant Study Start:** No mandatory sign-up walls, onboarding mazes, or complex menus. A user can open the app and be practicing within 3 seconds.
+4. **Bite-Sized Sessions:** Designed around 2 to 5-minute study intervals (10–20 questions) suitable for busy schedules.
+5. **Mobile-First Ergonomics:** UI designed for one-handed thumb interaction on mobile devices, while cleanly expanding into a centered, keyboard-friendly layout on desktop.
+6. **Typographic Clarity:** Japanese characters (Kanji, Furigana, Kana) and Vietnamese diacritical marks must render with impeccable sharpness, appropriate font weights, and clear visual hierarchy.
+7. **Clean Contextual Explanations:** When a mistake occurs, Tango displays the Kana, Vietnamese definition, and Hán Việt (if present). When Hán Việt is absent (e.g. Katakana words), the section is cleanly hidden.
+8. **Zero Clutter:** No intrusive popups, spammy notifications, excessive gamification gimmicks, or visual noise that distracts from learning.
+9. **No Feature Creep:** Maintain an uncompromising focus on vocabulary acquisition. Keep the MVP lean, reliable, and fast.

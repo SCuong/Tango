@@ -1,148 +1,165 @@
 # Tango — Data Model Specification
 
-This document defines the core data schemas, entity relationships, and client-side persistence models for Tango.
+This document defines the core data schemas, TypeScript interfaces, and client-side persistence models for Tango.
 
 ---
 
-## 1. Core Entities
+## 1. Architectural Entity Relationship
+
+Vocabulary and Kanji lessons share the exact same item structure and feed into a single unified quiz engine.
 
 ```mermaid
 erDiagram
-    VOCABULARY_SET ||--|{ VOCABULARY_ITEM : contains
-    VOCABULARY_ITEM ||--o{ KANJI_BREAKDOWN : decomposes
-    VOCABULARY_ITEM ||--o{ LEARNING_PROGRESS : tracks
+    LESSON ||--|{ STUDY_ITEM : contains
+    STUDY_ITEM ||--o{ ITEM_PROGRESS : tracks
+    QUIZ_CONFIG ||--|{ LESSON : selects_multiple
     QUIZ_SESSION ||--|{ QUIZ_QUESTION : generates
-    QUIZ_QUESTION }|--|| VOCABULARY_ITEM : references
+    QUIZ_QUESTION }|--|| STUDY_ITEM : references
 ```
 
 ---
 
-## 2. Vocabulary Data Model
+## 2. Core Study Item & Lesson Models
 
 ### 2.1 TypeScript Interfaces
 
 ```typescript
 /**
- * Individual Kanji character breakdown with its Sino-Vietnamese reading
+ * Category distinguishing the curriculum area.
+ * Vocabulary and Kanji share the identical item schema and quiz engine.
  */
-export interface KanjiBreakdown {
-  character: string;     // Single Kanji character, e.g. "観"
-  hanViet: string;       // Sino-Vietnamese reading, e.g. "QUAN"
-  meaning?: string;      // Optional short Vietnamese meaning, e.g. "xem, quan sát"
+export type StudyCategory = 'vocabulary' | 'kanji';
+
+/**
+ * Shared core study item for both Vocabulary and Kanji lessons.
+ */
+export interface StudyItem {
+  id: string;              // Stable unique identifier, e.g. "kanji-01-001" or "vocab-01-001"
+  japanese: string;        // Japanese word/compound, e.g. "旅行" or "ファストフード"
+  kana: string;            // Reading in Hiragana/Katakana, e.g. "りょこう" or "ふぁすとふーど"
+  hanViet?: string;        // Optional Sino-Vietnamese reading, e.g. "LỮ HÀNH" (omitted for loanwords)
+  vietnamese: string[];    // Array of accepted Vietnamese definitions, e.g. ["du lịch"]
 }
 
 /**
- * Individual vocabulary word entry
+ * Standard Lesson container used for both Vocabulary and Kanji categories.
  */
-export interface VocabularyItem {
-  id: string;                    // Stable unique identifier, e.g. "vocab-chuko-1-01"
-  japanese: string;              // Kanji/Kana compound, e.g. "観光客" or "ハンバーガー"
-  kana: string;                  // Reading in Hiragana/Katakana, e.g. "かんこうきゃく"
-  vietnamese: string[];          // List of valid Vietnamese definitions
-  hanViet?: string;              // Optional compound Hán Việt, e.g. "QUAN QUANG KHÁCH"
-  kanjiBreakdown?: KanjiBreakdown[]; // Optional array of Kanji component breakdowns
-  tags?: string[];               // Optional semantic tags: ["N3", "noun", "lesson-1"]
-}
-
-/**
- * Cohesive collection of vocabulary (e.g. textbook chapter or custom list)
- */
-export interface VocabularySet {
-  id: string;                    // Unique set identifier, e.g. "set-chuko-lesson-1"
-  title: string;                 // Set title, e.g. "第1課 ファストフード"
-  subtitle?: string;             // Vietnamese subtitle, e.g. "Bài 1: Đồ ăn nhanh"
-  group: string;                 // Group/Book name, e.g. "中級へ行こう"
-  description?: string;          // Optional introductory context
-  items: VocabularyItem[];       // Array of vocabulary entries
+export interface Lesson {
+  id: string;              // Unique lesson ID, e.g. "vocab-lesson-01" or "kanji-lesson-01"
+  category: StudyCategory; // 'vocabulary' | 'kanji'
+  title: string;           // Display title, e.g. "Bài 1"
+  subtitle?: string;       // Optional subtitle, e.g. "Đồ ăn nhanh" or "Giao thông & Đi lại"
+  items: StudyItem[];      // Flat list of study items
 }
 ```
 
 ### 2.2 JSON Schema Examples
 
-#### Example 1: Kanji Compound with Full Hán Việt & Breakdown
+#### Example 1: Kanji Lesson Item (with Hán Việt)
 ```json
 {
-  "id": "vocab-chuko-1-01",
-  "japanese": "観光客",
-  "kana": "かんこうきゃく",
-  "vietnamese": [
-    "khách tham quan",
-    "khách du lịch"
-  ],
-  "hanViet": "QUAN QUANG KHÁCH",
-  "kanjiBreakdown": [
-    {
-      "character": "観",
-      "hanViet": "QUAN",
-      "meaning": "xem, nhìn"
-    },
-    {
-      "character": "光",
-      "hanViet": "QUANG",
-      "meaning": "ánh sáng, vẻ vang"
-    },
-    {
-      "character": "客",
-      "hanViet": "KHÁCH",
-      "meaning": "người đến thăm"
-    }
-  ],
-  "tags": ["N3", "noun"]
+  "id": "kanji-lesson-01-001",
+  "japanese": "旅行",
+  "kana": "りょこう",
+  "hanViet": "LỮ HÀNH",
+  "vietnamese": ["du lịch"]
 }
 ```
 
-#### Example 2: Katakana Loanword (Pure Kana, No Hán Việt)
+#### Example 2: Vocabulary Lesson Item without Hán Việt (Loanword)
 ```json
 {
-  "id": "vocab-chuko-1-12",
-  "japanese": "ハンバーガー",
-  "kana": "はんばーがー",
-  "vietnamese": [
-    "bánh mì kẹp thịt",
-    "hamburger"
-  ],
-  "tags": ["food", "katakana"]
+  "id": "vocab-lesson-01-001",
+  "japanese": "ファストフード",
+  "kana": "ふぁすとふーど",
+  "vietnamese": ["đồ ăn nhanh"]
 }
 ```
-*Note: Neither `hanViet` nor `kanjiBreakdown` are included. The consumer UI evaluates `if (item.hanViet)` to conditionally render the section.*
+*Rule: When `hanViet` is omitted, UI components check `if (item.hanViet)` and conditionally omit the Hán Việt block entirely.*
+
+#### Example 3: Full Lesson File (`src/data/kanji/lesson-01.json`)
+```json
+{
+  "id": "kanji-lesson-01",
+  "category": "kanji",
+  "title": "Bài 1",
+  "subtitle": "Hành động & Đi lại",
+  "items": [
+    {
+      "id": "kanji-01-001",
+      "japanese": "旅行",
+      "kana": "りょこう",
+      "hanViet": "LỮ HÀNH",
+      "vietnamese": ["du lịch"]
+    },
+    {
+      "id": "kanji-01-002",
+      "japanese": "実際",
+      "kana": "じっさい",
+      "hanViet": "THỰC TẾ",
+      "vietnamese": ["thực tế"]
+    },
+    {
+      "id": "kanji-01-003",
+      "japanese": "礼儀",
+      "kana": "れいぎ",
+      "hanViet": "LỄ NGHI",
+      "vietnamese": ["lễ nghi", "phép lịch sự"]
+    },
+    {
+      "id": "kanji-01-004",
+      "japanese": "景観",
+      "kana": "けいかん",
+      "hanViet": "CẢNH QUAN",
+      "vietnamese": ["cảnh quan"]
+    }
+  ]
+}
+```
 
 ---
 
 ## 3. Quiz & Practice Session Models
 
-The quiz engine instantiates transient question models derived from vocabulary items during an active session:
+### 3.1 Multi-Lesson Quiz Configuration
+
+Tango supports testing any arbitrary set of lessons—single lesson, multi-lesson, or a mixed test across Vocabulary and Kanji:
 
 ```typescript
 export type QuestionType =
-  | 'kana_to_kanji'      // Prompt: かんこうきゃく → Choose 観光客
-  | 'kanji_to_vi'        // Prompt: 観光客 → Choose khách tham quan
-  | 'vi_to_kanji'        // Prompt: khách tham quan → Choose 観光客
-  | 'vi_to_text';        // Prompt: khách tham quan → Type 観光客 or かんこうきゃく
-
-export interface QuizQuestion {
-  id: string;                     // Unique question ID in session, e.g. "q-1"
-  type: QuestionType;
-  prompt: string;                 // The primary question text
-  subPrompt?: string;             // Supplemental clue or instruction
-  correctAnswer: string;          // The correct option value or expected text
-  options?: string[];             // 4 choices for multiple choice questions
-  targetItem: VocabularyItem;     // Full reference to the target vocabulary item
-  userAnswer?: string;            // The answer submitted by user
-  isCorrect?: boolean;            // Answer evaluation flag
-}
+  | 'kana_to_kanji'      // Prompt: りょこう → Choose 旅行
+  | 'kanji_to_vi'        // Prompt: 旅行 → Choose du lịch
+  | 'vi_to_kanji'        // Prompt: du lịch → Choose 旅行
+  | 'vi_to_text';        // Prompt: du lịch → Type 旅行 or りょこう
 
 export type QuizMode = 'practice' | 'test';
 
 export interface QuizConfig {
-  setId: string;                  // Set being studied
+  lessonIds: string[];            // Array of selected lesson IDs (supports 1 to N lessons)
   mode: QuizMode;                 // 'practice' or 'test'
-  questionCount: number | 'all';  // 10, 20, or 'all'
-  allowedTypes: QuestionType[];   // Enabled question styles
+  questionCount: number | 'all';  // 10, 20, 40, or 'all'
+  allowedTypes: QuestionType[];   // Enabled question formats
+}
+```
+
+### 3.2 Active Question & Session State
+
+```typescript
+export interface QuizQuestion {
+  id: string;                     // Question identifier in session, e.g. "q-1"
+  type: QuestionType;
+  prompt: string;                 // The prompt string displayed
+  subPrompt?: string;             // Optional reading aid or instruction
+  correctAnswer: string;          // Correct choice text or expected input
+  options?: string[];             // 4 choices for multiple choice questions
+  targetItem: StudyItem;          // Full reference to the underlying StudyItem
+  userAnswer?: string;            // Answer submitted by learner
+  isCorrect?: boolean;            // Evaluation flag
 }
 
 export interface QuizSessionResult {
   sessionId: string;
-  setId: string;
+  lessonIds: string[];            // IDs of lessons included in this session
   mode: QuizMode;
   totalQuestions: number;
   correctCount: number;
@@ -150,7 +167,7 @@ export interface QuizSessionResult {
   accuracy: number;               // 0 to 100 percentage
   bestStreak: number;
   timeSpentSeconds: number;
-  missedItemIds: string[];        // VocabularyItem IDs failed during this quiz
+  missedItemIds: string[];        // StudyItem IDs failed during this quiz
   completedAt: string;            // ISO 8601 timestamp
 }
 ```
@@ -159,27 +176,27 @@ export interface QuizSessionResult {
 
 ## 4. Local Learning Progress & Mistake Tracking
 
-Tracking user retention requires a lightweight, locally persistent data structure keyed by `VocabularyItem.id`. No cloud database is required.
+Tracking user retention is handled via a unified, client-side store keyed by `StudyItem.id`. Because Vocabulary and Kanji items use the same item schema and ID convention, progress tracking is completely uniform.
 
 ```typescript
 export interface ItemProgress {
-  itemId: string;                 // References VocabularyItem.id
+  itemId: string;                 // References StudyItem.id
   totalAttempts: number;          // Total times tested
-  correctCount: number;           // Total correct responses
-  incorrectCount: number;         // Total mistakes made
+  correctCount: number;           // Times answered correctly
+  incorrectCount: number;         // Times answered incorrectly
   lastMistakeAt?: string;         // ISO timestamp of last incorrect response
   lastStudiedAt: string;          // ISO timestamp of last interaction
-  isMarkedWeak: boolean;          // True if incorrectCount / totalAttempts > 0.3
+  isMarkedWeak: boolean;          // Flagged if error rate exceeds threshold
 }
 
 export interface UserStudyState {
-  version: number;                // Schema version for future migrations (e.g. 1)
+  version: number;                // Schema version for future migrations
   progressByItem: Record<string, ItemProgress>;
   recentResults: QuizSessionResult[];
 }
 ```
 
-### Concept of Operation:
-1. **Mistake Identification:** Whenever a user answers incorrectly, `progressByItem[itemId].incorrectCount` increments, and `isMarkedWeak` becomes `true`.
-2. **Review Missed Words Trigger:** Clicking "Review Missed Words" at the end of a quiz filters the set for `missedItemIds` and builds a high-focus practice session exclusively targeting those items.
-3. **Recovery:** Answering a weak word correctly in 2 consecutive sessions unmarks `isMarkedWeak`.
+### Mistake Review Lifecycle
+1. When any question is answered incorrectly, `targetItem.id` is added to `QuizSessionResult.missedItemIds`.
+2. Clicking **"Ôn lại từ sai" (Review Missed Words)** gathers the corresponding `StudyItem` records across all tested lessons and launches a focused practice session exclusively for those items.
+3. Once an item is answered correctly in subsequent review sessions, `isMarkedWeak` is cleared.

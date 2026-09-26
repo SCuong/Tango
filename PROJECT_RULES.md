@@ -7,7 +7,7 @@ This document defines the persistent rules, standards, and Git hygiene constrain
 ## 1. Project Overview
 
 - **Project Name:** Tango
-- **Description:** A Japanese vocabulary learning web application designed specifically for Vietnamese learners.
+- **Description:** A Japanese vocabulary and Kanji learning web application designed specifically for Vietnamese learners.
 - **Platforms:** Web application designed and optimized for both mobile and desktop browsers.
 - **Scope & Focus:** Keep the core learning experience streamlined and robust. Avoid premature optimization and feature creep.
 
@@ -60,7 +60,7 @@ Maintain strict repository hygiene at all times. Distinguish clearly between fil
 
 ## 5. UI / UX Standards
 
-- **Design Guidance:** The local skill `.agents/ui-ux-pro-max` may be referenced locally for UX patterns, typography, color palettes, and component design principles. The skill itself must never be committed.
+- **Design Guidance:** The local skill `.agents/skills/ui-ux-pro-max` may be referenced locally for UX patterns, typography, color palettes, and component design principles. The skill itself must never be committed.
 - **Mobile-First Usability:** Mobile responsiveness is a first-class requirement. Touch targets (minimum 44x44px), thumb reachability, and mobile viewport ergonomics must be validated alongside desktop layouts.
 - **Typographic & Cultural Clarity:** Japanese typography (Kanji, Furigana, Kana) and Vietnamese diacritics must render legibly across devices with appropriate font stacks and spacing.
 - **Accessibility:** Maintain proper semantic HTML, accessible color contrast ratios, clear focus indicators, and screen-reader considerations.
