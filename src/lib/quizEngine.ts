@@ -418,5 +418,5 @@ export function evaluateQuizAnswer(
     return false;
   }
 
-  return userAnswer.trim() === question.correctAnswer.trim();
+  return userAnswer === question.correctAnswer;
 }

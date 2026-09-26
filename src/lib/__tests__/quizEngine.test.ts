@@ -160,47 +160,97 @@ describe('quizEngine', () => {
     });
 
     it('selects the first compatible real member if earlier duplicate lacks required fields', () => {
-      // First duplicate lacks kana
-      const itemWithoutKana = createItem('v1', '旅行', undefined, ['du lịch']);
-      // Second duplicate has kana
-      const itemWithKana = createItem('k1', '旅行', 'りょこう', ['chuyến đi']);
+      // Both duplicates share identical Japanese and Kana -> same canonical lexical group "旅行::りょこう"
+      const itemWithoutVi = createItem('v1', '旅行', 'りょこう', []);
+      const itemWithVi = createItem('k1', '旅行', 'りょこう', ['du lịch']);
+      // Other lexical groups to satisfy the 3-distinct-distractor contract for japanese_to_vi
       const itemB = createItem('b', '車', 'くるま', ['xe']);
       const itemC = createItem('c', '木', 'き', ['cây']);
       const itemD = createItem('d', '火', 'ひ', ['lửa']);
 
       const lessons: Record<string, Lesson> = {
         'lesson-1': createLesson('lesson-1', [
-          itemWithoutKana,
-          itemWithKana,
+          itemWithoutVi,
+          itemWithVi,
           itemB,
           itemC,
           itemD,
         ]),
       };
 
-      // When kana_to_japanese is requested, group is compatible because itemWithKana has kana
+      // 5 raw items, but itemWithoutVi and itemWithVi form 1 lexical group -> 4 lexical groups total
       const eligibility = getQuizEligibility(
         ['lesson-1'],
         lessons,
-        ['kana_to_japanese']
+        ['japanese_to_vi']
       );
+      expect(eligibility.rawItemCount).toBe(5);
+      // Group remains eligible because later real duplicate itemWithVi has the required Vietnamese definition
       expect(eligibility.eligibleCount).toBe(4);
 
       const questions = generateQuizQuestions(
         {
           lessonIds: ['lesson-1'],
-          allowedTypes: ['kana_to_japanese'],
+          allowedTypes: ['japanese_to_vi'],
           questionCount: 'all',
         },
         lessons,
         createDeterministicRng(42)
       );
 
-      const travelQ = questions.find((q) => q.correctAnswer === '旅行');
+      const travelQ = questions.find((q) => q.prompt === '旅行');
       expect(travelQ).toBeDefined();
-      // Must pick itemWithKana as targetItem because itemWithoutKana is incompatible with kana_to_japanese
+      // Must use later compatible real StudyItem as targetItem
       expect(travelQ!.targetItem.id).toBe('k1');
-      expect(travelQ!.prompt).toBe('りょこう');
+      expect(travelQ!.targetItem).toBe(itemWithVi);
+      // Verify no synthetic merged StudyItem was created
+      expect(travelQ!.targetItem.vietnamese).toEqual(['du lịch']);
+      expect(travelQ!.correctAnswer).toBe('du lịch');
+    });
+
+    it('selects the first compatible real StudyItem in deterministic selected-lesson order', () => {
+      // Two compatible items sharing the exact same canonical key, in different lessons
+      const itemInLessonA = createItem('item-a', '旅行', 'りょこう', ['du lịch']);
+      const itemInLessonB = createItem('item-b', '旅行', 'りょこう', ['du lịch']);
+
+      const item2 = createItem('dist-2', '車', 'くるま', ['xe']);
+      const item3 = createItem('dist-3', '木', 'き', ['cây']);
+      const item4 = createItem('dist-4', '火', 'ひ', ['lửa']);
+
+      const lessons: Record<string, Lesson> = {
+        'lesson-a': createLesson('lesson-a', [itemInLessonA, item2, item3, item4]),
+        'lesson-b': createLesson('lesson-b', [itemInLessonB]),
+      };
+
+      // Order 1: ['lesson-a', 'lesson-b'] -> itemInLessonA encountered first
+      const questionsAFirst = generateQuizQuestions(
+        {
+          lessonIds: ['lesson-a', 'lesson-b'],
+          allowedTypes: ['japanese_to_vi'],
+          questionCount: 'all',
+        },
+        lessons,
+        createDeterministicRng(42)
+      );
+      const travelQA = questionsAFirst.find((q) => q.prompt === '旅行');
+      expect(travelQA).toBeDefined();
+      expect(travelQA!.targetItem.id).toBe('item-a');
+      expect(travelQA!.targetItem).toBe(itemInLessonA);
+
+      // Order 2: ['lesson-b', 'lesson-a'] -> itemInLessonB encountered first
+      const questionsBFirst = generateQuizQuestions(
+        {
+          lessonIds: ['lesson-b', 'lesson-a'],
+          allowedTypes: ['japanese_to_vi'],
+          questionCount: 'all',
+        },
+        lessons,
+        createDeterministicRng(42)
+      );
+      const travelQB = questionsBFirst.find((q) => q.prompt === '旅行');
+      expect(travelQB).toBeDefined();
+      expect(travelQB!.targetItem.id).toBe('item-b');
+      expect(travelQB!.targetItem).toBe(itemInLessonB);
     });
 
     it('safely skips missing lesson IDs without crashing', () => {
@@ -695,7 +745,7 @@ describe('quizEngine', () => {
       vietnamese: ['du lịch', 'chuyến đi'],
     };
 
-    it('evaluates multiple-choice questions against correctAnswer without fuzzy matching', () => {
+    it('evaluates multiple-choice questions against correctAnswer using exact string equality', () => {
       const mcQuestion: QuizQuestion = {
         id: 'q-1',
         type: 'japanese_to_vi',
@@ -705,10 +755,15 @@ describe('quizEngine', () => {
         targetItem,
       };
 
+      // Exact generated answer -> true
       expect(evaluateQuizAnswer(mcQuestion, 'du lịch')).toBe(true);
-      expect(evaluateQuizAnswer(mcQuestion, '  du lịch  ')).toBe(true);
-      expect(evaluateQuizAnswer(mcQuestion, 'du lich')).toBe(false); // No fuzzy matching for diacritics
-      expect(evaluateQuizAnswer(mcQuestion, 'chuyến đi')).toBe(false); // Only generated correctAnswer is accepted
+      // Added leading/trailing whitespace -> false (exact match, no trimming)
+      expect(evaluateQuizAnswer(mcQuestion, '  du lịch  ')).toBe(false);
+      // Missing Vietnamese diacritics -> false
+      expect(evaluateQuizAnswer(mcQuestion, 'du lich')).toBe(false);
+      // Alternate Vietnamese definition not the generated correctAnswer -> false
+      expect(evaluateQuizAnswer(mcQuestion, 'chuyến đi')).toBe(false);
+      // Incorrect distractor -> false
       expect(evaluateQuizAnswer(mcQuestion, 'xe')).toBe(false);
     });
 
