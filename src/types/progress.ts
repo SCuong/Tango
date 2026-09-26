@@ -1,0 +1,34 @@
+import { StudyBook, Lesson } from './study';
+import { QuizSessionResult } from './quiz';
+
+export interface ItemProgress {
+  itemId: string;                 // References StudyItem.id
+  totalAttempts: number;          // Total times tested
+  correctCount: number;           // Times answered correctly
+  incorrectCount: number;         // Times answered incorrectly
+  lastMistakeAt?: string;         // ISO timestamp of last incorrect response
+  lastStudiedAt: string;          // ISO timestamp of last interaction
+  isMarkedWeak: boolean;          // Flagged if error rate exceeds threshold
+}
+
+export type AppTheme = 'light' | 'dark' | 'sakura';
+export type AppLanguage = 'vi' | 'en';
+
+export interface UserPreferences {
+  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura'
+  language: AppLanguage;         // 'vi' (default) | 'en'
+  soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
+}
+
+/**
+ * Aggregated runtime client-side state in TypeScript memory.
+ * Physical persistence is partitioned across dedicated storage keys.
+ */
+export interface UserStudyState {
+  version: number;                // Schema version for future migrations
+  preferences: UserPreferences;
+  books: Record<string, StudyBook>; // All textbooks keyed by StudyBook.id
+  lessons: Record<string, Lesson>;  // Canonical mutable Lesson store
+  progressByItem: Record<string, ItemProgress>;
+  recentResults: QuizSessionResult[];
+}

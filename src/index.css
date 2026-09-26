@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Font Stacks */
+  --font-ui: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-japanese: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+
+  /* Radius Scale */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 26px;
+  --radius-full: 9999px;
+
+  /* Semantic Feedback */
+  --success: #059669;
+  --success-surface: #ECFDF5;
+  --error: #DC2626;
+  --error-surface: #FEF2F2;
+  --error-border: #FCA5A5;
+  --warning: #D97706;
+
+  /* Default / Light Theme */
+  --bg-page: #FBFBF9;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F4F4F0;
+  --border-subtle: #E8E8E2;
+  --border-strong: #CBD5E1;
+
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --primary-surface: #EEF2FF;
+
+  --shadow-clay-card: 0 4px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --shadow-clay-button: 0 4px 8px rgba(79, 70, 229, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --shadow-clay-pressed: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  --answer-1-bg: #FEF9C3;
+  --answer-1-border: #FDE047;
+  --answer-1-text: #713F12;
+
+  --answer-2-bg: #E0F2FE;
+  --answer-2-border: #7DD3FC;
+  --answer-2-text: #075985;
+
+  --answer-3-bg: #F3E8FF;
+  --answer-3-border: #D8B4FE;
+  --answer-3-text: #581C87;
+
+  --answer-4-bg: #FFE4E6;
+  --answer-4-border: #FDA4AF;
+  --answer-4-text: #881337;
+}
+
+[data-theme="dark"] {
+  --bg-page: #0B0F19;
+  --bg-surface: #151D2E;
+  --bg-surface-elevated: #1E293B;
+  --border-subtle: #26334B;
+  --border-strong: #334155;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  --primary: #6366F1;
+  --primary-hover: #818CF8;
+  --primary-surface: #1E1B4B;
+
+  --shadow-clay-card: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-clay-button: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --shadow-clay-pressed: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+
+  --answer-1-bg: #2B2313;
+  --answer-1-border: #785412;
+  --answer-1-text: #FEF08A;
+
+  --answer-2-bg: #102336;
+  --answer-2-border: #1E4E75;
+  --answer-2-text: #BAE6FD;
+
+  --answer-3-bg: #241836;
+  --answer-3-border: #552D80;
+  --answer-3-text: #E9D5FF;
+
+  --answer-4-bg: #33141F;
+  --answer-4-border: #7A223B;
+  --answer-4-text: #FECDD3;
+}
+
+[data-theme="sakura"] {
+  --bg-page: #FAF5F5;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F3E8E8;
+  --border-subtle: #EAD7D7;
+  --border-strong: #D8B4B4;
+
+  --text-primary: #2D1F24;
+  --text-secondary: #5C454D;
+  --text-muted: #8F757D;
+
+  --primary: #D95379;
+  --primary-hover: #C23E64;
+  --primary-surface: #FDF0F3;
+
+  --shadow-clay-card: 0 4px 12px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-clay-button: 0 4px 10px rgba(217, 83, 121, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --shadow-clay-pressed: 0 1px 3px rgba(180, 120, 135, 0.15), inset 0 1px 2px rgba(0, 0, 0, 0.08);
+
+  --answer-1-bg: #FFF8E7;
+  --answer-1-border: #F6D896;
+  --answer-1-text: #5A3E1B;
+
+  --answer-2-bg: #EDF4FA;
+  --answer-2-border: #B5D4EE;
+  --answer-2-text: #23496D;
+
+  --answer-3-bg: #F5EEF8;
+  --answer-3-border: #D2B4DE;
+  --answer-3-text: #4A235A;
+
+  --answer-4-bg: #FCEEF1;
+  --answer-4-border: #EBB3C0;
+  --answer-4-text: #641E2F;
+}
+
+body {
+  font-family: var(--font-ui);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
