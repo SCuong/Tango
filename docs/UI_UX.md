@@ -66,12 +66,14 @@ The home screen clearly presents two distinct learning pathways plus the unified
 │  └─────────────────────────────────────────┘  │
 │                                               │
 │        [ ⚡ Kiểm tra tổng hợp (Mixed) ]        │
+│        [ 📥 Nhập bài mới (Import) ]            │
 └───────────────────────────────────────────────┘
 ```
 
 - **📘 Từ vựng Card:** Enters the Vocabulary lesson list.
 - **漢 Hán tự Card:** Enters the Kanji lesson list.
 - **⚡ Kiểm tra tổng hợp CTA:** Directly opens the multi-lesson selector.
+- **📥 Nhập bài mới CTA:** Opens the unified Lesson Importer (see `docs/IMPORT_SPEC.md`).
 
 ---
 
@@ -80,7 +82,7 @@ The home screen clearly presents two distinct learning pathways plus the unified
 Both categories use the same clean list layout:
 
 ```text
-← TỪ VỰNG (hoặc HÁN TỰ)
+← TỪ VỰNG (hoặc HÁN TỰ)              [ + Nhập bài mới ]
 
 ┌───────────────────────────────────────────────┐
 │ Bài 1: Đồ ăn nhanh             20 từ  ·  80%  │
@@ -119,7 +121,7 @@ Số câu
 [ 10 ]  [ 20 ]  [ 40 ]  [ Tất cả ]
 
 Loại câu hỏi
-☑ Hiragana → Japanese
+☑ Kana → Japanese
 ☑ Japanese → Vietnamese
 ☑ Vietnamese → Japanese
 ☐ Written Answer

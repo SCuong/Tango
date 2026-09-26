@@ -45,7 +45,7 @@ Traditional flashcards often encourage passive recognition (flipping cards witho
 The core user journey is rapid, cyclical, and frictionless:
 
 ```
-Select Lesson(s) (Vocabulary, Kanji, or Mixed)
+Import or Select Lesson(s) (Vocabulary, Kanji, or Mixed)
                     ↓
            Start Practice Session
                     ↓

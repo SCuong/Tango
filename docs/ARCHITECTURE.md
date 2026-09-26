@@ -7,7 +7,7 @@ This document details the architectural design, frontend stack selection, multi-
 ## 1. Architectural Principles
 
 1. **Shared Foundation, Dual Categorization:** Vocabulary and Kanji are two navigation categories backed by the **identical data schema** (`StudyItem`, `Lesson`) and processed by the **exact same quiz engine**. No duplicated quiz runners or category-specific models exist.
-2. **Flexible Multi-Lesson Aggregation:** The quiz engine is decoupled from individual lessons. It consumes an array of `lessonIds: string[]`, aggregates their items into a unified study pool, deduplicates them, and feeds questions into a single quiz runner.
+2. **Flexible Multi-Lesson Aggregation:** The quiz engine is decoupled from individual lessons. It consumes an array of `lessonIds: string[]`, aggregates their items into a unified study pool, deduplicates them by normalized Japanese + Kana, and feeds questions into a single quiz runner.
 3. **Client-Side First (Local-First):** 100% of the application runs directly in the user's browser with zero API latency and complete offline capability.
 4. **Zero Unnecessary Dependencies:** Keep the third-party dependency footprint minimal to guarantee instant cold-start times and long-term maintainability.
 5. **No Premature Backend:** No servers, databases, or microservices are required for MVP. Bundled lesson data is stored in static JSON files.
@@ -42,7 +42,7 @@ The quiz pipeline is designed to be completely decoupled from lesson categorizat
           ↓
 [ Pool Aggregator ] ─── Reads lessons from data registry
           ↓
-[ Deduplication ] ───── Ensures unique StudyItems by item.id
+[ Deduplication ] ───── Deduplicates by normalized Japanese + Kana
           ↓
 [ Question Generator ] ─ Generates Type 1-4 questions, shuffles options
           ↓
@@ -50,6 +50,8 @@ The quiz pipeline is designed to be completely decoupled from lesson categorizat
           ↓
 [ Shared Quiz Runner ] ─ Unified UI handling Practice, Test, and Review
 ```
+
+> **Pool Deduplication Key:** Uses `normalized(japanese) + '::' + normalized(kana || '')` rather than `item.id`, ensuring items shared between Vocabulary and Kanji lessons are not tested redundantly.
 
 ---
 
@@ -67,6 +69,7 @@ All user progress, weak-word markers, and session histories are stored in browse
 │                          │ weak status keyed by itemId │
 │ tango_v1_history         │ Recent quiz session records │
 │ tango_v1_preferences     │ Quiz defaults (10/20/all)   │
+│ tango_v1_custom_lessons  │ Custom user-imported lessons│
 └──────────────────────────┴─────────────────────────────┘
 ```
 
@@ -94,7 +97,7 @@ Tango is designed to be installed on mobile phones and tablets:
 
 ## 6. Text Processing & Unicode Normalization
 
-Written-answer quiz mode (Type 4) utilizes normalization utilities in `src/lib/textNormalization.ts`:
+Written-answer quiz mode (`vi_to_text`) utilizes normalization utilities in `src/lib/textNormalization.ts`:
 
 1. **Japanese Kana Normalization:**
    - Trims leading/trailing whitespace and full-width Japanese spaces (`\u3000`).
@@ -138,10 +141,11 @@ src/
 │   └── ProgressBar.tsx
 ├── data/                      # Bundled lessons (vocabulary/ & kanji/)
 ├── features/                  # Domain-driven feature modules
-│   ├── lessons/               # Category views and lesson browsers
+│   ├── lessons/               # Category views, lesson browsers, and importer
 │   │   ├── CategoryCards.tsx  # Dual entry: Vocabulary vs. Kanji cards
 │   │   ├── LessonList.tsx     # List of lessons for selected category
 │   │   ├── LessonDetail.tsx   # Word list inside a single lesson
+│   │   ├── LessonImporter.tsx # Authoritative import interface (see docs/IMPORT_SPEC.md)
 │   │   └── MixedTestModal.tsx # Multi-lesson selector with checkboxes
 │   ├── quiz/                  # Shared quiz engine (used for all tests)
 │   │   ├── QuizRunner.tsx     # Active session controller
@@ -160,17 +164,19 @@ src/
 ├── lib/                       # Pure utility functions (no React dependencies)
 │   ├── storage.ts             # LocalStorage wrapper with schema version guard
 │   ├── quizEngine.ts          # Multi-lesson pool aggregator, question generator
+│   ├── importer.ts            # Delimiter detection, parsing, deduplication
 │   └── textNormalization.ts   # Japanese and Vietnamese unicode matchers
 ├── types/                     # Shared TypeScript domain interfaces
 │   ├── study.ts               # StudyItem, Lesson, StudyCategory
-│   └── quiz.ts                # QuizConfig, QuizQuestion, QuizSessionResult
+│   └── quiz.ts                # QuizConfig, QuizQuestion, QuizSessionResult, QuestionType
 ├── App.tsx                    # Screen router / navigation coordinator
 ├── index.css                  # Tailwind directives and font stack configurations
 └── main.tsx                   # Application entry point & PWA registration
 ```
 
 ### Directory Responsibilities
-- `src/features/lessons/`: Category home view (Từ vựng vs Hán tự), lesson listings, and the Mixed Test multi-lesson configuration modal.
+- `src/features/lessons/`: Category home view (Từ vựng vs Hán tự), lesson listings, LessonImporter, and the Mixed Test multi-lesson configuration modal.
 - `src/features/quiz/`: The **single, reusable quiz system** that powers Practice Mode, Quick Tests, Mixed Tests, and Review Sessions.
-- `src/lib/quizEngine.ts`: Pure algorithmic logic that takes `lessonIds: string[]`, collects items, shuffles choices, and emits `QuizQuestion[]`.
+- `src/lib/quizEngine.ts`: Pure algorithmic logic that takes `lessonIds: string[]`, collects items, deduplicates by normalized Japanese + Kana, shuffles choices, and emits `QuizQuestion[]`.
+- `src/lib/importer.ts`: Pure parsing, delimiter auto-detection, RFC 4180 CSV tokenizer, and duplicate/merge logic.
 - `src/types/`: Centralized interfaces guaranteeing strict data symmetry across both study categories.

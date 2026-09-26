@@ -32,15 +32,15 @@ export type StudyCategory = 'vocabulary' | 'kanji';
 
 /**
  * Shared core study item for both Vocabulary and Kanji lessons.
+ * Fully synchronized with forgiving import rules (see docs/IMPORT_SPEC.md).
  */
 export interface StudyItem {
   id: string;              // Stable unique identifier, e.g. "kanji-01-001" or "vocab-01-001"
-  japanese: string;        // Japanese word/compound, e.g. "旅行" or "ファストフード"
-  kana: string;            // Reading in Hiragana/Katakana, e.g. "りょこう" or "ふぁすとふーど"
+  japanese: string;        // Japanese word/compound, e.g. "旅行" or "ファストフード" (Required)
+  kana?: string;           // Optional reading in Hiragana/Katakana, e.g. "りょこう" or "ふぁすとふーど"
   hanViet?: string;        // Optional Sino-Vietnamese reading, e.g. "LỮ HÀNH" (omitted for loanwords)
-  vietnamese: string[];    // Array of accepted Vietnamese definitions, e.g. ["du lịch"]
+  vietnamese: string[];    // Array of accepted Vietnamese definitions (allowed to be empty [])
 }
-// Note: See docs/IMPORT_SPEC.md for import data requirements and field optionality considerations.
 
 /**
  * Standard Lesson container used for both Vocabulary and Kanji categories.
@@ -128,9 +128,9 @@ Tango supports testing any arbitrary set of lessons—single lesson, multi-lesso
 
 ```typescript
 export type QuestionType =
-  | 'kana_to_kanji'      // Prompt: りょこう → Choose 旅行
-  | 'kanji_to_vi'        // Prompt: 旅行 → Choose du lịch
-  | 'vi_to_kanji'        // Prompt: du lịch → Choose 旅行
+  | 'kana_to_japanese'   // Prompt: りょこう → Choose 旅行
+  | 'japanese_to_vi'     // Prompt: 旅行 → Choose du lịch
+  | 'vi_to_japanese'     // Prompt: du lịch → Choose 旅行
   | 'vi_to_text';        // Prompt: du lịch → Type 旅行 or りょこう
 
 export type QuizMode = 'practice' | 'test';
@@ -142,6 +142,8 @@ export interface QuizConfig {
   allowedTypes: QuestionType[];   // Enabled question formats
 }
 ```
+
+> **Cross-Category Pool Deduplication:** When building the study question pool from multiple lessons, items are deduplicated using `normalized(japanese) + '::' + normalized(kana || '')` to ensure the same word appearing in both Vocabulary and Kanji is not tested redundantly.
 
 ### 3.2 Active Question & Session State
 

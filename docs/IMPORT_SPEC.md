@@ -70,40 +70,24 @@ Imported data maps into four conceptual columns:
 | **Hán Việt** | Âm Hán Việt | Sino-Vietnamese reading (optional) | Nhật Bản Phỏng / Lữ Hành |
 | **Vietnamese** | Nghĩa tiếng Việt | Vietnamese definition(s) | Đến thăm Nhật Bản / Du lịch, chuyến đi |
 
-### 3.2 Canonical `StudyItem` Model Reference & Discrepancy Analysis
+### 3.2 Canonical `StudyItem` Model Synchronization
 
-The canonical definition in [`docs/DATA_MODEL.md`](file:///a:/Tango/docs/DATA_MODEL.md) is currently:
+The canonical definition in [`docs/DATA_MODEL.md`](./DATA_MODEL.md) is fully synchronized with the forgiving import requirements:
 
 ```typescript
 export interface StudyItem {
-  id: string;              // Unique identifier
-  japanese: string;        // Japanese expression
-  kana: string;            // Reading in Hiragana/Katakana
-  hanViet?: string;        // Optional Sino-Vietnamese reading
-  vietnamese: string[];    // Array of accepted Vietnamese definitions
+  id: string;              // Stable unique identifier
+  japanese: string;        // Japanese expression (Required)
+  kana?: string;           // Optional reading in Hiragana/Katakana
+  hanViet?: string;        // Optional Sino-Vietnamese reading (omitted for loanwords)
+  vietnamese: string[];    // Array of accepted Vietnamese definitions (allowed to be empty [])
 }
 ```
 
-> [!IMPORTANT]
-> ### Schema Synchronization Decision (To Be Resolved Before Implementation)
-> In `docs/DATA_MODEL.md`, `kana: string` and `vietnamese: string[]` are currently marked as strictly **required**.
-> 
-> However, real-world forgiving import requirements dictate that:
-> 1. An item may lack a Kana reading (e.g. user only copied Kanji and meaning).
-> 2. An item may lack a Vietnamese meaning (e.g. user only copied Kanji and readings for recognition drill).
-> 
-> **Resolution Path:** Before implementing the codebase, the canonical `StudyItem` model should be synchronized to either:
-> - **Option A (Recommended):** Relax fields in `docs/DATA_MODEL.md`:
->   ```typescript
->   export interface StudyItem {
->     id: string;
->     japanese: string;
->     kana?: string;          // Optional: warnings in preview, skips reading-based quiz types
->     hanViet?: string;       // Optional: hides section when absent
->     vietnamese: string[];   // Always an array, but can be empty [] if meaning was omitted
->   }
->   ```
-> - **Option B:** Maintain `kana: string` and provide fallback default values during import (e.g. copying `japanese` into `kana` when purely Kana). Option A is strongly preferred for semantic accuracy.
+This synchronization ensures:
+1. Items lacking a Kana reading or Vietnamese meaning can be imported without type conflicts.
+2. Missing Kana or Vietnamese definitions trigger non-blocking warnings (`⚠`) in the import preview.
+3. The quiz engine gracefully skips question types that require the missing field(s) for that item.
 
 ---
 
@@ -142,7 +126,7 @@ A clean, responsive `<textarea>` supporting direct pasting of copied text from s
 ### 5.2 Method B: Upload File (Chọn file)
 Uses standard HTML5 File API for local, client-side reading:
 - Supported extensions: `.txt`, `.csv`, `.md`, `.xlsx`
-- Tested across standard file pickers on Windows, macOS, Android, and iOS.
+- Required supported targets across standard file pickers on Windows, macOS, Android, and iOS that must be validated during implementation and testing.
 - **100% Client-Side:** Files are parsed in-memory in the browser. Zero server upload, zero backend required.
 
 ---
@@ -271,9 +255,10 @@ Row 2: 旅行;りょこう;;Du lịch
 ```
 
 ### 10.4 Conflicting Duplicates
-If two matching keys contain conflicting non-empty definitions (e.g. different meanings), the importer does **not** silently overwrite or drop them:
-- Merges multiple unique definitions into `vietnamese: ["du lịch", "chuyến đi"]`.
-- Flags the item in Preview with an info badge for user review.
+If two matching keys contain conflicting non-empty definitions or readings:
+- Tango does **not** silently invent a resolution or overwrite data blindly.
+- It keeps one canonical item (the first encountered valid entry).
+- It clearly surfaces a conflict warning badge (`⚠ Xung đột dữ liệu`) in the Preview interface so the user is informed.
 
 ---
 
@@ -409,9 +394,9 @@ flowchart TD
 ## 16. Quiz Compatibility & Dynamic Generation
 
 Imported lessons integrate immediately into the shared quiz engine:
-- If `kana` is missing: Type 1 (`Kana → Japanese`) questions are skipped for that item.
-- If `vietnamese` is missing: Type 2 (`Japanese → Vietnamese`) and Type 3 (`Vietnamese → Japanese`) questions are skipped for that item.
-- Type 4 (`Written Answer`) operates on whatever fields are present.
+- If `kana` is missing: Type 1 (`kana_to_japanese`) questions are skipped for that item.
+- If `vietnamese` is missing: Type 2 (`japanese_to_vi`) and Type 3 (`vi_to_japanese`) questions are skipped for that item.
+- Type 4 (`vi_to_text`) operates on available fields.
 - Missing fields **never** cause quiz crashes.
 
 ---
@@ -448,10 +433,8 @@ To prevent feature bloat, the following are strictly excluded:
 ## 20. Relationship to Existing Documentation
 
 This specification directly depends upon and integrates with:
-- [`docs/PROJECT_OVERVIEW.md`](file:///a:/Tango/docs/PROJECT_OVERVIEW.md) — Rapid study loop (Import → Practice → Test).
-- [`docs/PRODUCT_SPEC.md`](file:///a:/Tango/docs/PRODUCT_SPEC.md) — Two study categories, question types, clean Hán Việt display.
-- [`docs/DATA_MODEL.md`](file:///a:/Tango/docs/DATA_MODEL.md) — Canonical `Lesson`, `StudyCategory`, and `StudyItem` models.
-- [`docs/ARCHITECTURE.md`](file:///a:/Tango/docs/ARCHITECTURE.md) — Client-side local persistence and PWA architecture.
-- [`docs/UI_UX.md`](file:///a:/Tango/docs/UI_UX.md) — Mobile thumb-zone ergonomics and typography standards.
-
-*(Note: See Section 3.2 for the recorded `StudyItem` required vs. optional fields synchronization decision).*
+- [`docs/PROJECT_OVERVIEW.md`](./PROJECT_OVERVIEW.md) — Rapid study loop (Import → Practice → Test).
+- [`docs/PRODUCT_SPEC.md`](./PRODUCT_SPEC.md) — Two study categories, question types, clean Hán Việt display.
+- [`docs/DATA_MODEL.md`](./DATA_MODEL.md) — Canonical `Lesson`, `StudyCategory`, and synchronized `StudyItem` models.
+- [`docs/ARCHITECTURE.md`](./ARCHITECTURE.md) — Client-side local persistence and PWA architecture.
+- [`docs/UI_UX.md`](./UI_UX.md) — Mobile thumb-zone ergonomics and typography standards.

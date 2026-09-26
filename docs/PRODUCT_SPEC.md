@@ -20,9 +20,9 @@ Every study item—whether from a Vocabulary or Kanji lesson—conforms to the e
 |---|---|---|---|---|
 | `id` | `string` | Required | `"kanji-lesson-01-001"` | `"vocab-lesson-01-001"` |
 | `japanese` | `string` | Required | `"旅行"` | `"ファストフード"` |
-| `kana` | `string` | Required | `"りょこう"` | `"ふぁすとふーど"` |
-| `hanViet` | `string` | **Optional** | `"LỮ HÀNH"` | *(omitted)* |
-| `vietnamese` | `string[]` | Required | `["du lịch"]` | `["đồ ăn nhanh"]` |
+| `kana` | `string` | **Optional** (`kana?: string`) | `"りょこう"` | `"ふぁすとふーど"` |
+| `hanViet` | `string` | **Optional** (`hanViet?: string`) | `"LỮ HÀNH"` | *(omitted)* |
+| `vietnamese` | `string[]` | Required array (allowed to be empty `[]`) | `["du lịch"]` | `["đồ ăn nhanh"]` |
 
 ### 1.2 Clean Presentation Rule
 - When `hanViet` is absent (such as in Katakana loanwords or words without Sino-Vietnamese roots), the UI **must completely hide** the Hán Việt section.
@@ -62,7 +62,7 @@ interface Lesson {
 
 All four question types operate identically on items from either category:
 
-### Type 1: Kana → Japanese
+### Type 1: Kana → Japanese (`kana_to_japanese`)
 - **Prompt:** `りょこう`
 - **Goal:** Identify the correct Japanese written form.
 - **Options (4 choices):**
@@ -71,7 +71,7 @@ All four question types operate identically on items from either category:
   - C. 礼儀
   - D. 景観
 
-### Type 2: Japanese → Vietnamese
+### Type 2: Japanese → Vietnamese (`japanese_to_vi`)
 - **Prompt:** `旅行` (`りょこう`)
 - **Goal:** Select the matching Vietnamese meaning.
 - **Options (4 choices):**
@@ -80,7 +80,7 @@ All four question types operate identically on items from either category:
   - C. lễ nghi
   - D. cảnh quan
 
-### Type 3: Vietnamese → Japanese
+### Type 3: Vietnamese → Japanese (`vi_to_japanese`)
 - **Prompt:** `du lịch`
 - **Goal:** Select the corresponding Japanese word.
 - **Options (4 choices):**
@@ -89,7 +89,7 @@ All four question types operate identically on items from either category:
   - C. **旅行** *(Correct)*
   - D. 実際
 
-### Type 4: Vietnamese → Written Answer (Text Input)
+### Type 4: Vietnamese → Written Answer (`vi_to_text`)
 - **Prompt:** `du lịch`
 - **User Types:**
   - Japanese Kanji: `旅行`
@@ -115,7 +115,7 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
                          ↓
                Collect all StudyItems
                          ↓
-               Deduplicate by item ID
+   Deduplicate by normalized Japanese + Kana
                          ↓
             Build Question Pool (shuffled)
                          ↓
@@ -123,6 +123,8 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
                          ↓
              Shared Single Quiz Engine
 ```
+
+> **Deduplication Key:** Because the same Japanese vocabulary expression may appear in both Vocabulary and Kanji lessons (with different item IDs), deduplication must **not** rely solely on `item.id`. Instead, the study pool deduplicates items using `normalized(japanese) + '::' + normalized(kana || '')`.
 
 ---
 
@@ -158,7 +160,7 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
 When an incorrect answer is submitted, the study flow pauses to present an educational breakdown:
 
 **Example A (Item with Hán Việt):**
-```
+```text
 ❌ Chưa chính xác
 
 旅行
@@ -174,7 +176,7 @@ du lịch
 ```
 
 **Example B (Item without Hán Việt):**
-```
+```text
 ❌ Chưa chính xác
 
 ファストフード
@@ -199,19 +201,14 @@ Nghĩa:
 
 ---
 
-## 8. Future Import Concept (Roadmap)
+## 8. Lesson Import (Core MVP Feature)
 
-To support custom content seamlessly without architectural friction:
-- **Import Format:** Line-delimited plaintext rows:
-  ```text
-  旅行 | りょこう | LỮ HÀNH | du lịch
-  実際 | じっさい | THỰC TẾ | thực tế
-  礼儀 | れいぎ | LỄ NGHI | lễ nghi
-  景観 | けいかん | CẢNH QUAN | cảnh quan
-  ファストフード | ふぁすとふーど | | đồ ăn nhanh
-  ```
-- During import, the user selects whether the lesson belongs to **Vocabulary** or **Kanji**.
-- *Specification:* See [`docs/IMPORT_SPEC.md`](file:///a:/Tango/docs/IMPORT_SPEC.md) for the authoritative import behavior and full specification.
+Lesson import is a primary, first-class feature of the Tango MVP, enabling learners to immediately import classroom and textbook materials into either study category:
+- **Unified Processing:** Both Vocabulary and Kanji lessons use the identical importer, parser, and validation pipeline.
+- **Flexible Delimiters:** Supports Tab, Semicolon (`;`), Pipe (`|`), and Comma (`,`) with RFC 4180 CSV compliance.
+- **Multiple Formats:** Direct text paste, `.txt`, `.csv`, `.md` (Markdown tables), and `.xlsx` (Excel).
+- **Forgiving & Non-Blocking:** Automatically removes exact duplicates, safely merges complementary items, flags conflicts, and issues non-blocking warnings (`⚠`) for missing optional fields.
+- **Authoritative Specification:** See [`docs/IMPORT_SPEC.md`](./IMPORT_SPEC.md) for the complete parsing pipeline, UI wireframes, duplicate rules, and template schemas.
 
 ---
 
