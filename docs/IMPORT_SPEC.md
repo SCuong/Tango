@@ -410,9 +410,8 @@ flowchart TD
 
 Imported lessons integrate immediately into the shared quiz engine:
 - If `kana` is missing: Type 1 (`kana_to_japanese`) questions are skipped for that item.
-- If `vietnamese` is missing: Type 2 (`japanese_to_vi`) and Type 3 (`vi_to_japanese`) questions are skipped for that item.
-- Type 4 (`vi_to_text`) operates on available fields.
-- Missing fields **never** cause quiz crashes.
+- If there is no non-empty Vietnamese definition: Type 2 (`japanese_to_vi`), Type 3 (`vi_to_japanese`), and Type 4 (`vi_to_text`) questions are skipped for that item.
+- Missing optional fields (e.g., `kana`, `hanViet`, or additional definitions) **never** cause quiz crashes.
 
 ---
 

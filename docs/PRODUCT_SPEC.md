@@ -78,7 +78,7 @@ All four question types operate identically on items from either category:
 ### Type 1: Kana → Japanese (`kana_to_japanese`)
 - **Prompt:** `りょこう`
 - **Goal:** Identify the correct Japanese written form.
-- **Options (4 choices — rendered without A/B/C/D indices):**
+- **Options (4 distinct choices — 1 correct answer + 3 distinct distractors from other lexical groups in the selected pool, rendered without A/B/C/D indices):**
   - 実際
   - **旅行** *(Correct)*
   - 礼儀
@@ -86,28 +86,29 @@ All four question types operate identically on items from either category:
 
 ### Type 2: Japanese → Vietnamese (`japanese_to_vi`)
 - **Prompt:** `旅行` (`りょこう`)
-- **Goal:** Select the matching Vietnamese meaning.
-- **Options (4 choices — rendered without A/B/C/D indices):**
+- **Goal:** Select the matching Vietnamese meaning (primary Vietnamese meaning).
+- **Options (4 distinct choices — 1 correct answer + 3 distinct distractors from other lexical groups in the selected pool, rendered without A/B/C/D indices):**
   - thực tế
   - **du lịch** *(Correct)*
   - lễ nghi
   - cảnh quan
 
 ### Type 3: Vietnamese → Japanese (`vi_to_japanese`)
-- **Prompt:** `du lịch`
+- **Prompt:** `du lịch` (primary Vietnamese meaning)
 - **Goal:** Select the corresponding Japanese word.
-- **Options (4 choices — rendered without A/B/C/D indices):**
+- **Options (4 distinct choices — 1 correct answer + 3 distinct distractors from other lexical groups in the selected pool, rendered without A/B/C/D indices):**
   - 景観
   - 礼儀
   - **旅行** *(Correct)*
   - 実際
 
 ### Type 4: Vietnamese → Written Answer (`vi_to_text`)
-- **Prompt:** `du lịch`
+- **Prompt:** `du lịch` (primary Vietnamese meaning)
 - **User Types:**
-  - Japanese Kanji: `旅行`
-  - Or reading (depending on test configuration): `りょこう`
-- **Validation:** Normalized comparison, trimming whitespace.
+  - Japanese expression: `旅行`
+  - Or reading (when Kana exists): `りょこう`
+- **Options:** None (`options` is undefined; direct text entry input).
+- **Validation:** Normalized comparison (NFC, trimming whitespace, collapsing internal whitespace, full-width Katakana normalization). Accepts normalized Japanese and normalized Kana (when Kana exists) without requiring a separate configuration flag.
 
 ---
 
@@ -126,23 +127,43 @@ A fundamental capability of Tango is enabling learners to combine **any combinat
 ```
 Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
                          ↓
-               Collect all StudyItems
+    Collect StudyItems (deterministic order)
                          ↓
-   Deduplicate by normalized Japanese + Kana
+  Deduplicate into Lexical Groups:
+  normalized(japanese) + '::' + normalized(kana || '')
                          ↓
-            Build Question Pool (shuffled)
+  Filter against enabled QuestionTypes & Pool Distractors
                          ↓
-     Slice to requested count (10 / 20 / 40 / Tất cả (N))
+  Eligible Lexical Groups (N)
                          ↓
-             Shared Single Quiz Engine
+    Build Question Pool (shuffled)
+                         ↓
+  Slice to requested count (10 / 20 / 40 / Tất cả (N))
+                         ↓
+      Shared Single Quiz Engine
 ```
 
-> **Deduplication Key:** Because the same Japanese vocabulary expression may appear in both Vocabulary and Kanji lessons (with different item IDs), deduplication must **not** rely solely on `item.id`. Instead, the study pool deduplicates items using `normalized(japanese) + '::' + normalized(kana || '')`.
+> **Cross-Lesson Deduplication & Lexical Groups:**
+> - Because the same Japanese vocabulary expression may appear in both Vocabulary and Kanji lessons (with different item IDs), deduplication must **not** rely solely on `item.id`. Instead, the study pool deduplicates items using `normalized(japanese) + '::' + normalized(kana || '')` into **deduplicated lexical groups**.
+> - Tango does **not** create a synthetic merged `StudyItem` at quiz runtime.
+> - For a candidate `QuestionType`, the lexical group is compatible if at least one real member of that group satisfies the field requirements for that question type.
+> - When generating the question, the first compatible real `StudyItem` in deterministic selected-lesson/item order serves as `targetItem`. This prevents $N$ from depending on whether the first duplicate happens to have or lack an optional field, while preserving a real `StudyItem.id` for mistake tracking (`missedItemIds`) and progress updates.
+
+> **Multiple-Choice Distractor Contract:**
+> - For multiple-choice question types (`kana_to_japanese`, `japanese_to_vi`, `vi_to_japanese`), a generated question must contain **exactly 4 distinct visible options**: 1 correct answer and 3 distinct distractors.
+> - Distractors must be drawn **strictly from other deduplicated lexical groups in the selected pool**.
+> - Never draw distractors from unselected lessons and never invent fake or synthetic answers.
+> - A multiple-choice question type is compatible for a target lexical group only if the selected pool can supply 3 distinct distractors for that type. Compatibility strictly requires both item suitability and pool suitability.
+
+> **Primary Vietnamese Meaning:**
+> - For quiz prompts and multiple-choice options, the primary Vietnamese meaning is defined as the **first non-empty normalized entry in `StudyItem.vietnamese`**.
+> - The complete `vietnamese[]` array remains accessible for explanation sheets and detailed review.
+> - An item with no non-empty Vietnamese definition is incompatible with `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`.
 
 > **Canonical Definition of N & Pool Slicing:**
-> - `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering**.
+> - `N` is strictly defined as the number of **deduplicated lexical groups supporting at least one enabled compatible QuestionType**.
 > - Candidate fixed count buttons (`10`, `20`, `40`) are displayed dynamically only when `<= N`.
-> - Selecting `Tất cả (N)` generates **exactly one initial question per eligible unique StudyItem** ($N$ eligible unique items = $N$ initial questions). It never multiplies the item count by the number of active question types.
+> - Selecting `Tất cả (N)` generates **exactly one initial question per eligible lexical group** ($N$ eligible groups = $N$ initial questions). It never multiplies the item count by the number of active question types.
 > - *The N = 0 State:* If $N = 0$, `Tất cả (0)` and fixed count buttons are **never** rendered. The Start Test action is disabled/hidden, and an explanatory empty state is shown: `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."` / `"No eligible questions for the selected question types."` Users can adjust lessons, toggle question types, or go back safely.
 
 ---

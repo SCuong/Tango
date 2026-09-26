@@ -51,7 +51,7 @@ The quiz pipeline is designed to be completely decoupled from lesson categorizat
 [ Shared Quiz Runner ] ─ Unified UI handling Practice, Test, and Review
 ```
 
-> **Pool Deduplication Key:** Uses `normalized(japanese) + '::' + normalized(kana || '')` rather than `item.id`, ensuring items shared between Vocabulary and Kanji lessons are not tested redundantly.
+> **Pool Deduplication Key & Lexical Groups:** Uses `normalized(japanese) + '::' + normalized(kana || '')` rather than `item.id`, grouping matching items into a single deduplicated lexical group. No synthetic merged items are created at runtime. When generating a question, the first compatible real StudyItem in deterministic selected-lesson/item order serves as `targetItem`, preserving real item IDs for history and progress tracking. Multiple-choice distractors are drawn strictly from other deduplicated lexical groups within the currently selected lesson pool.
 
 ---
 
@@ -144,14 +144,17 @@ Tango is designed to be installed on mobile phones and tablets:
 
 ## 6. Text Processing & Unicode Normalization
 
-Written-answer quiz mode (`vi_to_text`) utilizes normalization utilities in `src/lib/textNormalization.ts`:
+Written-answer quiz mode (`vi_to_text`) and text matching utilize normalization utilities in `src/lib/textNormalization.ts`:
 
-1. **Japanese Kana Normalization:**
+1. **Japanese & Kana Normalization (Written Answers & Deduplication Keys):**
    - Trims leading/trailing whitespace and full-width Japanese spaces (`\u3000`).
+   - Collapses internal whitespace sequences.
    - Normalizes half-width Katakana to full-width.
-2. **Vietnamese Text Comparison:**
+   - Normalizes Unicode to `NFC`.
+   - In `vi_to_text` evaluation, learner input is normalized and compared against the target item's normalized `japanese` expression or normalized `kana` reading (when Kana exists).
+2. **Vietnamese Text Normalization (Definitions & Prompts):**
    - Normalizes Unicode using `String.prototype.normalize('NFC')` to ensure composed and decomposed diacritics match consistently across iOS, Android, and desktop browsers.
-   - Case-insensitively compares answers against the `vietnamese` definition array.
+   - Trims leading/trailing whitespace and collapses internal spaces for clean prompt display and definition indexing.
 
 ---
 

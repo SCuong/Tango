@@ -174,31 +174,58 @@ export interface QuizConfig {
 ```text
 selected lessonIds
          ↓
-collect StudyItems from tango_v1_lessons
+collect StudyItems from tango_v1_lessons (in deterministic lesson/item order)
          ↓
-deduplicate by normalized Japanese + Kana
+deduplicate by normalized Japanese + Kana into lexical groups:
+normalized(japanese) + '::' + normalized(kana || '')
          ↓
-filter items against enabled QuestionTypes and available item fields
+filter groups against enabled QuestionTypes:
+  • Target field availability (e.g. non-empty Vietnamese meaning, Kana reading)
+  • Distractor contract for multiple-choice types (must yield 3 distinct distractors from other groups)
          ↓
-eligible unique StudyItems
+eligible lexical groups
          ↓
          N
 ```
 
 > **Canonical Definition of N:**
-> `N` is strictly defined as the number of **eligible unique StudyItems after BOTH deduplication and question-type compatibility filtering**.
-> 
-> Example: 20 unique items deduplicated across lessons may yield $N = 15$ if 5 items lack required fields (e.g. missing `vietnamese` when only Vietnamese-based questions are enabled).
+> `N` is strictly defined as the number of **deduplicated lexical groups supporting at least one enabled compatible QuestionType**.
 > 
 > **Distinction Between Selected Items and N:** The raw selected count represents all content in the chosen lessons before filtering (e.g. `79 mục đã chọn`). `N` represents the eligible questions after deduplication and type filtering (e.g. `72 câu khả dụng`). Fixed count buttons and `Tất cả (N)` strictly use `N`, never the raw selected count.
 
+#### Cross-Lesson Deduplication & Lexical Groups
+- **Deduplication Key:** `normalized(japanese) + '::' + normalized(kana || '')`. Items sharing this key are treated as one **deduplicated lexical group**.
+- **No Synthetic Merging:** Tango does **not** synthesize merged StudyItems at runtime.
+- **Group Compatibility:** For any candidate `QuestionType`, a lexical group is compatible if at least one real member of that group satisfies the field requirements for that type.
+- **Deterministic Target Selection:** When generating a question for a compatible group, the first compatible real `StudyItem` in deterministic selected-lesson/item order serves as `targetItem`. This prevents $N$ from fluctuating based on which duplicate is encountered first, while preserving valid, real `StudyItem.id` references for mistake tracking (`missedItemIds`) and progress persistence (`ItemProgress`).
+
+#### Multiple-Choice Distractor Contract
+For multiple-choice question formats (`kana_to_japanese`, `japanese_to_vi`, `vi_to_japanese`):
+- A generated question must contain **exactly 4 distinct visible option strings**: 1 correct answer and 3 distinct distractors.
+- Distractors are drawn **strictly from other deduplicated lexical groups** within the currently selected lesson pool.
+- Tango **never** sources distractors from unselected lessons and **never** invents synthetic or placeholder answers.
+- A multiple-choice `QuestionType` is compatible for a target group only when the selected pool contains enough distinct answer values to supply **3 distinct distractors** for that type.
+- Therefore, question-type compatibility strictly requires both:
+  1. Target item field availability, and
+  2. Pool ability to generate the required 4 distinct option strings.
+
+#### Vietnamese Primary Meaning & Written-Answer Rules
+- **Primary Meaning:** For quiz prompts and multiple-choice answer strings, the primary Vietnamese meaning is defined as the **first non-empty normalized entry in `StudyItem.vietnamese`**. The complete `vietnamese[]` array remains accessible for explanation sheets and detailed displays.
+- An item with no non-empty Vietnamese definition is incompatible with `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`.
+- **Written-Answer Mode (`vi_to_text`):**
+  - Prompt: Primary Vietnamese meaning.
+  - Accepted inputs: Normalized `StudyItem.japanese`, and also normalized `StudyItem.kana` when Kana exists.
+  - Requires no separate configuration flag.
+  - Has no multiple-choice option buttons (`options` is undefined).
+
 #### Authoritative `questionCount: 'all'` Rule
-- Selecting `questionCount: 'all'` generates **exactly one initial question per eligible unique StudyItem** ($N$ eligible unique items = $N$ initial questions).
-- It does **NOT** multiply by the number of enabled question types (e.g., 52 eligible items = 52 initial questions, never 52 × 4 = 208).
-- For each unique item, exactly **ONE** enabled compatible QuestionType is selected:
-  - If `kana` is missing: skips `kana_to_japanese`.
-  - If `vietnamese` is empty: skips `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`.
-  - If an item supports none of the enabled question types, it is excluded from `N`.
+- Selecting `questionCount: 'all'` generates **exactly one initial question per eligible lexical group** ($N$ eligible groups = $N$ initial questions).
+- It does **NOT** multiply by the number of enabled question types (e.g., 52 eligible groups = 52 initial questions, never 52 × 4 = 208).
+- For each group, exactly **ONE** enabled compatible QuestionType is selected:
+  - If `kana` is missing across the group: skips `kana_to_japanese`.
+  - If no non-empty `vietnamese` exists across the group: skips `japanese_to_vi`, `vi_to_japanese`, and `vi_to_text`.
+  - If 3 distinct distractors cannot be formed from the pool: skips that multiple-choice type.
+  - If a group supports none of the enabled question types, it is excluded from `N`.
 - *Practice Mode Note:* In Practice Mode, missed items may be re-queued after the initial question set until answered correctly, so total interactions in the session may exceed `N`.
 
 #### Dynamic Fixed Count Options
@@ -221,8 +248,6 @@ If $N = 0$:
   - **Vietnamese:** `"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."`
   - **English:** `"No eligible questions for the selected question types."`
 - The user can freely toggle question types, change selected lessons, or navigate back safely. No disruptive error modals are used.
-
-> **Cross-Category Pool Deduplication:** When building the study question pool from multiple lessons, items are deduplicated using `normalized(japanese) + '::' + normalized(kana || '')` to ensure the same word appearing in both Vocabulary and Kanji is not tested redundantly.
 
 ### 3.3 Active Question & Session State
 

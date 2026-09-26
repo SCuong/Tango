@@ -22,22 +22,26 @@ All quiz configuration screens operate on the identical canonical question-slici
    ```text
    selected lessonIds
             ↓
-   collect StudyItems from tango_v1_lessons
+   collect StudyItems from tango_v1_lessons (in deterministic lesson/item order)
             ↓
-   deduplicate by normalized Japanese + Kana:
+   deduplicate by normalized Japanese + Kana into lexical groups:
    normalized(japanese) + '::' + normalized(kana || '')
             ↓
-   filter items against enabled QuestionTypes and available item fields
+   filter groups against enabled QuestionTypes & pool distractors:
+     • Target field availability (non-empty Vietnamese meaning, Kana reading)
+     • Distractor contract for multiple-choice types (must yield 3 distinct distractors from other groups)
             ↓
-   eligible unique StudyItems
+   eligible lexical groups
             ↓
             N
    ```
-   > **Pool Deduplication Key:** The question pool is deduplicated using `normalized(japanese) + '::' + normalized(kana || '')` rather than `StudyItem.id`. This guarantees that identical Japanese expressions appearing across both Vocabulary and Kanji lessons (with different internal item IDs) are not tested redundantly.
-2. **Total vs Eligible Counts:** The interface explicitly communicates both: `X mục đã chọn · Y câu khả dụng`.
+   > **Pool Deduplication Key & Lexical Groups:** Items sharing `normalized(japanese) + '::' + normalized(kana || '')` are treated as one **deduplicated lexical group**. No synthetic merged `StudyItem` is created at runtime. For a candidate `QuestionType`, the group is compatible if at least one real member can generate that type. When generating the question, the first compatible real `StudyItem` in deterministic selected-lesson/item order serves as `targetItem`.
+   >
+   > **Multiple-Choice Distractor Contract:** For multiple-choice question types (`kana_to_japanese`, `japanese_to_vi`, `vi_to_japanese`), 4 distinct visible options (1 correct + 3 distinct distractors) are drawn strictly from other deduplicated lexical groups in the selected pool. A multiple-choice type is compatible only if the selected pool can supply 3 distinct distractors.
+2. **Total vs Eligible Counts:** The interface explicitly communicates both: `X mục đã chọn · Y câu khả dụng` (raw selected count before filtering vs. $N$ eligible questions after deduplication and compatibility checks).
 3. **Dynamic Candidate Count Buttons:**
    - Candidate options `10`, `20`, `40` are rendered **strictly when `<= N`**.
-   - `Tất cả (N)` button displays the exact eligible count $N$. Selecting `Tất cả` yields exactly $N$ questions (one question per unique item), **never** multiplying by the number of question types selected.
+   - `Tất cả (N)` button displays the exact eligible count $N$. Selecting `Tất cả` yields exactly $N$ questions (one initial question per eligible lexical group), **never** multiplying by the number of question types selected.
 4. **$N = 0$ Empty / Zero State:**
    - When 0 lessons are checked or selected types yield 0 eligible items:
      - Fixed count buttons (`10`, `20`, `40`) are hidden.
