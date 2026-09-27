@@ -13,6 +13,7 @@ import {
   updateStudyBook,
 } from '../contentActions';
 import {
+  deleteCoverBlob,
   getCoverBlob,
   loadBooks,
   loadHistory,
@@ -187,6 +188,67 @@ describe('hard-delete cascades', () => {
     expect(loadBooks().b1).toBeDefined();
     expect(Object.keys(loadProgress()).sort()).toEqual(['i3', 'i4', 'i5']);
     expect(loadHistory().map((h) => h.sessionId)).toEqual(['s-b2', 's-free']);
+  });
+});
+
+async function listCoverIds(): Promise<string[]> {
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open('tango_v1_covers_idb', 1);
+    request.onupgradeneeded = () => request.result.createObjectStore('covers');
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  const keys = await new Promise<IDBValidKey[]>((resolve, reject) => {
+    const request = db.transaction('covers').objectStore('covers').getAllKeys();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  db.close();
+  return keys.map(String);
+}
+
+/** Makes every write to the books key fail (e.g. QuotaExceededError). */
+function failBooksWrites() {
+  const storage = localStorage as unknown as MemoryStorage;
+  const original = storage.setItem.bind(storage);
+  vi.spyOn(storage, 'setItem').mockImplementation((key: string, value: string) => {
+    if (key === 'tango_v1_books') throw new Error('QuotaExceededError');
+    original(key, value);
+  });
+}
+
+describe('cover persistence failures', () => {
+  beforeEach(async () => {
+    for (const id of await listCoverIds()) await deleteCoverBlob(id);
+  });
+
+  it('replacing a cover deletes the new blob and keeps the old cover when metadata cannot be saved', async () => {
+    await saveCoverBlob('cover_1', new Blob(['old']));
+    failBooksWrites();
+    await expect(replaceBookCover('b1', new Blob(['new']), now)).rejects.toThrow('QuotaExceededError');
+    expect(loadBooks().b1.coverImageId).toBe('cover_1');
+    expect(await getCoverBlob('cover_1')).not.toBeNull();
+    expect(await listCoverIds()).toEqual(['cover_1']);
+  });
+
+  it('removing a cover restores the blob when clearing the metadata fails', async () => {
+    await saveCoverBlob('cover_1', new Blob(['img']));
+    failBooksWrites();
+    await expect(removeBookCover('b1', now)).rejects.toThrow('QuotaExceededError');
+    expect(loadBooks().b1.coverImageId).toBe('cover_1');
+    const restored = await getCoverBlob('cover_1');
+    expect(restored).not.toBeNull();
+    expect(await restored!.text()).toBe('img');
+  });
+
+  it('a retried removal succeeds after a failure', async () => {
+    await saveCoverBlob('cover_1', new Blob(['img']));
+    failBooksWrites();
+    await expect(removeBookCover('b1', now)).rejects.toThrow();
+    vi.restoreAllMocks();
+    await removeBookCover('b1', now);
+    expect(loadBooks().b1.coverImageId).toBeUndefined();
+    expect(await listCoverIds()).toEqual([]);
   });
 });
 

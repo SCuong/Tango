@@ -873,6 +873,7 @@ Removing a cover image is an independent, non-destructive operation on book data
 - **Cover Blob Deletion:** Deletes the binary image blob from the `covers` object store in IndexedDB (`tango_v1_covers_idb`).
 - **Metadata Update:** Clears `StudyBook.coverImageId = undefined` in `tango_v1_books`.
 - **Card Fallback:** Reverts card display to the theme-aware ceramic clay placeholder.
+- **Failure Safety:** If clearing `coverImageId` fails after the Blob was deleted, the Blob is written back under the same ID, so the book never references a missing cover. Likewise, replacing a cover deletes the newly stored Blob when the metadata write fails and keeps the previous cover.
 - **Strict Decoupling from Book Deletion:** Removing a cover image is strictly decoupled from book hard-delete semantics. It only affects the cover image blob and property. The `StudyBook` record itself, all its `Lesson` records in `tango_v1_lessons`, nested `StudyItem` records, `ItemProgress` in `tango_v1_progress`, and `QuizSessionResult` records in `tango_v1_history` remain 100% intact and untouched.
 
 ---

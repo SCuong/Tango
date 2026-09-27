@@ -82,6 +82,8 @@ export async function storeCoverBlob(file: Blob): Promise<string> {
 /**
  * Replaces a book cover: saves the new Blob, points the book at it, then deletes the
  * obsolete Blob so no orphaned image remains (CONTENT_LIBRARY_SPEC §5.3).
+ * If the metadata write fails, the new Blob is deleted and the old cover stays referenced
+ * and intact, so the operation can simply be retried.
  */
 export async function replaceBookCover(bookId: string, file: Blob, now: Date): Promise<StudyBook | null> {
   const current = loadBooks()[bookId];
@@ -94,7 +96,14 @@ export async function replaceBookCover(bookId: string, file: Blob, now: Date): P
   }
   const oldCoverId = books[bookId].coverImageId;
   books[bookId] = updateStudyBook(books[bookId], { coverImageId }, now);
-  saveBooks(books);
+  try {
+    saveBooks(books);
+  } catch (error) {
+    // Metadata still points at the old cover: drop the new Blob so nothing is orphaned
+    await deleteCoverBlob(coverImageId).catch(() => undefined);
+    throw error;
+  }
+  // Only after the new reference is persisted is the obsolete Blob removed
   if (oldCoverId && oldCoverId !== coverImageId) {
     await deleteCoverBlob(oldCoverId);
   }

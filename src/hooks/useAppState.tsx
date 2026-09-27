@@ -43,8 +43,11 @@ export interface AppStateContextValue {
   reloadState: () => void;
   updatePreferences: (patch: Partial<UserPreferences>) => void;
   /**
-   * Persists the given partitions (each to its own storage key) and then updates in-memory
-   * state. A failed write (e.g. QuotaExceededError) throws before state changes.
+   * Persists the given partitions one by one, each to its own storage key, then updates
+   * in-memory state. Partitions are not written atomically: if a later write fails
+   * (e.g. QuotaExceededError), the partitions already written stay persisted and are applied
+   * to in-memory state, the failed and remaining partitions are left unchanged, and the
+   * error is rethrown to the caller. If the first write fails, nothing changes.
    */
   commitStudyData: (patch: StudyDataPatch) => void;
 }

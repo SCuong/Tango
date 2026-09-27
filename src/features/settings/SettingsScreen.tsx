@@ -1,12 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
+  IconAlertTriangle,
   IconCheck,
   IconChevronRight,
   IconFolders,
   IconVolume,
   IconVolumeOff,
 } from '@tabler/icons-react';
-import { AppTheme } from '../../types';
+import { AppTheme, UserPreferences } from '../../types';
 import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
@@ -15,6 +16,24 @@ import { FOCUS_RING } from '../../components/Button';
 import { ModalRoute } from '../../components/ModalRoute';
 import { SegmentedControl } from '../../components/FormControls';
 import { TranslationKey } from '../../lib/i18n';
+import { InlineNotice } from '../study/StudyParts';
+
+/**
+ * Applies a preference change and reports whether it was saved. `updatePreferences` persists
+ * before touching the document or in-memory state, so a failed write leaves both unchanged.
+ */
+export function applyPreferenceChange(
+  updatePreferences: (patch: Partial<UserPreferences>) => void,
+  patch: Partial<UserPreferences>
+): boolean {
+  try {
+    updatePreferences(patch);
+    return true;
+  } catch (error) {
+    console.error('Failed to save preferences:', error);
+    return false;
+  }
+}
 
 const THEMES: { value: AppTheme; nameKey: TranslationKey; descKey: TranslationKey }[] = [
   { value: 'light', nameKey: 'preferences.theme.light', descKey: 'settings.themeDesc.light' },
@@ -35,12 +54,10 @@ export const SettingsScreen: React.FC = () => {
 
   const { preferences } = state;
 
-  const safeUpdate = (patch: Parameters<typeof updatePreferences>[0]) => {
-    try {
-      updatePreferences(patch);
-    } catch (error) {
-      console.error('Failed to save preferences:', error);
-    }
+  const [saveFailed, setSaveFailed] = useState(false);
+
+  const safeUpdate = (patch: Partial<UserPreferences>) => {
+    setSaveFailed(!applyPreferenceChange(updatePreferences, patch));
   };
 
   return (
@@ -50,6 +67,14 @@ export const SettingsScreen: React.FC = () => {
           <h2 id="settings-appearance" className="text-xs font-semibold uppercase tracking-wider text-text-muted">
             {t('settings.appearance')}
           </h2>
+
+          {saveFailed && (
+            <div role="alert">
+              <InlineNotice tone="warning" icon={<IconAlertTriangle size={18} stroke={2} />}>
+                {t('common.saveError')}
+              </InlineNotice>
+            </div>
+          )}
 
           <div>
             <p id="settings-language" className="text-sm font-semibold text-text-primary mb-2">

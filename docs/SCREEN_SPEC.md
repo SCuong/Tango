@@ -178,7 +178,7 @@ flowchart TD
    - **Cover Formats:** Supported strictly: `.jpg`, `.jpeg`, `.png`, `.webp`. Invalid warning: *"Chỉ hỗ trợ tệp ảnh .jpg, .jpeg, .png hoặc .webp."*.
    - **Import Formats:** Supported strictly: `.txt`, `.csv`, `.md`, `.xlsx` (matching [`docs/IMPORT_SPEC.md`](./IMPORT_SPEC.md)).
    - **$N = 0$ Quiz State:** If checked lessons yield 0 eligible questions, fixed count buttons are hidden, `Tất cả (0)` is not rendered, Start CTA is disabled, and warning shows: *"Không có câu hỏi phù hợp với các loại câu hỏi đã chọn."*.
-   - **Storage Quota / Write Failures:** If a local write fails (e.g. browser quota exhausted), the screen shows a clear inline error next to the action (`Không thể lưu vào thiết bị...`) and the in-memory state is left unchanged.
+   - **Storage Quota / Write Failures:** If a local write fails (e.g. browser quota exhausted), the screen shows a clear inline error next to the action (`Không thể lưu vào thiết bị...`). Storage keys are written one at a time, not atomically: keys written before the failure stay saved and in-memory state mirrors exactly what was stored, while the failed key and any later ones keep their previous values. A failed preference change leaves the stored preferences and the applied theme/language unchanged.
 
 ---
 

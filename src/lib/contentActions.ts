@@ -13,6 +13,7 @@
 import { Lesson, StudyBook, StudyCategory, StudyItem, QuizSessionResult } from '../types';
 import {
   deleteCoverBlob,
+  getCoverBlob,
   loadBooks,
   loadHistory,
   loadLessons,
@@ -21,6 +22,7 @@ import {
   saveHistory,
   saveLessons,
   saveProgress,
+  saveCoverBlob,
 } from './storage';
 import { createId } from './ids';
 
@@ -268,16 +270,27 @@ export function deleteLessonCascade(
 /**
  * Removes a book cover: deletes the Blob, then clears `coverImageId`. Lessons, items,
  * progress, and history are untouched (CONTENT_LIBRARY_SPEC §19).
+ *
+ * If clearing the metadata fails, the Blob is written back under the same ID, so the book
+ * never references a deleted cover and the removal can be retried.
  */
 export async function removeBookCover(bookId: string, now: Date): Promise<void> {
   const book = loadBooks()[bookId];
   if (!book) return;
-  if (book.coverImageId) {
-    await deleteCoverBlob(book.coverImageId);
+  const coverImageId = book.coverImageId;
+  const backup = coverImageId ? await getCoverBlob(coverImageId) : null;
+  if (coverImageId) {
+    await deleteCoverBlob(coverImageId);
   }
   const books = loadBooks();
-  if (books[bookId]) {
-    books[bookId] = updateStudyBook(books[bookId], { coverImageId: undefined }, now);
+  if (!books[bookId]) return;
+  books[bookId] = updateStudyBook(books[bookId], { coverImageId: undefined }, now);
+  try {
     saveBooks(books);
+  } catch (error) {
+    if (coverImageId && backup) {
+      await saveCoverBlob(coverImageId, backup).catch(() => undefined);
+    }
+    throw error;
   }
 }
