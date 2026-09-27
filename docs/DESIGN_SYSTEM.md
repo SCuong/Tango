@@ -70,6 +70,28 @@ Tango adopts **Soft Claymorphism** as its signature visual language. Claymorphis
 3. **Tactile Pressed State:** On click/tap, the element shifts slightly down (~1px), the outer shadow compresses, and the inner highlight softens, providing satisfying physical feedback.
 4. **Never Extreme:** No high-contrast embossed text, no glossy plastic reflections, and no blurry neumorphic borders that degrade WCAG contrast.
 
+### 3.1 Canonical Clay Interaction Recipe
+
+All primary interactive clay surfaces (Study Book cards, Learn by Type cards, primary Home CTAs, and future lesson-selection cards) adhere to this canonical interaction lifecycle:
+
+- **Default:**
+  - Semantic surface background (`--bg-surface` or category semantic surface)
+  - Subtle semantic border (`--border-subtle` or category semantic border)
+  - Visible but soft dual-layer elevation (`--shadow-clay-card` or `--shadow-clay-button`)
+  - Restrained inner top highlight catching a rounded bevel
+  - `transform: translateY(0)`
+- **Hover on pointer-capable devices:**
+  - Tactile lift: `transform: translateY(-1px)` (`hover:-translate-y-px`)
+  - Dedicated clay hover elevation: `--shadow-clay-card-hover`
+  - Strictly NO generic Tailwind shadows (`hover:shadow-md`, `hover:shadow-lg`)
+- **Active / Pressed:**
+  - Tactile depression: `transform: translateY(1px)` (`active:translate-y-px`)
+  - Compressed elevation: `--shadow-clay-pressed`
+- **Focus-Visible:**
+  - High-contrast primary focus ring with clear 2px offset (`focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none`)
+  - Never relies on shadow alone for keyboard focus
+- **Restraint Rule:** Dense vocabulary lists, dictionary tables, and administrative management tables retain flat surfaces with clean 1px dividers rather than clay cards.
+
 ---
 
 ## 4. Ergonomic UX Architecture
@@ -225,8 +247,20 @@ Components **never** reference raw hex colors. All components consume semantic C
   --answer-4-border: ...;
   --answer-4-text: ...;
 
+  /* Category Semantic Identities */
+  --category-vocabulary-surface: ...;
+  --category-vocabulary-border: ...;
+  --category-vocabulary-icon: ...;
+  --category-vocabulary-text: ...;
+
+  --category-kanji-surface: ...;
+  --category-kanji-border: ...;
+  --category-kanji-icon: ...;
+  --category-kanji-text: ...;
+
   /* Clay Elevation Shadows & Highlights */
   --shadow-clay-card: ...;
+  --shadow-clay-card-hover: ...;
   --shadow-clay-button: ...;
   --shadow-clay-pressed: ...;
 }
@@ -245,14 +279,25 @@ A warm, soft off-white canvas with gentle ceramic elevation and crisp slate typo
 | `--bg-surface` | `#FFFFFF` | Crisp white card surface |
 | `--bg-surface-elevated` | `#F4F4F0` | Elevated sub-panels and active containers |
 | `--border-subtle` | `#E8E8E2` | Thin structural boundary (1px) |
+| `--border-strong` | `#CBD5E1` | Solid secondary boundary (1px) |
 | `--text-primary` | `#1E293B` | Slate 800 high-contrast primary text |
 | `--text-secondary` | `#475569` | Slate 600 secondary definitions |
 | `--text-muted` | `#94A3B8` | Slate 400 captions and readings |
 | `--primary` | `#4F46E5` | Deep Indigo brand accent |
 | `--primary-hover` | `#4338CA` | Indigo 700 active tap state |
 | `--primary-surface` | `#EEF2FF` | Faint indigo wash for selected items |
-| `--shadow-clay-card` | `0 4px 12px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)` | Subtle clay lift |
-| `--shadow-clay-button`| `0 4px 8px rgba(79,70,229,0.12), inset 0 1px 0 rgba(255,255,255,0.4)` | Tactile button depth |
+| `--category-vocabulary-surface` | `#F4F6FF` | Calm cool-indigo study card surface |
+| `--category-vocabulary-border` | `#DDE3FC` | Subtle indigo border |
+| `--category-vocabulary-icon` | `#4F46E5` | Primary indigo vocabulary icon |
+| `--category-vocabulary-text` | `#312E81` | Deep indigo header text |
+| `--category-kanji-surface` | `#FFF7ED` | Warm amber-peach study card surface |
+| `--category-kanji-border` | `#F6E5D3` | Subtle warm amber border |
+| `--category-kanji-icon` | `#B45309` | Warm amber Kanji icon |
+| `--category-kanji-text` | `#78350F` | Deep amber-plum Kanji header text |
+| `--shadow-clay-card` | `0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Subtle clay lift |
+| `--shadow-clay-card-hover` | `0 8px 20px -2px rgba(0, 0, 0, 0.09), 0 3px 8px -1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)` | Tactile hover lift |
+| `--shadow-clay-button`| `0 4px 12px rgba(79, 70, 229, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.45)` | Tactile button depth |
+| `--shadow-clay-pressed`| `0 1px 2px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.06)` | Tactile pressed state |
 
 ### 9.2 Dark Theme (Tối)
 Deep slate and midnight navy tones rather than pitch black. Emphasizes clean border delineation and subtle matte highlights over heavy drop shadows.
@@ -263,14 +308,25 @@ Deep slate and midnight navy tones rather than pitch black. Emphasizes clean bor
 | `--bg-surface` | `#151D2E` | Elevated dark slate card |
 | `--bg-surface-elevated` | `#1E293B` | Layered sub-panels and options |
 | `--border-subtle` | `#26334B` | Crisp dark border for structural definition |
+| `--border-strong` | `#334155` | Defined dark structural boundary |
 | `--text-primary` | `#F8FAFC` | Crisp off-white text (never blinding pure white) |
 | `--text-secondary` | `#94A3B8` | Slate 400 secondary text |
 | `--text-muted` | `#64748B` | Slate 500 metadata |
 | `--primary` | `#6366F1` | Luminous Indigo brand accent |
 | `--primary-hover` | `#818CF8` | Indigo 400 hover state |
 | `--primary-surface` | `#1E1B4B` | Deep indigo surface wash |
-| `--shadow-clay-card` | `0 4px 14px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05)` | Restrained dark elevation |
-| `--shadow-clay-button`| `0 4px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)` | Dark tactile press |
+| `--category-vocabulary-surface` | `#18223C` | Deep indigo slate study card surface |
+| `--category-vocabulary-border` | `#29385C` | Crisp dark indigo border |
+| `--category-vocabulary-icon` | `#818CF8` | Luminous indigo vocabulary icon |
+| `--category-vocabulary-text` | `#E0E7FF` | Crisp off-white vocabulary header text |
+| `--category-kanji-surface` | `#291D1A` | Deep warm charcoal-amber study card surface |
+| `--category-kanji-border` | `#442E25` | Subtle dark warm border |
+| `--category-kanji-icon` | `#F59E0B` | Luminous warm amber Kanji icon |
+| `--category-kanji-text` | `#FEF3C7` | Warm amber-plum Kanji header text |
+| `--shadow-clay-card` | `0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)` | Restrained dark elevation |
+| `--shadow-clay-card-hover` | `0 8px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12)` | Dark tactile hover lift |
+| `--shadow-clay-button`| `0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)` | Dark tactile button depth |
+| `--shadow-clay-pressed`| `0 1px 2px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4)` | Dark tactile pressed state |
 
 ### 9.3 Sakura Theme (Sakura)
 A serene, poetic theme inspired by Japanese cherry blossoms. Uses soft cream, peach blush, warm rose accents, and dark plum text. **Never neon, candy, or overwhelming pink.**
@@ -281,14 +337,25 @@ A serene, poetic theme inspired by Japanese cherry blossoms. Uses soft cream, pe
 | `--bg-surface` | `#FFFFFF` | Pure white elevated surface |
 | `--bg-surface-elevated` | `#F3E8E8` | Soft blush tint for sub-panels |
 | `--border-subtle` | `#EAD7D7` | Soft dusty rose structural border |
+| `--border-strong` | `#D5BDBD` | Defined dusty rose boundary |
 | `--text-primary` | `#2D1F24` | Deep plum-charcoal text (exceptional contrast) |
 | `--text-secondary` | `#5C454D` | Warm muted plum secondary |
 | `--text-muted` | `#8F757D` | Soft dusty lavender metadata |
 | `--primary` | `#D95379` | Refined Sakura Rose primary accent |
 | `--primary-hover` | `#C23E64` | Deep rose hover state |
 | `--primary-surface` | `#FDF0F3` | Faint petal blush surface |
-| `--shadow-clay-card` | `0 4px 12px rgba(180,120,135,0.08), inset 0 1px 0 rgba(255,255,255,0.9)` | Gentle warm blossom lift |
-| `--shadow-clay-button`| `0 4px 10px rgba(217,83,121,0.15), inset 0 1px 0 rgba(255,255,255,0.5)` | Soft tactile rose depth |
+| `--category-vocabulary-surface` | `#F2F4FA` | Soft cool-slate study card surface |
+| `--category-vocabulary-border` | `#DCE1EF` | Soft slate-lavender border |
+| `--category-vocabulary-icon` | `#4F46E5` | Indigo vocabulary icon |
+| `--category-vocabulary-text` | `#232C42` | Deep slate-plum vocabulary header text |
+| `--category-kanji-surface` | `#FAF0EC` | Soft plum-amber study card surface |
+| `--category-kanji-border` | `#EEDCD2` | Soft warm rose-linen border |
+| `--category-kanji-icon` | `#C05621` | Warm amber-plum Kanji icon |
+| `--category-kanji-text` | `#4A232E` | Deep plum Kanji header text |
+| `--shadow-clay-card` | `0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Gentle warm blossom lift |
+| `--shadow-clay-card-hover` | `0 8px 22px rgba(180, 120, 135, 0.18), 0 2px 6px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1)` | Warm blossom hover lift |
+| `--shadow-clay-button`| `0 4px 12px rgba(217, 83, 121, 0.22), 0 1px 3px rgba(180, 120, 135, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.55)` | Soft tactile rose depth |
+| `--shadow-clay-pressed`| `0 1px 2px rgba(180, 120, 135, 0.18), inset 0 2px 4px rgba(180, 120, 135, 0.1)` | Warm blossom pressed state |
 
 ---
 
@@ -442,17 +509,22 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 ## 16. Screen Design Specifications
 
 ### 16.1 Home Screen (Safe Study Hub)
-- **Top Bar:** Tango wordmark, appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`), and `IconSettings` (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
+- **Top Bar:** Solid surface (`bg-surface`, `border-b border-subtle`), matte clay finish with zero translucent frosted glass or blur. Contains Tango wordmark, appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`), and `IconSettings` wrapped in tactile `rounded-full` clay icon action controls. (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
 - **Hero Area:** Brief study greeting in selected UI language: `"Bạn muốn học gì hôm nay?"` / `"What would you like to learn today?"`.
 - **Study Books Section (Giáo trình):**
   - Responsive grid / scroll of textbook cards with cover image thumbnail, title, and lesson counts.
+  - Cards apply the canonical clay interaction recipe: `shadow-clay-card`, `hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`.
   - Fallback placeholder uses a theme-aware clay card with `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
 - **Learn by Type Section (Học theo loại):**
-  - **[IconBook] Từ vựng (Vocabulary):** Soft indigo/slate clay elevation, lesson count, total words.
-  - **[IconWriting] Hán tự (Kanji):** Soft amber/plum clay elevation, lesson count, total words.
+  - Distinct semantic clay surfaces preserving brand harmony:
+    - **[IconBook] Từ vựng (Vocabulary):** `--category-vocabulary-surface`, `--category-vocabulary-border`, `--category-vocabulary-icon`, `--category-vocabulary-text`. Lesson count, total words.
+    - **[IconWriting] Hán tự (Kanji):** `--category-kanji-surface`, `--category-kanji-border`, `--category-kanji-icon`, `--category-kanji-text`. Lesson count, total words.
+  - Interactive cards apply the canonical clay recipe (`hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`).
 - **Combined Test Action Bar:**
-  - Full-width clay button: `[IconBolt] Kiểm tra tổng hợp (Mixed Test)` across books.
+  - Full-width elevated clay button: `[IconBolt] Kiểm tra tổng hợp (Mixed Test)` across books (`bg-primary-surface border border-primary/20 text-primary shadow-clay-button hover:-translate-y-px hover:shadow-clay-card-hover active:translate-y-px active:shadow-clay-pressed`).
+- **Zero-Book Empty State:**
+  - Renders a compact, restrained notice card (`max-w-md mx-auto w-full p-6 text-center`) with a rounded clay icon puck and tactile "Đi tới Cài đặt" button. Never places an "+ Add Book" button directly on Home.
 - **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
 ### 16.2 Lesson List & Category Screens
@@ -575,10 +647,22 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-3-bg: #F3E8FF; --answer-3-border: #D8B4FE; --answer-3-text: #581C87;
   --answer-4-bg: #FFE4E6; --answer-4-border: #FDA4AF; --answer-4-text: #881337;
 
+  /* Category Semantic Identities */
+  --category-vocabulary-surface: #F4F6FF;
+  --category-vocabulary-border: #DDE3FC;
+  --category-vocabulary-icon: #4F46E5;
+  --category-vocabulary-text: #312E81;
+
+  --category-kanji-surface: #FFF7ED;
+  --category-kanji-border: #F6E5D3;
+  --category-kanji-icon: #B45309;
+  --category-kanji-text: #78350F;
+
   /* Clay Shadows */
-  --shadow-clay-card: 0 4px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --shadow-clay-button: 0 4px 8px rgba(79, 70, 229, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  --shadow-clay-pressed: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-clay-card: 0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 20px -2px rgba(0, 0, 0, 0.09), 0 3px 8px -1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(79, 70, 229, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 /* 2. DARK THEME */
@@ -610,10 +694,22 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-3-bg: #241836; --answer-3-border: #552D80; --answer-3-text: #E9D5FF;
   --answer-4-bg: #33141F; --answer-4-border: #7A223B; --answer-4-text: #FECDD3;
 
+  /* Category Semantic Identities */
+  --category-vocabulary-surface: #18223C;
+  --category-vocabulary-border: #29385C;
+  --category-vocabulary-icon: #818CF8;
+  --category-vocabulary-text: #E0E7FF;
+
+  --category-kanji-surface: #291D1A;
+  --category-kanji-border: #442E25;
+  --category-kanji-icon: #F59E0B;
+  --category-kanji-text: #FEF3C7;
+
   /* Clay Shadows (Dark structural emphasis) */
-  --shadow-clay-card: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --shadow-clay-button: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-clay-card: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-clay-card-hover: 0 8px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --shadow-clay-button: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* 3. SAKURA THEME */
@@ -645,10 +741,22 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-3-bg: #F5EEF8; --answer-3-border: #D2B4DE; --answer-3-text: #4A235A;
   --answer-4-bg: #FCEEF1; --answer-4-border: #EBB3C0; --answer-4-text: #641E2F;
 
+  /* Category Semantic Identities */
+  --category-vocabulary-surface: #F2F4FA;
+  --category-vocabulary-border: #DCE1EF;
+  --category-vocabulary-icon: #4F46E5;
+  --category-vocabulary-text: #232C42;
+
+  --category-kanji-surface: #FAF0EC;
+  --category-kanji-border: #EEDCD2;
+  --category-kanji-icon: #C05621;
+  --category-kanji-text: #4A232E;
+
   /* Clay Shadows (Warm pink-slate lift) */
-  --shadow-clay-card: 0 4px 12px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --shadow-clay-button: 0 4px 10px rgba(217, 83, 121, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  --shadow-clay-pressed: 0 1px 2px rgba(180, 120, 135, 0.12), inset 0 2px 4px rgba(180, 120, 135, 0.08);
+  --shadow-clay-card: 0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 22px rgba(180, 120, 135, 0.18), 0 2px 6px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(217, 83, 121, 0.22), 0 1px 3px rgba(180, 120, 135, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --shadow-clay-pressed: 0 1px 2px rgba(180, 120, 135, 0.18), inset 0 2px 4px rgba(180, 120, 135, 0.1);
 }
 ```
 

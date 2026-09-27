@@ -20,10 +20,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <div
-      className={`w-full bg-surface border border-border-subtle rounded-2xl p-6 sm:p-8 text-center shadow-clay-card ${className}`}
+      className={`w-full bg-surface border border-border-subtle rounded-2xl p-6 text-center shadow-clay-card ${className}`}
     >
       {icon && (
-        <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-surface-elevated text-text-muted flex items-center justify-center">
+        <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-surface-elevated border border-border-subtle shadow-sm text-text-muted flex items-center justify-center">
           {icon}
         </div>
       )}
@@ -38,7 +38,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <button
             type="button"
             onClick={action.onClick}
-            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-surface hover:bg-surface-elevated active:translate-y-[1px] border border-border-subtle text-text-primary text-sm font-medium transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-touch"
+            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-surface hover:bg-surface-elevated hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed border border-border-subtle text-text-primary text-sm font-medium transition-all shadow-clay-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-touch"
           >
             {action.label}
           </button>

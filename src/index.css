@@ -58,10 +58,22 @@
   --answer-3-bg: #F3E8FF; --answer-3-border: #D8B4FE; --answer-3-text: #581C87;
   --answer-4-bg: #FFE4E6; --answer-4-border: #FDA4AF; --answer-4-text: #881337;
 
+  /* Category Semantic Identities */
+  --category-vocabulary-surface: #F4F6FF;
+  --category-vocabulary-border: #DDE3FC;
+  --category-vocabulary-icon: #4F46E5;
+  --category-vocabulary-text: #312E81;
+
+  --category-kanji-surface: #FFF7ED;
+  --category-kanji-border: #F6E5D3;
+  --category-kanji-icon: #B45309;
+  --category-kanji-text: #78350F;
+
   /* Clay Shadows */
-  --shadow-clay-card: 0 4px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --shadow-clay-button: 0 4px 8px rgba(79, 70, 229, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  --shadow-clay-pressed: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-clay-card: 0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 20px -2px rgba(0, 0, 0, 0.09), 0 3px 8px -1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(79, 70, 229, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 /* 2. DARK THEME */
@@ -93,10 +105,22 @@
   --answer-3-bg: #241836; --answer-3-border: #552D80; --answer-3-text: #E9D5FF;
   --answer-4-bg: #33141F; --answer-4-border: #7A223B; --answer-4-text: #FECDD3;
 
+  /* Category Semantic Identities */
+  --category-vocabulary-surface: #18223C;
+  --category-vocabulary-border: #29385C;
+  --category-vocabulary-icon: #818CF8;
+  --category-vocabulary-text: #E0E7FF;
+
+  --category-kanji-surface: #291D1A;
+  --category-kanji-border: #442E25;
+  --category-kanji-icon: #F59E0B;
+  --category-kanji-text: #FEF3C7;
+
   /* Clay Shadows (Dark structural emphasis) */
-  --shadow-clay-card: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --shadow-clay-button: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-clay-card: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-clay-card-hover: 0 8px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --shadow-clay-button: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* 3. SAKURA THEME */
@@ -128,10 +152,22 @@
   --answer-3-bg: #F5EEF8; --answer-3-border: #D2B4DE; --answer-3-text: #4A235A;
   --answer-4-bg: #FCEEF1; --answer-4-border: #EBB3C0; --answer-4-text: #641E2F;
 
+  /* Category Semantic Identities */
+  --category-vocabulary-surface: #F2F4FA;
+  --category-vocabulary-border: #DCE1EF;
+  --category-vocabulary-icon: #4F46E5;
+  --category-vocabulary-text: #232C42;
+
+  --category-kanji-surface: #FAF0EC;
+  --category-kanji-border: #EEDCD2;
+  --category-kanji-icon: #C05621;
+  --category-kanji-text: #4A232E;
+
   /* Clay Shadows (Warm pink-slate lift) */
-  --shadow-clay-card: 0 4px 12px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --shadow-clay-button: 0 4px 10px rgba(217, 83, 121, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  --shadow-clay-pressed: 0 1px 2px rgba(180, 120, 135, 0.12), inset 0 2px 4px rgba(180, 120, 135, 0.08);
+  --shadow-clay-card: 0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 22px rgba(180, 120, 135, 0.18), 0 2px 6px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(217, 83, 121, 0.22), 0 1px 3px rgba(180, 120, 135, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --shadow-clay-pressed: 0 1px 2px rgba(180, 120, 135, 0.18), inset 0 2px 4px rgba(180, 120, 135, 0.1);
 }
 
 body {

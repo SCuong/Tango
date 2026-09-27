@@ -29,9 +29,8 @@ export const BookCard: React.FC<BookCardProps> = ({
       onClick={onClick}
       data-study-card="true"
       aria-label={t('aria.openBook', { title: book.title })}
-      className={`w-full text-left bg-surface border border-border-subtle rounded-2xl p-3 sm:p-4 shadow-clay-card hover:shadow-md transition-all duration-150 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary flex flex-row sm:flex-col items-center sm:items-stretch gap-3.5 min-h-[56px] ${className}`}
+      className={`w-full text-left bg-surface border border-border-subtle rounded-2xl p-3 sm:p-4 shadow-clay-card hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary flex flex-row sm:flex-col items-center sm:items-stretch gap-3.5 min-h-[56px] ${className}`}
     >
-      {/* Book Cover container: 1:1 thumbnail on mobile, 3:4 aspect ratio on tablet/desktop */}
       <div className="w-14 h-14 sm:w-full sm:aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-border-subtle">
         <BookCover coverImageId={book.coverImageId} title={book.title} />
       </div>

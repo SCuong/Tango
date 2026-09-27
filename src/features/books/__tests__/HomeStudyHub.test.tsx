@@ -346,4 +346,58 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toMatch(/width:\s*42%/);
     expect(html).toContain('bg-primary');
   });
+
+  it('renders TopBar with solid matte surface and rounded-full clay controls', () => {
+    const html = renderHome(populatedState);
+
+    // TopBar has solid bg-surface and crisp border, strictly NO backdrop-blur
+    expect(html).toContain('bg-surface');
+    expect(html).toContain('border-b border-border-subtle');
+    expect(html).not.toContain('backdrop-blur');
+    expect(html).not.toContain('bg-surface/80');
+
+    // Controls use rounded-full
+    expect(html).toContain('rounded-full');
+    expect(html).toContain('shadow-clay-card');
+  });
+
+  it('applies category semantic tokens and canonical clay recipe to study actions', () => {
+    const html = renderHome(populatedState);
+
+    // Category tokens
+    expect(html).toContain('bg-category-vocabulary-surface');
+    expect(html).toContain('border-category-vocabulary-border');
+    expect(html).toContain('text-category-vocabulary-icon');
+    expect(html).toContain('text-category-vocabulary-text');
+
+    expect(html).toContain('bg-category-kanji-surface');
+    expect(html).toContain('border-category-kanji-border');
+    expect(html).toContain('text-category-kanji-icon');
+    expect(html).toContain('text-category-kanji-text');
+
+    // Mixed test styling
+    expect(html).toContain('bg-primary-surface');
+    expect(html).toContain('border-primary/20');
+    expect(html).toContain('shadow-clay-button');
+
+    // Canonical clay recipe classes on cards
+    expect(html).toContain('hover:shadow-clay-card-hover');
+    expect(html).toContain('hover:-translate-y-px');
+    expect(html).toContain('active:translate-y-px');
+    expect(html).toContain('active:shadow-clay-pressed');
+  });
+
+  it('renders compact constrained empty state layout when no books exist', () => {
+    const emptyBooksState: UserStudyState = {
+      ...populatedState,
+      books: {},
+    };
+
+    const html = renderHome(emptyBooksState);
+
+    // Constrained width container
+    expect(html).toContain('max-w-md mx-auto w-full');
+    // Rounded clay puck
+    expect(html).toContain('rounded-full bg-surface-elevated');
+  });
 });

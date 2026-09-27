@@ -21,7 +21,7 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
 
   return (
     <header
-      className={`w-full border-b border-border-subtle bg-surface/80 backdrop-blur-sm sticky top-0 z-10 pt-[env(safe-area-inset-top)] ${className}`}
+      className={`w-full border-b border-border-subtle bg-surface sticky top-0 z-10 pt-[env(safe-area-inset-top)] ${className}`}
     >
       <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
         <button
@@ -36,7 +36,7 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
         <div className="flex items-center gap-2">
           {/* Active theme status indicator (read-only, non-interactive) */}
           <div
-            className="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-elevated text-text-secondary border border-border-subtle"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-elevated text-text-secondary border border-border-subtle shadow-sm"
             aria-label={currentThemeAria}
             title={currentThemeAria}
           >
@@ -50,7 +50,7 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
             onClick={() => navigate({ type: 'settings' })}
             aria-label={t('nav.settings')}
             title={t('nav.settings')}
-            className="flex items-center justify-center w-12 h-12 rounded-xl bg-surface hover:bg-surface-elevated active:translate-y-[1px] border border-border-subtle text-text-primary shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-touch"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-surface hover:bg-surface-elevated hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed border border-border-subtle text-text-primary shadow-clay-card transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-touch"
           >
             <IconSettings size={22} stroke={2} aria-hidden="true" />
           </button>

@@ -63,9 +63,24 @@ export default {
             text: 'var(--answer-4-text)',
           },
         },
+        category: {
+          vocabulary: {
+            surface: 'var(--category-vocabulary-surface)',
+            border: 'var(--category-vocabulary-border)',
+            icon: 'var(--category-vocabulary-icon)',
+            text: 'var(--category-vocabulary-text)',
+          },
+          kanji: {
+            surface: 'var(--category-kanji-surface)',
+            border: 'var(--category-kanji-border)',
+            icon: 'var(--category-kanji-icon)',
+            text: 'var(--category-kanji-text)',
+          },
+        },
       },
       boxShadow: {
         'clay-card': 'var(--shadow-clay-card)',
+        'clay-card-hover': 'var(--shadow-clay-card-hover)',
         'clay-button': 'var(--shadow-clay-button)',
         'clay-pressed': 'var(--shadow-clay-pressed)',
       },

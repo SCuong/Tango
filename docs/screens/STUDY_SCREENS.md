@@ -38,9 +38,11 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
   - Tapping `[IconSettings]` $\rightarrow$ [SCREEN 16: Settings](./SETTINGS_CONTENT_SCREENS.md#screen-16-settings) (`/settings`).
 
 #### Responsive Layout Strategy:
-- **Mobile (< 640px):** Single-column vertical flow. Study Books are displayed as a **vertical stacked list of compact tactile cards** (eliminates horizontal swipe collisions with browser gestures).
-- **Tablet (640px – 1024px):** 2-column responsive grid for Study Books with 3:4 book cover aspect ratio. 2-column card row for Learn by Type.
-- **Desktop (> 1024px):** Centered container (`max-w-4xl`). 3 to 4-column responsive grid for Study Books. Learn by Type as a balanced 2-column card row. Full-width Mixed Test action card.
+- **Top Bar:** Solid matte clay surface (`bg-surface`, `border-b border-subtle`, zero blur), with tactile `rounded-full` controls for theme status and Settings.
+- **Mobile (< 640px):** Single-column vertical flow. Study Books are displayed as a **vertical stacked list of compact tactile clay cards** (`shadow-clay-card`, active pressed depth).
+- **Tablet (640px – 1024px):** 2-column responsive grid for Study Books with 3:4 book cover aspect ratio. 2-column card row for Learn by Type with category semantic washes.
+- **Desktop (> 1024px):** Centered container (`max-w-4xl`). 3 to 4-column responsive grid for Study Books. Learn by Type as a balanced 2-column card row (`--category-vocabulary-*` and `--category-kanji-*`). Full-width elevated Mixed Test action card (`shadow-clay-button`, hover lift).
+- **Tactile Clay Recipe:** All interactive cards and buttons adhere strictly to `shadow-clay-card`, `hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`.
 
 #### Wireframes:
 ```text
@@ -104,7 +106,7 @@ DESKTOP (> 1024px - max-w-4xl Centered)
 - Arrow keys navigate cards; `Enter` opens active card; `Alt+S` opens Settings.
 
 #### Empty State:
-- If 0 books exist, renders a calm empty card: *"Chưa có giáo trình nào. Bạn có thể thêm giáo trình trong [IconSettings] Cài đặt → Quản lý nội dung."*. Never places an "+ Add Book" button directly on Home.
+- If 0 books exist, renders a compact, restrained notice card (`max-w-md mx-auto w-full p-6 text-center`) with a rounded clay icon puck and tactile action button: *"Chưa có giáo trình nào. Bạn có thể thêm giáo trình trong Cài đặt → Quản lý nội dung."*. Never places an "+ Add Book" button directly on Home.
 
 ---
 
