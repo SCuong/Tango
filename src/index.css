@@ -393,13 +393,25 @@
 
   /*
    * Settings theme carousel (DESIGN_SYSTEM §16.5): three cards visible; the track slides by exactly
-   * one card to reveal Meo's World. The viewport clips horizontally but pads by the card gap, so
-   * shadows and the selection ring are never cut; off-screen cards fade out and ignore pointers.
+   * one card to reveal Meo's World. The picker reserves one arrow gutter: the card row sits left of
+   * it at the first position ([Light Dark Sakura] >) and right of it at the second
+   * (< [Dark Sakura Meo]), so an arrow never overlaps a card. The picker extends 12px into the page
+   * gutter, which holds the viewport's 12px clip padding (shadows and the selection ring are never
+   * cut) without any horizontal overflow; off-screen cards fade out and ignore pointers.
    */
+  .theme-picker {
+    --theme-arrow-gutter: 44px;
+  }
+
   .theme-carousel-viewport {
     overflow: hidden;
-    margin: -12px;
+    margin: -12px calc(var(--theme-arrow-gutter) - 12px) -12px 0;
     padding: 12px;
+    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .theme-picker[data-position="1"] .theme-carousel-viewport {
+    transform: translateX(calc(var(--theme-arrow-gutter) - 12px));
   }
 
   .theme-carousel-track {

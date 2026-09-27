@@ -99,6 +99,43 @@ describe('Settings theme picker (SSR)', () => {
     expect(sakuraCard).not.toContain('--meo-');
   });
 
+  it('previews the current shell in every theme: brand top bar, categories, and the 3-item navigation', () => {
+    const html = renderSettings('light');
+    for (const theme of ['light', 'dark', 'sakura', 'meo'] as const) {
+      const start = html.indexOf(`data-theme-option="${theme}"`);
+      const card = html.slice(start, html.indexOf('</button>', start));
+      // No stale Home CTA bar any more
+      expect(card, theme).not.toContain('bg-cta-surface');
+      expect(card, theme).not.toContain('--cta-depth');
+      // Brand top bar with the cat wordmark, Vocabulary / Kanji cards, then the mini navigation
+      const topbar = card.indexOf('data-mini="topbar"');
+      const categories = card.indexOf('data-mini="categories"');
+      const nav = card.indexOf('data-mini="nav"');
+      expect(topbar, theme).toBeGreaterThan(-1);
+      expect(categories, theme).toBeGreaterThan(topbar);
+      expect(nav, theme).toBeGreaterThan(categories);
+      expect(card.slice(topbar, categories)).toMatch(/<img[^>]*alt=""/);
+      const navMarkup = card.slice(nav);
+      for (const icon of ['tabler-icon-home', 'tabler-icon-cards', 'tabler-icon-settings']) {
+        expect(navMarkup, `${theme} ${icon}`).toContain(icon);
+      }
+      // Home is the active destination in every miniature
+      expect(navMarkup).toMatch(/bg-primary-surface text-primary"><svg[^>]*tabler-icon-home/);
+    }
+  });
+
+  it('keeps both carousel arrows in a reserved gutter beside the card row', () => {
+    for (const theme of ['light', 'meo'] as const) {
+      const html = renderSettings(theme);
+      expect(html).toMatch(/<div class="theme-picker relative -mx-3" data-position="[01]">/);
+      const arrow = html.match(/<button[^>]*data-carousel-arrow="(left|right)"[^>]*>/);
+      expect(arrow).not.toBeNull();
+      expect(arrow![0]).toMatch(arrow![1] === 'right' ? /\bright-0\b/ : /\bleft-0\b/);
+      expect(arrow![0]).toContain('w-11 h-11');
+      expect(arrow![0]).toContain('focus-visible:ring-2');
+    }
+  });
+
   it('keeps the standard selected-card treatment for every theme card', () => {
     for (const theme of ['light', 'dark', 'sakura', 'meo'] as const) {
       const tag = cardTag(renderSettings(theme), theme);

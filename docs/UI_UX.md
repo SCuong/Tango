@@ -243,7 +243,7 @@ A clean, minimalist preferences modal/sheet:
 - **Language (Ngôn ngữ):** Segmented control `[ Tiếng Việt ]` | `[ English ]`.
 - **Theme (Giao diện):**
   - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`; an arrow beside the group reveals the special fourth theme `Mèo mập 😺` / `Meo's World` (see [`DESIGN_SYSTEM.md` §16.5](./DESIGN_SYSTEM.md#165-settings-screen)).
-  - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
+  - Each card renders a miniature of the **current** Tango shell in its own theme's tokens: a tiny top bar with the cat wordmark, the Vocabulary (`語`) / Kanji (`漢`) category cards, and a 3-item Home / Test / Settings navigation with Home active, plus the localized theme name. Simple shapes only (no stale Home CTA bar, no text paragraphs); the canvas motif hints at the ambience, and Meo's World adds only the mini navigation's brown outline and cat ears.
   - Selected state: primary border plus a 2px primary ring (a shape cue, never a color change alone), no check badge; the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
   - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
   - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.

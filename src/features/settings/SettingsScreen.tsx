@@ -3,7 +3,10 @@ import {
   IconAlertTriangle,
   IconChevronLeft,
   IconChevronRight,
+  IconCards,
   IconFolders,
+  IconHome,
+  IconSettings,
   IconVolume,
   IconVolumeOff,
 } from '@tabler/icons-react';
@@ -17,6 +20,7 @@ import { ModalRoute } from '../../components/ModalRoute';
 import { SegmentedControl } from '../../components/FormControls';
 import { TranslationKey } from '../../lib/i18n';
 import { InlineNotice } from '../study/StudyParts';
+import tangoWordmark from '../../assets/brand/tango-wordmark.webp';
 
 /**
  * Applies a preference change and reports whether it was saved. `updatePreferences` persists
@@ -213,7 +217,7 @@ const ThemePicker: React.FC<{ value: AppTheme; onChange: (theme: AppTheme) => vo
   };
 
   return (
-    <div className="relative">
+    <div className="theme-picker relative -mx-3" data-position={position}>
       <div className="theme-carousel-viewport">
         <div
           id="settings-theme-track"
@@ -247,7 +251,7 @@ const ThemePicker: React.FC<{ value: AppTheme; onChange: (theme: AppTheme) => vo
   );
 };
 
-/** Small clay arrow beside the middle of the theme group; a 48px touch target around a 36px puck. */
+/** Small clay arrow in the picker's reserved gutter, beside the card row: a 44px touch target around a 32px puck. */
 const CarouselArrow = React.forwardRef<
   HTMLButtonElement,
   { side: 'left' | 'right'; label: string; onPress: () => void }
@@ -264,11 +268,11 @@ const CarouselArrow = React.forwardRef<
       title={label}
       aria-controls="settings-theme-track"
       data-carousel-arrow={side}
-      className={`theme-carousel-arrow absolute top-1/2 -translate-y-1/2 ${side === 'right' ? '-right-4 sm:-right-5' : '-left-4 sm:-left-5'} z-10 w-12 h-12 flex items-center justify-center rounded-full ${FOCUS_RING}`}
+      className={`theme-carousel-arrow absolute top-1/2 -translate-y-1/2 ${side === 'right' ? 'right-0' : 'left-0'} z-10 w-11 h-11 flex items-center justify-center rounded-full ${FOCUS_RING}`}
     >
       <span
         aria-hidden="true"
-        className={`tango-icon-puck flex items-center justify-center w-9 h-9 rounded-full bg-surface border border-border-subtle text-text-secondary transition-[transform,box-shadow] duration-100 ease-out ${
+        className={`tango-icon-puck flex items-center justify-center w-8 h-8 rounded-full bg-surface border border-border-subtle text-text-secondary transition-[transform,box-shadow] duration-100 ease-out ${
           isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'
         }`}
       >
@@ -325,7 +329,11 @@ const ThemeCard = React.forwardRef<
   );
 });
 
-/** Miniature page in the given theme: canvas + motif, a book card, two category tiles, and the CTA. */
+/**
+ * Miniature of the current Tango shell in the given theme (its own `data-theme`, so real tokens):
+ * the brand top bar, the Vocabulary / Kanji category cards, and the Home / Test / Settings
+ * navigation with Home active. Simple shapes only; the canvas motif hints at the ambience.
+ */
 const ThemeMiniature: React.FC<{ theme: AppTheme }> = ({ theme }) => (
   <span
     data-theme={theme}
@@ -334,17 +342,12 @@ const ThemeMiniature: React.FC<{ theme: AppTheme }> = ({ theme }) => (
   >
     <MiniMotif theme={theme} />
     <span className="relative flex h-full flex-col gap-1 sm:gap-1.5">
-      <span className="relative flex items-center gap-1 rounded-md bg-surface border border-border-subtle shadow-clay-card p-1">
-        {theme === 'meo' && <MiniCatEars />}
-        <span className="w-3.5 sm:w-4 aspect-[3/4] rounded-sm bg-primary-surface border-l-2 border-primary-border shrink-0" />
-        <span className="flex-1 space-y-1">
-          <span className="block h-1 rounded-full bg-text-primary opacity-70 w-4/5" />
-          <span className="block h-1 rounded-full bg-surface-elevated">
-            <span className="block h-full w-1/2 rounded-full bg-primary" />
-          </span>
-        </span>
+      {/* Top bar: the Tango cat wordmark, the brand of every theme */}
+      <span className="flex items-center h-3 sm:h-3.5 shrink-0" data-mini="topbar">
+        <img src={tangoWordmark} alt="" draggable={false} className="block h-full w-auto" />
       </span>
-      <span className="grid grid-cols-2 gap-1 flex-1">
+      {/* Vocabulary / Kanji category cards */}
+      <span className="grid grid-cols-2 gap-1 flex-1" data-mini="categories">
         <span className="rounded-md bg-category-vocabulary-surface border border-category-vocabulary-border flex items-start p-0.5">
           <span className="font-japanese text-[9px] sm:text-[10px] font-bold leading-none text-category-vocabulary-icon">語</span>
         </span>
@@ -352,28 +355,28 @@ const ThemeMiniature: React.FC<{ theme: AppTheme }> = ({ theme }) => (
           <span className="font-japanese text-[9px] sm:text-[10px] font-bold leading-none text-category-kanji-icon">漢</span>
         </span>
       </span>
-      <span className="h-3 sm:h-3.5 rounded-md bg-cta-surface shadow-[0_2px_0_0_var(--cta-depth)] shrink-0 mb-0.5" />
+      {/* Primary navigation: Home (active) / Test / Settings */}
+      <span
+        data-mini="nav"
+        className={`relative flex items-center justify-around shrink-0 h-4 sm:h-5 rounded-md bg-surface border shadow-clay-card ${
+          theme === 'meo' ? 'border-[color:var(--meo-outline)]' : 'border-border-subtle'
+        }`}
+      >
+        {theme === 'meo' && <MiniNavEars />}
+        <span className="flex items-center justify-center h-3 sm:h-3.5 px-1 rounded-full bg-primary-surface text-primary">
+          <IconHome size={9} stroke={2.4} />
+        </span>
+        <IconCards size={9} stroke={2.4} className="text-text-secondary" />
+        <IconSettings size={9} stroke={2.4} className="text-text-secondary" />
+      </span>
     </span>
-    {theme === 'meo' && <MiniCatFace />}
   </span>
 );
 
-/** Meo's World preview: the book card wears cat ears, echoing the catified icon pucks. */
-const MiniCatEars: React.FC = () => (
-  <svg viewBox="0 0 40 8" preserveAspectRatio="none" className="absolute left-1.5 right-1.5 -top-[5px] h-[6px] w-[calc(100%-12px)]" focusable="false">
-    <path d="M2 8 L6 0 L11 8 Z M29 8 L34 0 L38 8 Z" fill="var(--meo-outline)" />
-  </svg>
-);
-
-/** Meo's World preview: a tiny Tango face peeking over the Kanji tile. */
-const MiniCatFace: React.FC = () => (
-  <svg viewBox="0 0 40 30" className="absolute right-0.5 bottom-5 sm:bottom-6 w-4 sm:w-5 h-auto" focusable="false">
-    <g stroke="var(--meo-outline)" strokeWidth="2.6" strokeLinejoin="round" fill="var(--meo-fur)">
-      <path d="M7 16 L9 2 L18 9 Z M33 16 L31 2 L22 9 Z" />
-      <path d="M3 30 C3 16 11 8 20 8 C29 8 37 16 37 30 Z" />
-    </g>
-    <path d="M11 20 Q14 17 17 20 M23 20 Q26 17 29 20" stroke="var(--meo-outline)" strokeWidth="2" fill="none" strokeLinecap="round" />
-    <ellipse cx="20" cy="26" rx="6" ry="3.4" fill="var(--meo-cream)" />
+/** Meo's World preview: the mini navigation wears the same small cat ears as the real bar. */
+const MiniNavEars: React.FC = () => (
+  <svg viewBox="0 0 40 6" preserveAspectRatio="none" className="absolute left-1 right-1 -top-[5px] h-[5px] w-[calc(100%-8px)]" focusable="false">
+    <path d="M4 6 L7 1 L10 6 Z M30 6 L33 1 L36 6 Z" fill="var(--meo-fur)" stroke="var(--meo-outline)" strokeWidth="1" strokeLinejoin="round" />
   </svg>
 );
 
