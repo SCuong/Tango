@@ -4,6 +4,7 @@ import App from './App';
 import { bootstrapAppState, applyDocumentPreferences } from './lib/appState';
 import { AppStateProvider } from './hooks/useAppState';
 import { NavigationProvider } from './hooks/useNavigation';
+import { QuizSessionProvider } from './features/quiz/QuizSessionContext';
 import './index.css';
 
 // 1. Bootstrap runtime state once before rendering
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <AppStateProvider initialState={initialAppState}>
       <NavigationProvider>
-        <App />
+        <QuizSessionProvider>
+          <App />
+        </QuizSessionProvider>
       </NavigationProvider>
     </AppStateProvider>
   </React.StrictMode>

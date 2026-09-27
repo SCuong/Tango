@@ -1,36 +1,80 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigation } from './hooks/useNavigation';
-import { useI18n } from './hooks/useI18n';
 import { HomeStudyHub } from './features/books/HomeStudyHub';
+import { BookStudyView } from './features/study/BookStudyView';
+import { CategoryInBook } from './features/study/CategoryInBook';
+import { LearnByType } from './features/study/LearnByType';
+import { LessonDetail } from './features/study/LessonDetail';
+import { LessonItems } from './features/study/LessonItems';
+import { QuizConfigScreen } from './features/quiz/QuizConfigScreen';
+import { QuizRunnerScreen } from './features/quiz/QuizRunnerScreen';
+import { QuizResultsScreen } from './features/quiz/QuizResultsScreen';
+import { SettingsScreen } from './features/settings/SettingsScreen';
+import { ContentManagement } from './features/content-management/ContentManagement';
+import { AddBookScreen } from './features/content-management/AddBookScreen';
+import { ManageBookScreen } from './features/content-management/ManageBookScreen';
+import { ManageLessonScreen } from './features/content-management/ManageLessonScreen';
+import { ImportScreen } from './features/content-management/ImportScreen';
+import { NotFoundScreen } from './components/NotFoundScreen';
 
+/**
+ * Screen router / navigation coordinator: one canonical screen per route (SCREEN_SPEC §4).
+ */
 export const App: React.FC = () => {
   const { route } = useNavigation();
-  const { t } = useI18n();
 
-  if (route.type === 'not_found') {
-    return (
-      <div className="min-h-screen bg-page text-text-primary p-4 flex items-center justify-center">
-        <div className="w-full max-w-md bg-surface border border-border-subtle rounded-xl p-6 shadow-clay-card space-y-2">
-          <h1 className="text-xl font-bold text-text-primary">404</h1>
-          <p className="text-sm text-text-secondary">{t('state.notFound')}</p>
-        </div>
-      </div>
-    );
+  // Each screen starts at the top of the page
+  useEffect(() => {
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+      window.scrollTo(0, 0);
+    }
+  }, [route.type]);
+
+  switch (route.type) {
+    case 'home':
+      return <HomeStudyHub />;
+    case 'book_study':
+      return <BookStudyView key={route.bookId} bookId={route.bookId} />;
+    case 'category_inside_book':
+      return <CategoryInBook key={`${route.bookId}/${route.category}`} bookId={route.bookId} category={route.category} />;
+    case 'learn_by_type':
+      return <LearnByType key={route.category} category={route.category} />;
+    case 'lesson_detail':
+      return <LessonDetail key={route.lessonId} lessonId={route.lessonId} />;
+    case 'lesson_items':
+      return <LessonItems key={route.lessonId} lessonId={route.lessonId} />;
+    case 'category_quiz_config':
+      return (
+        <QuizConfigScreen
+          key={`category/${route.bookId}/${route.category}`}
+          scope={{ kind: 'category', bookId: route.bookId, category: route.category }}
+        />
+      );
+    case 'book_quiz_config':
+      return <QuizConfigScreen key={`book/${route.bookId}`} scope={{ kind: 'book', bookId: route.bookId }} />;
+    case 'mixed_quiz_config':
+      return <QuizConfigScreen key="mixed" scope={{ kind: 'mixed' }} />;
+    case 'quiz_session':
+      return <QuizRunnerScreen key="session" review={false} />;
+    case 'quiz_review':
+      return <QuizRunnerScreen key="review" review />;
+    case 'quiz_results':
+      return <QuizResultsScreen />;
+    case 'settings':
+      return <SettingsScreen />;
+    case 'content_management':
+      return <ContentManagement />;
+    case 'add_book':
+      return <AddBookScreen />;
+    case 'manage_book':
+      return <ManageBookScreen key={route.bookId} bookId={route.bookId} />;
+    case 'manage_lesson':
+      return <ManageLessonScreen key={route.lessonId} lessonId={route.lessonId} />;
+    case 'import':
+      return <ImportScreen />;
+    case 'not_found':
+      return <NotFoundScreen />;
   }
-
-  if (route.type !== 'home') {
-    return (
-      <div className="min-h-screen bg-page text-text-primary p-4 flex items-center justify-center">
-        <div className="w-full max-w-md bg-surface border border-border-subtle rounded-xl p-6 shadow-clay-card space-y-2">
-          <h1 className="text-xl font-bold text-text-primary">{t('app.name')}</h1>
-          <p className="text-sm text-text-secondary">{t('state.notImplemented')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // SCREEN 01: Home / Study Hub
-  return <HomeStudyHub />;
 };
 
 export default App;

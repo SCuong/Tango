@@ -1,0 +1,269 @@
+import React, { useRef } from 'react';
+import {
+  IconCheck,
+  IconChevronRight,
+  IconFolders,
+  IconVolume,
+  IconVolumeOff,
+} from '@tabler/icons-react';
+import { AppTheme } from '../../types';
+import { useAppState } from '../../hooks/useAppState';
+import { useNavigation } from '../../hooks/useNavigation';
+import { useI18n } from '../../hooks/useI18n';
+import { usePressFeedback } from '../../hooks/usePressFeedback';
+import { FOCUS_RING } from '../../components/Button';
+import { ModalRoute } from '../../components/ModalRoute';
+import { SegmentedControl } from '../../components/FormControls';
+import { TranslationKey } from '../../lib/i18n';
+
+const THEMES: { value: AppTheme; nameKey: TranslationKey; descKey: TranslationKey }[] = [
+  { value: 'light', nameKey: 'preferences.theme.light', descKey: 'settings.themeDesc.light' },
+  { value: 'dark', nameKey: 'preferences.theme.dark', descKey: 'settings.themeDesc.dark' },
+  { value: 'sakura', nameKey: 'preferences.theme.sakura', descKey: 'settings.themeDesc.sakura' },
+];
+
+/**
+ * SCREEN 16 — Settings (`/settings`).
+ * Full-screen route on mobile; a centered `max-w-lg` panel over a dimmed canvas from `sm` up.
+ * Theme selection lives only here (DESIGN_SYSTEM §16.5).
+ */
+export const SettingsScreen: React.FC = () => {
+  const { state, updatePreferences } = useAppState();
+  const { navigate, goBack } = useNavigation();
+  const { t } = useI18n();
+  const close = () => goBack({ type: 'home' });
+
+  const { preferences } = state;
+
+  const safeUpdate = (patch: Parameters<typeof updatePreferences>[0]) => {
+    try {
+      updatePreferences(patch);
+    } catch (error) {
+      console.error('Failed to save preferences:', error);
+    }
+  };
+
+  return (
+    <ModalRoute titleId="settings-title" title={t('settings.title')} onClose={close} size="lg">
+      <div className="space-y-7 pb-4">
+        <section aria-labelledby="settings-appearance" className="space-y-5">
+          <h2 id="settings-appearance" className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+            {t('settings.appearance')}
+          </h2>
+
+          <div>
+            <p id="settings-language" className="text-sm font-semibold text-text-primary mb-2">
+              {t('settings.language')}
+            </p>
+            <SegmentedControl
+              labelledBy="settings-language"
+              value={preferences.language}
+              onChange={(language) => safeUpdate({ language })}
+              options={[
+                { value: 'vi', label: t('preferences.language.vi') },
+                { value: 'en', label: t('preferences.language.en') },
+              ]}
+            />
+          </div>
+
+          <div>
+            <p id="settings-theme" className="text-sm font-semibold text-text-primary mb-2">
+              {t('settings.theme')}
+            </p>
+            <ThemePicker value={preferences.theme} onChange={(theme) => safeUpdate({ theme })} />
+          </div>
+
+          <div>
+            <p id="settings-sound" className="text-sm font-semibold text-text-primary">
+              {t('settings.sound')}
+            </p>
+            <p className="text-xs text-text-muted mt-0.5 mb-2 leading-relaxed">{t('settings.soundDesc')}</p>
+            <SegmentedControl
+              labelledBy="settings-sound"
+              value={preferences.soundEnabled ? 'on' : 'off'}
+              onChange={(value) => safeUpdate({ soundEnabled: value === 'on' })}
+              options={[
+                { value: 'off', label: t('preferences.sound.off'), icon: <IconVolumeOff size={18} stroke={2} /> },
+                { value: 'on', label: t('preferences.sound.on'), icon: <IconVolume size={18} stroke={2} /> },
+              ]}
+            />
+          </div>
+        </section>
+
+        <section aria-labelledby="settings-content" className="space-y-2">
+          <h2 id="settings-content" className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+            {t('settings.studyContent')}
+          </h2>
+          <ContentManagementRow onOpen={() => navigate({ type: 'content_management' })} />
+        </section>
+      </div>
+    </ModalRoute>
+  );
+};
+
+const ContentManagementRow: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
+  const { t } = useI18n();
+  const { pressHandlers } = usePressFeedback();
+  return (
+    <button
+      type="button"
+      {...pressHandlers}
+      onClick={onOpen}
+      className={`flat-interactive w-full min-h-[64px] px-4 py-3 rounded-xl border border-border-subtle bg-surface flex items-center gap-3 text-left ${FOCUS_RING}`}
+    >
+      <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-primary-surface text-primary flex items-center justify-center shrink-0">
+        <IconFolders size={20} stroke={1.75} />
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className="block text-[15px] font-semibold text-text-primary leading-snug">{t('settings.manageContent')}</span>
+        <span className="block text-sm text-text-secondary leading-snug mt-0.5">{t('settings.manageContentDesc')}</span>
+      </span>
+      <IconChevronRight size={20} stroke={2} aria-hidden="true" className="shrink-0 text-text-muted" />
+    </button>
+  );
+};
+
+/**
+ * Three genuine theme previews: each miniature sets its own `data-theme`, so it renders with
+ * that theme's real tokens (canvas, surface card, category identities, CTA, ambience motif).
+ */
+const ThemePicker: React.FC<{ value: AppTheme; onChange: (theme: AppTheme) => void }> = ({ value, onChange }) => {
+  const refs = useRef<Array<HTMLButtonElement | null>>([]);
+  const onKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let next = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % THEMES.length;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + THEMES.length) % THEMES.length;
+    if (next >= 0) {
+      e.preventDefault();
+      onChange(THEMES[next].value);
+      refs.current[next]?.focus();
+    }
+  };
+  return (
+    <div role="radiogroup" aria-labelledby="settings-theme" className="grid grid-cols-3 gap-2.5 sm:gap-3">
+      {THEMES.map((theme, index) => (
+        <ThemeCard
+          key={theme.value}
+          ref={(el) => {
+            refs.current[index] = el;
+          }}
+          theme={theme}
+          selected={value === theme.value}
+          onSelect={() => onChange(theme.value)}
+          onKeyDown={(e) => onKeyDown(e, index)}
+        />
+      ))}
+    </div>
+  );
+};
+
+const ThemeCard = React.forwardRef<
+  HTMLButtonElement,
+  {
+    theme: (typeof THEMES)[number];
+    selected: boolean;
+    onSelect: () => void;
+    onKeyDown: (e: React.KeyboardEvent) => void;
+  }
+>(function ThemeCard({ theme, selected, onSelect, onKeyDown }, ref) {
+  const { t } = useI18n();
+  const { isPressed, pressHandlers } = usePressFeedback();
+  const descId = `theme-desc-${theme.value}`;
+  return (
+    <button
+      ref={ref}
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      aria-describedby={descId}
+      tabIndex={selected ? 0 : -1}
+      {...pressHandlers}
+      onKeyDown={(e) => {
+        pressHandlers.onKeyDown(e);
+        onKeyDown(e);
+      }}
+      onClick={onSelect}
+      className={`clay-interactive relative text-left rounded-xl border bg-surface p-1.5 sm:p-2 ${
+        selected ? 'border-primary ring-2 ring-primary' : 'border-border-subtle'
+      } ${isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'} ${FOCUS_RING}`}
+    >
+      <ThemeMiniature theme={theme.value} />
+      <span className="flex items-center justify-between gap-1 px-1 pt-2 pb-0.5">
+        <span className="text-sm font-semibold text-text-primary leading-snug truncate">{t(theme.nameKey)}</span>
+        {selected && (
+          <span aria-hidden="true" className="w-5 h-5 shrink-0 rounded-full bg-primary text-page flex items-center justify-center">
+            <IconCheck size={14} stroke={3} />
+          </span>
+        )}
+      </span>
+      <span id={descId} className="hidden sm:block px-1 pb-1 text-xs text-text-muted leading-snug">
+        {t(theme.descKey)}
+      </span>
+    </button>
+  );
+});
+
+/** Miniature page in the given theme: canvas + motif, a book card, two category tiles, and the CTA. */
+const ThemeMiniature: React.FC<{ theme: AppTheme }> = ({ theme }) => (
+  <span
+    data-theme={theme}
+    aria-hidden="true"
+    className="relative block aspect-[4/5] rounded-lg overflow-hidden border border-border-subtle bg-page p-1.5 sm:p-2"
+  >
+    <MiniMotif theme={theme} />
+    <span className="relative flex h-full flex-col gap-1 sm:gap-1.5">
+      <span className="flex items-center gap-1 rounded-md bg-surface border border-border-subtle shadow-clay-card p-1">
+        <span className="w-3.5 sm:w-4 aspect-[3/4] rounded-sm bg-primary-surface border-l-2 border-primary-border shrink-0" />
+        <span className="flex-1 space-y-1">
+          <span className="block h-1 rounded-full bg-text-primary opacity-70 w-4/5" />
+          <span className="block h-1 rounded-full bg-surface-elevated">
+            <span className="block h-full w-1/2 rounded-full bg-primary" />
+          </span>
+        </span>
+      </span>
+      <span className="grid grid-cols-2 gap-1 flex-1">
+        <span className="rounded-md bg-category-vocabulary-surface border border-category-vocabulary-border flex items-start p-0.5">
+          <span className="font-japanese text-[9px] sm:text-[10px] font-bold leading-none text-category-vocabulary-icon">語</span>
+        </span>
+        <span className="rounded-md bg-category-kanji-surface border border-category-kanji-border flex items-start p-0.5">
+          <span className="font-japanese text-[9px] sm:text-[10px] font-bold leading-none text-category-kanji-icon">漢</span>
+        </span>
+      </span>
+      <span className="h-3 sm:h-3.5 rounded-md bg-cta-surface shadow-[0_2px_0_0_var(--cta-depth)] shrink-0 mb-0.5" />
+    </span>
+  </span>
+);
+
+const MiniMotif: React.FC<{ theme: AppTheme }> = ({ theme }) => {
+  if (theme === 'light') {
+    return (
+      <svg viewBox="0 0 40 50" className="absolute -right-2 top-1 w-8 h-10" focusable="false">
+        <rect x="2" y="2" width="36" height="46" rx="2" fill="var(--ambience-glow)" opacity="0.6" />
+        <path d="M14 2 V48 M26 2 V48 M2 16 H38 M2 30 H38" stroke="var(--ambience-line)" strokeWidth="1.5" opacity="0.14" fill="none" />
+      </svg>
+    );
+  }
+  if (theme === 'dark') {
+    return (
+      <svg viewBox="0 0 40 40" className="absolute -right-2 -top-1 w-9 h-9" focusable="false">
+        <circle cx="22" cy="18" r="11" fill="var(--ambience-glow)" opacity="0.16" />
+        <circle cx="6" cy="34" r="1.6" fill="var(--ambience-accent)" opacity="0.7" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 40 40" className="absolute -right-1 -top-1 w-9 h-9" focusable="false">
+      <path d="M40 6 C30 10 22 14 14 24" stroke="var(--ambience-line)" strokeWidth="2" opacity="0.3" fill="none" strokeLinecap="round" />
+      {[
+        [24, 16],
+        [33, 9],
+      ].map(([x, y]) => (
+        <g key={`${x}-${y}`} transform={`translate(${x} ${y})`} fill="var(--ambience-accent)" opacity="0.7">
+          {[0, 72, 144, 216, 288].map((angle) => (
+            <ellipse key={angle} cx="0" cy="-2.5" rx="1.8" ry="2.6" transform={`rotate(${angle})`} />
+          ))}
+        </g>
+      ))}
+    </svg>
+  );
+};
