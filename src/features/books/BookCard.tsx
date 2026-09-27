@@ -2,6 +2,7 @@ import React from 'react';
 import { StudyBook, Lesson, ItemProgress } from '../../types';
 import { getBookStudyMetrics } from '../../lib/studyMetrics';
 import { useI18n } from '../../hooks/useI18n';
+import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeedback';
 import { BookCover } from './BookCover';
 import { ProgressBar } from '../../components/ProgressBar';
 
@@ -21,15 +22,17 @@ export const BookCard: React.FC<BookCardProps> = ({
   className = '',
 }) => {
   const { t } = useI18n();
+  const { isPressed, pressHandlers } = usePressFeedback();
   const metrics = getBookStudyMetrics(book.id, lessons, progressByItem);
 
   return (
     <button
       type="button"
+      {...pressHandlers}
       onClick={onClick}
       data-study-card="true"
       aria-label={t('aria.openBook', { title: book.title })}
-      className={`w-full text-left bg-surface border border-border-subtle rounded-2xl p-3 sm:p-4 shadow-clay-card hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page flex items-stretch gap-3.5 sm:gap-4 min-h-[56px] ${className}`}
+      className={`clay-interactive w-full text-left bg-surface border border-border-subtle rounded-2xl p-3 sm:p-4 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page flex items-stretch gap-3.5 sm:gap-4 min-h-[56px] ${className}`}
     >
       {/* 3:4 book cover thumbnail */}
       <div className="w-14 sm:w-16 aspect-[3/4] rounded-lg overflow-hidden shrink-0 border border-border-subtle shadow-clay-card self-center">

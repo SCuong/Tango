@@ -3,6 +3,7 @@ import { IconSun, IconMoon, IconFlower, IconSettings } from '@tabler/icons-react
 import { useNavigation } from '../hooks/useNavigation';
 import { useAppState } from '../hooks/useAppState';
 import { useI18n } from '../hooks/useI18n';
+import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../hooks/usePressFeedback';
 
 export interface TopBarProps {
   className?: string;
@@ -12,6 +13,8 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
   const { navigate } = useNavigation();
   const { state } = useAppState();
   const { t } = useI18n();
+  const { isPressed: isSettingsPressed, pressHandlers: settingsPressHandlers } =
+    usePressFeedback();
 
   const theme = state.preferences.theme;
   const themeLabel = t(`preferences.theme.${theme}`);
@@ -47,10 +50,11 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
           {/* Settings button */}
           <button
             type="button"
+            {...settingsPressHandlers}
             onClick={() => navigate({ type: 'settings' })}
             aria-label={t('nav.settings')}
             title={t('nav.settings')}
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-surface hover:bg-surface-elevated hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed border border-border-subtle text-text-primary shadow-clay-card transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch"
+            className={`clay-interactive clay-hover-surface flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border-subtle text-text-primary ${isSettingsPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch`}
           >
             <IconSettings size={22} stroke={2} aria-hidden="true" />
           </button>

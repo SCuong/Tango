@@ -1,4 +1,5 @@
 import React from 'react';
+import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../hooks/usePressFeedback';
 
 export interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -25,6 +26,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   action,
   className = '',
 }) => {
+  const { isPressed, pressHandlers } = usePressFeedback();
+
   return (
     <div
       className={`w-full bg-surface-elevated border border-border-subtle rounded-2xl p-4 sm:p-5 shadow-clay-pressed flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 ${className}`}
@@ -50,8 +53,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       {action && (
         <button
           type="button"
+          {...pressHandlers}
           onClick={action.onClick}
-          className={`${icon ? 'ml-14 sm:ml-0' : ''} self-start sm:self-center shrink-0 inline-flex items-center justify-center gap-2 px-4 rounded-lg bg-surface border border-border-subtle text-text-primary text-sm font-semibold shadow-clay-card hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch`}
+          className={`clay-interactive ${icon ? 'ml-14 sm:ml-0' : ''} self-start sm:self-center shrink-0 inline-flex items-center justify-center gap-2 px-4 rounded-lg bg-surface border border-border-subtle text-text-primary text-sm font-semibold ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch`}
         >
           {action.icon}
           {action.label}

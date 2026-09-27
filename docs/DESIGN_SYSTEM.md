@@ -72,7 +72,7 @@ Tango adopts **Soft Claymorphism** as its signature visual language. Claymorphis
 
 ### 3.1 Canonical Clay Interaction Recipe
 
-All primary interactive clay surfaces (Study Book cards, Learn by Type cards, primary Home CTAs, and future lesson-selection cards) adhere to this canonical interaction lifecycle:
+All primary interactive clay surfaces (Study Book cards, Learn by Type cards, primary Home CTAs, tactile icon buttons, and future lesson-selection cards) adhere to this canonical interaction lifecycle. It is implemented by the shared `.clay-interactive` rule in `src/index.css` plus the `usePressFeedback` hook (`src/hooks/usePressFeedback.ts`):
 
 - **Default:**
   - Semantic surface background (`--bg-surface` or category semantic surface)
@@ -80,13 +80,17 @@ All primary interactive clay surfaces (Study Book cards, Learn by Type cards, pr
   - Visible but soft dual-layer elevation (`--shadow-clay-card` or `--shadow-clay-button`)
   - Restrained inner top highlight catching a rounded bevel
   - `transform: translateY(0)`
-- **Hover on pointer-capable devices:**
-  - Tactile lift: `transform: translateY(-1px)` (`hover:-translate-y-px`)
+- **Hover (only on devices with a real hovering pointer):**
+  - Gated by `@media (hover: hover) and (pointer: fine)` inside `.clay-interactive`, so touch screens never keep a sticky hover lift.
+  - Tactile lift: `transform: translateY(-1px)`
   - Dedicated clay hover elevation: `--shadow-clay-card-hover`
-  - Strictly NO generic Tailwind shadows (`hover:shadow-md`, `hover:shadow-lg`)
-- **Active / Pressed:**
-  - Tactile depression: `transform: translateY(1px)` (`active:translate-y-px`)
-  - Compressed elevation: `--shadow-clay-pressed`
+  - Never applied while the control is pressed (`:not([data-pressed="true"])`).
+  - Do not use Tailwind `hover:*` / `group-hover:*` utilities for clay elevation, and strictly NO generic Tailwind shadows (`hover:shadow-md`, `hover:shadow-lg`).
+- **Pressed (explicit pointer state, never CSS `:active`):**
+  - Mobile browsers can leave `:active` / `:hover` stuck after a touch is dragged off a control and released, so pressed depth is component state from `usePressFeedback`.
+  - The press starts on pointer down (primary mouse button, touch, or pen) or `Space`, and clears on pointer up, pointer cancel, pointer leave, pointer moving outside the control bounds, blur, and any pointer/key release in the window.
+  - Pointer capture is not used, so native click cancellation on drag-out is unchanged.
+  - While pressed, the control swaps its resting shadow for `CLAY_PRESSED_CLASSES` (`translate-y-px shadow-clay-pressed`) and exposes `data-pressed="true"`.
 - **Focus-Visible:**
   - High-contrast primary focus ring with clear 2px offset (`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page`)
   - Never relies on shadow alone for keyboard focus
@@ -490,8 +494,8 @@ All interactive Clay surfaces (cards, buttons, choices) share a predictable, phy
 | State | Visual Treatment | CSS / Transform |
 |---|---|---|
 | **Default** | Resting subtle elevation, dual-layer shadow, top highlight | `transform: translateY(0)` |
-| **Hover (Desktop)** | Subtle lift (+1px upward), shadow expands faintly | `transform: translateY(-1px)`, transition `150ms ease` |
-| **Pressed / Active** | Tactile depression (+1px downward), shadow compresses | `transform: translateY(1px)`, shadow blur reduced by 50% |
+| **Hover (hover-capable fine pointers only)** | Subtle lift (+1px upward), shadow expands faintly | `@media (hover: hover) and (pointer: fine)`: `transform: translateY(-1px)`, transition `150ms ease` |
+| **Pressed** | Tactile depression (+1px downward), shadow compresses | Explicit state (`usePressFeedback`, `data-pressed="true"`): `translate-y-px shadow-clay-pressed`; never CSS `:active` |
 | **Focus-Visible** | High-contrast focus ring (2px solid primary, 2px offset) | `outline: 2px solid var(--primary); outline-offset: 2px` |
 | **Disabled** | Opacity 50%, flat shadow, cursor not-allowed | `opacity: 0.5; filter: grayscale(20%)` |
 
@@ -556,7 +560,7 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
   - Compact horizontal cards: 3:4 cover thumbnail, title (2-line clamp), lesson/item counts, and one Study Coverage bar. Stacked on mobile, 2 columns on tablet, 3 columns on desktop (aligned with the study path row).
   - Fallback placeholder uses a theme-aware primary-tinted cover with a spine band and `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
-- **Interaction:** All interactive tiles and cards apply the canonical clay recipe (`hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`, primary focus ring with 2px page offset).
+- **Interaction:** All interactive tiles, cards, the empty-state action, and the Settings button apply the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. The read-only theme indicator stays non-interactive.
 - **Zero-Book Empty State:**
   - Renders inline inside the Study Books section as a full-width recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, title, and description in one row, with a tactile `[IconSettings] Cài đặt` button (right-aligned on desktop, under the text on mobile). Never a centered floating card. Never places an "+ Add Book" button directly on Home.
 - **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).

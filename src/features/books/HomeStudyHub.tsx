@@ -10,6 +10,7 @@ import {
 import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
+import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeedback';
 import { getCategoryStudyMetrics, StudyCollectionMetrics } from '../../lib/studyMetrics';
 import { TranslationKey } from '../../lib/i18n';
 import { StudyCategory } from '../../types';
@@ -17,9 +18,8 @@ import { TopBar } from '../../components/TopBar';
 import { EmptyState } from '../../components/EmptyState';
 import { BookCard } from './BookCard';
 
-// Canonical clay interaction recipe (hover lift, pressed depth) and focus ring
-const CLAY_MOTION =
-  'hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150';
+// Focus ring shared by Home study actions. Hover lift comes from `.clay-interactive`
+// (pointer-capability gated) and pressed depth from usePressFeedback (explicit state).
 const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page';
 
@@ -65,6 +65,7 @@ interface CategoryTileProps {
 
 const CategoryTile: React.FC<CategoryTileProps> = ({ category, metrics, onClick }) => {
   const { t } = useI18n();
+  const { isPressed, pressHandlers } = usePressFeedback();
   const tile = CATEGORY_TILES[category];
   const label = t(tile.labelKey);
 
@@ -73,9 +74,10 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, metrics, onClick 
       type="button"
       data-study-card="true"
       data-category={category}
+      {...pressHandlers}
       onClick={onClick}
       aria-label={t('aria.learnCategory', { category: label })}
-      className={`w-full text-left border rounded-2xl p-4 sm:p-5 min-h-[148px] sm:min-h-[168px] flex flex-col justify-between gap-4 shadow-clay-card ${tile.surface} ${CLAY_MOTION} ${FOCUS_RING}`}
+      className={`clay-interactive w-full text-left border rounded-2xl p-4 sm:p-5 min-h-[148px] sm:min-h-[168px] flex flex-col justify-between gap-4 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div
@@ -118,6 +120,8 @@ export const HomeStudyHub: React.FC = () => {
   const { state } = useAppState();
   const { navigate } = useNavigation();
   const { t } = useI18n();
+  const { isPressed: isMixedTestPressed, pressHandlers: mixedTestPressHandlers } =
+    usePressFeedback();
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -252,8 +256,9 @@ export const HomeStudyHub: React.FC = () => {
                 type="button"
                 id="home-mixed-test-heading"
                 data-study-card="true"
+                {...mixedTestPressHandlers}
                 onClick={() => navigate({ type: 'mixed_quiz_config' })}
-                className={`group relative flex-1 w-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl p-4 sm:p-5 min-h-[88px] flex items-center gap-4 lg:flex-col lg:items-start lg:justify-between shadow-clay-button ${CLAY_MOTION} ${FOCUS_RING}`}
+                className={`clay-interactive relative flex-1 w-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl p-4 sm:p-5 min-h-[88px] flex items-center gap-4 lg:flex-col lg:items-start lg:justify-between ${isMixedTestPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-button'} ${FOCUS_RING}`}
               >
                 <div
                   className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0"
@@ -270,7 +275,7 @@ export const HomeStudyHub: React.FC = () => {
                   </p>
                 </div>
                 <div
-                  className="w-9 h-9 rounded-full bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0 transition-transform duration-150 group-hover:translate-x-0.5 lg:absolute lg:top-5 lg:right-5"
+                  className="w-9 h-9 rounded-full bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0 clay-hover-nudge transition-transform duration-150 lg:absolute lg:top-5 lg:right-5"
                   aria-hidden="true"
                 >
                   <IconArrowRight size={18} stroke={2} />

@@ -197,6 +197,35 @@
   --shadow-clay-pressed: 0 1px 2px rgba(180, 120, 135, 0.18), inset 0 2px 4px rgba(180, 120, 135, 0.1);
 }
 
+/*
+ * Canonical clay interaction.
+ * - Hover lift runs only on devices with a real hovering pointer, so touch screens never
+ *   keep a sticky hover elevation.
+ * - Pressed depth is explicit state (`data-pressed="true"` from usePressFeedback), never
+ *   CSS `:active`, which mobile browsers can leave stuck after a drag-out release.
+ */
+@layer components {
+  .clay-interactive {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+      background-color var(--transition-fast);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .clay-interactive:hover:not([data-pressed="true"]) {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-clay-card-hover);
+    }
+
+    .clay-interactive.clay-hover-surface:hover:not([data-pressed="true"]) {
+      background-color: var(--bg-surface-elevated);
+    }
+
+    .clay-interactive:hover:not([data-pressed="true"]) .clay-hover-nudge {
+      transform: translateX(2px);
+    }
+  }
+}
+
 body {
   font-family: var(--font-ui);
   min-height: 100vh;

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { renderToString } from 'react-dom/server';
 import { describe, it, expect } from 'vitest';
 import { AppStateProvider } from '../../../hooks/useAppState';
@@ -6,6 +8,11 @@ import { HomeStudyHub } from '../HomeStudyHub';
 import { BookCover } from '../BookCover';
 import { ProgressBar } from '../../../components/ProgressBar';
 import { UserStudyState, StudyBook, Lesson } from '../../../types';
+import {
+  CLAY_PRESSED_CLASSES,
+  isPointInsideRect,
+  shouldStartPress,
+} from '../../../hooks/usePressFeedback';
 
 describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
   const mockBook1: StudyBook = {
@@ -382,11 +389,8 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).not.toContain('border-primary/20');
     expect(html).toContain('shadow-clay-button');
 
-    // Canonical clay recipe classes on cards
-    expect(html).toContain('hover:shadow-clay-card-hover');
-    expect(html).toContain('hover:-translate-y-px');
-    expect(html).toContain('active:translate-y-px');
-    expect(html).toContain('active:shadow-clay-pressed');
+    // Canonical clay interaction is carried by the shared `.clay-interactive` rule
+    expect(html).toContain('clay-interactive');
   });
 
   it('applies 2px focus-ring offset to page consistently on all interactive Home controls', () => {
@@ -483,5 +487,82 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
   it('renders a single Study Coverage progress bar per book card', () => {
     const html = renderHome(populatedState);
     expect(html.match(/role="progressbar"/g)).toHaveLength(1);
+  });
+
+  describe('clay press interaction contract (structural; does not reproduce real touch devices)', () => {
+    const interactiveButtonTags = (html: string) =>
+      Array.from(html.matchAll(/<button[^>]*class="[^"]*clay-interactive[^"]*"[^>]*>/g), (m) => m[0]);
+
+    it('never relies on CSS :hover or :active utilities for clay elevation on Home controls', () => {
+      for (const html of [renderHome(populatedState), renderHome({ ...populatedState, books: {} })]) {
+        expect(html).not.toContain('active:translate-y-px');
+        expect(html).not.toContain('active:shadow-clay-pressed');
+        expect(html).not.toContain('hover:-translate-y-px');
+        expect(html).not.toContain('hover:shadow-clay-card-hover');
+        expect(html).not.toContain('group-hover:');
+      }
+    });
+
+    it('marks every tactile Home control with clay-interactive and an explicit resting press state', () => {
+      const html = renderHome(populatedState);
+      const tags = interactiveButtonTags(html);
+
+      // Settings, Vocabulary, Kanji, Mixed Test, and the single book card
+      expect(tags).toHaveLength(5);
+      for (const tag of tags) {
+        expect(tag).toContain('data-pressed="false"');
+        expect(tag).not.toContain(CLAY_PRESSED_CLASSES);
+      }
+
+      // Every registered study card is a clay-interactive control
+      const studyCards = Array.from(
+        html.matchAll(/<button[^>]*data-study-card="true"[^>]*>/g),
+        (m) => m[0]
+      );
+      expect(studyCards).toHaveLength(4);
+      for (const tag of studyCards) {
+        expect(tag).toContain('clay-interactive');
+      }
+
+      // Empty-state Settings action uses the same contract
+      const emptyTags = interactiveButtonTags(renderHome({ ...populatedState, books: {} }));
+      expect(emptyTags).toHaveLength(5); // Settings, Vocabulary, Kanji, Mixed Test, empty-state action
+      for (const tag of emptyTags) {
+        expect(tag).toContain('data-pressed="false"');
+      }
+    });
+
+    it('keeps the read-only theme indicator non-interactive', () => {
+      const html = renderHome(populatedState);
+      const indicator = html.match(/<div[^>]*aria-label="Giao diện hiện tại: Sáng"[^>]*>/);
+      expect(indicator).not.toBeNull();
+      expect(indicator![0]).not.toContain('clay-interactive');
+      expect(indicator![0]).not.toContain('data-pressed');
+      expect(indicator![0]).not.toContain('tabindex');
+    });
+
+    it('gates hover elevation behind a real hovering pointer and drives pressed depth from state', () => {
+      const css = readFileSync(resolve(__dirname, '../../../index.css'), 'utf-8');
+
+      expect(css).toContain('@media (hover: hover) and (pointer: fine)');
+      expect(css).toMatch(/\.clay-interactive:hover:not\(\[data-pressed="true"\]\)/);
+      expect(css).not.toMatch(/\.clay-interactive[^{]*:active/);
+      expect(CLAY_PRESSED_CLASSES).toBe('translate-y-px shadow-clay-pressed');
+    });
+
+    it('only starts a press for primary mouse button, touch, or pen contacts', () => {
+      expect(shouldStartPress('mouse', 0)).toBe(true);
+      expect(shouldStartPress('mouse', 2)).toBe(false);
+      expect(shouldStartPress('touch', 0)).toBe(true);
+      expect(shouldStartPress('pen', 0)).toBe(true);
+    });
+
+    it('detects a pointer dragged outside the control bounds', () => {
+      const rect = { left: 10, right: 110, top: 20, bottom: 70 };
+      expect(isPointInsideRect(50, 40, rect)).toBe(true);
+      expect(isPointInsideRect(10, 20, rect)).toBe(true);
+      expect(isPointInsideRect(111, 40, rect)).toBe(false);
+      expect(isPointInsideRect(50, 71, rect)).toBe(false);
+    });
   });
 });
