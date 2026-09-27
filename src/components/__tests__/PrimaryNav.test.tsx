@@ -9,6 +9,8 @@ import {
   PRIMARY_DESTINATIONS,
   PrimaryDestination,
   getPrimaryDestination,
+  primaryNavTarget,
+  shouldAnimateRootEntrance,
 } from '../PrimaryNav';
 
 function state(language: AppLanguage): UserStudyState {
@@ -75,6 +77,28 @@ describe('primary destinations', () => {
   });
 });
 
+describe('tab presses and root transitions', () => {
+  it('does not navigate when the current tab is tapped again', () => {
+    for (const destination of PRIMARY_DESTINATIONS) {
+      expect(primaryNavTarget(destination, true), destination.id).toBeNull();
+      expect(primaryNavTarget(destination, false), destination.id).toEqual(destination.route);
+    }
+  });
+
+  it('animates only switches between two different root destinations', () => {
+    const roots: PrimaryDestination[] = ['home', 'test', 'settings'];
+    for (const from of roots) {
+      for (const to of roots) {
+        expect(shouldAnimateRootEntrance(from, to), `${from} -> ${to}`).toBe(from !== to);
+      }
+      // Leaving to or returning from a deeper route never animates
+      expect(shouldAnimateRootEntrance(from, null)).toBe(false);
+      expect(shouldAnimateRootEntrance(null, from)).toBe(false);
+    }
+    expect(shouldAnimateRootEntrance(null, null)).toBe(false);
+  });
+});
+
 describe('MobileBottomNav', () => {
   it('is a labelled, mobile-only nav with three equal destinations', () => {
     const html = renderNav('home');
@@ -86,7 +110,25 @@ describe('MobileBottomNav', () => {
       expect(tab).toContain('flex-1');
       expect(tab).toContain('data-pressed="false"');
       expect(tab).toContain('focus-visible:ring-2');
+      // The cell never becomes a pressed slab: no flat pressed background, no tap highlight
+      expect(tab).not.toContain('flat-interactive');
+      expect(tab).not.toMatch(/class="[^"]*bg-/);
+      expect(tab).toContain('tango-nav-tab');
     }
+  });
+
+  it('keeps one icon-puck geometry for every tab, active or not', () => {
+    const html = renderNav('home');
+    const pucks = html.match(/<span[^>]*data-nav-puck=""[^>]*>/g) ?? [];
+    expect(pucks).toHaveLength(3);
+    for (const puck of pucks) {
+      expect(puck).toContain('w-14 h-8 rounded-full border');
+      expect(puck).toContain('tango-nav-puck');
+    }
+    // Only the active puck is filled and raised at rest
+    expect(tabMarkup(html, 'home')).toContain('shadow-clay-card');
+    expect(tabMarkup(html, 'test')).toContain('border-transparent');
+    expect(tabMarkup(html, 'test')).not.toContain('shadow-clay');
   });
 
   it.each(['home', 'test', 'settings'] as const)('marks only %s as the current page', (active) => {

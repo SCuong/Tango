@@ -14,7 +14,7 @@ import { FOCUS_RING } from './Button';
  */
 export type PrimaryDestination = 'home' | 'test' | 'settings';
 
-interface DestinationConfig {
+export interface DestinationConfig {
   id: PrimaryDestination;
   route: AppRoute;
   labelKey: TranslationKey;
@@ -44,6 +44,26 @@ export function getPrimaryDestination(route: AppRoute): PrimaryDestination | nul
   }
 }
 
+/**
+ * Route a tab press navigates to, or null for the tab that is already current, so tapping the
+ * active destination neither pushes a history entry nor replays the root entrance transition.
+ */
+export function primaryNavTarget(destination: DestinationConfig, active: boolean): AppRoute | null {
+  return active ? null : destination.route;
+}
+
+/**
+ * True only when moving between two different root destinations (Home, Test, Settings).
+ * Entering or leaving a deeper route, a first render, and staying on the same root never
+ * trigger the root entrance transition.
+ */
+export function shouldAnimateRootEntrance(
+  previous: PrimaryDestination | null,
+  next: PrimaryDestination | null
+): boolean {
+  return previous !== null && next !== null && previous !== next;
+}
+
 /** Stroke weights: primary navigation icons are bolder than regular 2px line icons. */
 const INACTIVE_STROKE = 2.4;
 const ACTIVE_STROKE = 2.7;
@@ -57,25 +77,33 @@ const MobileNavTab: React.FC<{ destination: DestinationConfig; active: boolean }
   const { isPressed, pressHandlers } = usePressFeedback();
   const label = t(destination.labelKey);
   const { Icon } = destination;
+  // Pressed state lives on the icon puck only (same geometry at rest, pressed, and active);
+  // the tab cell itself never gains a pressed background.
+  let puckClasses: string;
+  if (active) {
+    puckClasses = `bg-primary-surface border-primary-border text-primary ${isPressed ? 'translate-y-0.5 shadow-clay-pressed' : 'shadow-clay-card'}`;
+  } else if (isPressed) {
+    puckClasses = 'translate-y-0.5 bg-surface-elevated border-border-subtle text-text-secondary shadow-clay-pressed';
+  } else {
+    puckClasses = 'border-transparent text-text-secondary';
+  }
   return (
     <button
       type="button"
       {...pressHandlers}
       onClick={() => {
-        if (!active) navigate(destination.route);
+        const target = primaryNavTarget(destination, active);
+        if (target) navigate(target);
       }}
       aria-label={label}
       aria-current={active ? 'page' : undefined}
       data-nav-destination={destination.id}
-      className={`flat-interactive relative flex-1 min-w-0 min-h-touch h-full rounded-[20px] flex flex-col items-center justify-center gap-1 ${FOCUS_RING} focus-visible:ring-offset-surface`}
+      className={`tango-nav-tab relative flex-1 min-w-0 min-h-touch h-full rounded-[20px] flex flex-col items-center justify-center gap-1 ${FOCUS_RING} focus-visible:ring-offset-surface`}
     >
       <span
         aria-hidden="true"
-        className={`flex items-center justify-center w-14 h-8 rounded-full transition-[transform,box-shadow,background-color] duration-150 ${
-          active
-            ? `bg-primary-surface border border-primary-border text-primary ${isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'}`
-            : `border border-transparent text-text-secondary ${isPressed ? 'translate-y-px' : ''}`
-        }`}
+        data-nav-puck=""
+        className={`tango-nav-puck flex items-center justify-center w-14 h-8 rounded-full border transition-[transform,box-shadow,background-color,border-color] duration-100 ease-out ${puckClasses}`}
       >
         <Icon size={24} stroke={active ? ACTIVE_STROKE : INACTIVE_STROKE} />
       </span>
@@ -119,7 +147,8 @@ const DesktopNavLink: React.FC<{ destination: DestinationConfig; active: boolean
       type="button"
       {...pressHandlers}
       onClick={() => {
-        if (!active) navigate(destination.route);
+        const target = primaryNavTarget(destination, active);
+        if (target) navigate(target);
       }}
       aria-current={active ? 'page' : undefined}
       title={label}

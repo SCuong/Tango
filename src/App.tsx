@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from './hooks/useNavigation';
 import { HomeStudyHub } from './features/books/HomeStudyHub';
 import { BookStudyView } from './features/study/BookStudyView';
@@ -16,7 +16,21 @@ import { ManageBookScreen } from './features/content-management/ManageBookScreen
 import { ManageLessonScreen } from './features/content-management/ManageLessonScreen';
 import { ImportScreen } from './features/content-management/ImportScreen';
 import { NotFoundScreen } from './components/NotFoundScreen';
-import { MobileBottomNav, getPrimaryDestination } from './components/PrimaryNav';
+import {
+  MobileBottomNav,
+  PrimaryDestination,
+  getPrimaryDestination,
+  shouldAnimateRootEntrance,
+} from './components/PrimaryNav';
+
+/**
+ * Class for the screen wrapper: root destinations reserve the mobile bottom-nav space, and a
+ * switch between two different roots adds the entrance transition (DESIGN_SYSTEM §16.0).
+ */
+export function rootWrapperClassName(destination: PrimaryDestination | null, entering: boolean): string | undefined {
+  if (!destination) return undefined;
+  return entering ? 'tango-primary-root tango-root-enter' : 'tango-primary-root';
+}
 
 /**
  * Screen router / navigation coordinator: one canonical screen per route (SCREEN_SPEC §4).
@@ -25,11 +39,22 @@ export const App: React.FC = () => {
   const { route } = useNavigation();
   const primaryDestination = getPrimaryDestination(route);
 
+  // Remember which root was shown last so only root-to-root switches animate. Updated during
+  // render (React's "adjust state when a prop changes" pattern), so the entrance class lands in
+  // the same commit that mounts the new root screen: no extra frame, no navigation delay.
+  const [rootMotion, setRootMotion] = useState({ destination: primaryDestination, entering: false });
+  if (rootMotion.destination !== primaryDestination) {
+    setRootMotion({
+      destination: primaryDestination,
+      entering: shouldAnimateRootEntrance(rootMotion.destination, primaryDestination),
+    });
+  }
+
   // Root destinations (Home, Test, Settings) get the mobile primary navigation; deeper and
   // focused flows (study details, active quiz, results, management, import) never do.
   // The wrapper element stays the same on every route so screens are not remounted by it.
   return (
-    <div className={primaryDestination ? 'tango-primary-root' : undefined}>
+    <div className={rootWrapperClassName(primaryDestination, rootMotion.entering)}>
       <Screens />
       {primaryDestination && <MobileBottomNav active={primaryDestination} />}
     </div>

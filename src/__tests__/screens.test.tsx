@@ -1,6 +1,6 @@
 import { renderToString } from 'react-dom/server';
 import { describe, it, expect } from 'vitest';
-import { App } from '../App';
+import { App, rootWrapperClassName } from '../App';
 import { AppStateProvider } from '../hooks/useAppState';
 import { NavigationProvider } from '../hooks/useNavigation';
 import { CompletedQuiz, QuizSessionProvider } from '../features/quiz/QuizSessionContext';
@@ -239,7 +239,18 @@ describe('mobile primary navigation mounting', () => {
         expect(navCount, path).toBe(0);
         expect(html, path).not.toContain('tango-primary-root');
       }
+      // A first render (initial load, reload, deep link) never plays the root entrance
+      expect(html, path).not.toContain('tango-root-enter');
     }
+  });
+
+  it('scopes the root entrance class to root destinations only', () => {
+    expect(rootWrapperClassName('home', false)).toBe('tango-primary-root');
+    expect(rootWrapperClassName('test', true)).toBe('tango-primary-root tango-root-enter');
+    expect(rootWrapperClassName('settings', true)).toBe('tango-primary-root tango-root-enter');
+    // Deeper routes never carry the wrapper class, entering or not
+    expect(rootWrapperClassName(null, false)).toBeUndefined();
+    expect(rootWrapperClassName(null, true)).toBeUndefined();
   });
 
   it('never renders global navigation during an active quiz or on results', () => {
