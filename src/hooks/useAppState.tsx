@@ -59,6 +59,7 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({
   const reloadState = useCallback(() => {
     const freshState = loadUserStudyState();
     applyDocumentPreferences(freshState.preferences);
+    stateRef.current = freshState;
     setState(freshState);
   }, []);
 
@@ -73,11 +74,15 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({
     // 2. Synchronize theme and language to document root
     applyDocumentPreferences(nextPreferences);
 
-    // 3. Update in-memory state only after persistence write succeeds
-    setState((prev) => ({
-      ...prev,
+    // 3. Synchronously update ref before scheduling React state update
+    const nextState: UserStudyState = {
+      ...stateRef.current,
       preferences: nextPreferences,
-    }));
+    };
+    stateRef.current = nextState;
+
+    // 4. Update in-memory state only after persistence write succeeds
+    setState(nextState);
   }, []);
 
   const contextValue = useMemo<AppStateContextValue>(

@@ -163,5 +163,105 @@ describe('src/hooks/useAppState.tsx', () => {
       expect(mockDocumentElement.dataset.theme).toBe('light');
       expect(mockDocumentElement.lang).toBe('vi');
     });
+
+    it('preserves both updates when two synchronous updatePreferences calls occur before rerender', () => {
+      const mockDocumentElement = {
+        dataset: {} as Record<string, string>,
+        lang: '',
+        setAttribute(name: string, value: string) {
+          if (name === 'data-theme') {
+            this.dataset.theme = value;
+          }
+        },
+      };
+
+      vi.stubGlobal('document', {
+        documentElement: mockDocumentElement,
+      });
+
+      let capturedContext: AppStateContextValue | null = null;
+      const Consumer = () => {
+        capturedContext = useAppState();
+        return <div>Rendered</div>;
+      };
+
+      renderToString(
+        <AppStateProvider initialState={mockInitialState}>
+          <Consumer />
+        </AppStateProvider>
+      );
+
+      // Two synchronous partial updates before any React rerender occurs
+      capturedContext!.updatePreferences({ theme: 'dark' });
+      capturedContext!.updatePreferences({ language: 'en' });
+
+      // Verifies both updates were sequentially merged and persisted
+      const stored = JSON.parse(
+        localStorage.getItem('tango_v1_preferences') || '{}'
+      );
+      expect(stored).toEqual({
+        theme: 'dark',
+        language: 'en',
+        soundEnabled: false,
+      });
+
+      // Verifies document root was sequentially updated
+      expect(mockDocumentElement.dataset.theme).toBe('dark');
+      expect(mockDocumentElement.lang).toBe('en');
+    });
+
+    it('merges against freshly reloaded preferences when reloadState is immediately followed by updatePreferences', () => {
+      const mockDocumentElement = {
+        dataset: {} as Record<string, string>,
+        lang: '',
+        setAttribute(name: string, value: string) {
+          if (name === 'data-theme') {
+            this.dataset.theme = value;
+          }
+        },
+      };
+
+      vi.stubGlobal('document', {
+        documentElement: mockDocumentElement,
+      });
+
+      let capturedContext: AppStateContextValue | null = null;
+      const Consumer = () => {
+        capturedContext = useAppState();
+        return <div>Rendered</div>;
+      };
+
+      renderToString(
+        <AppStateProvider initialState={mockInitialState}>
+          <Consumer />
+        </AppStateProvider>
+      );
+
+      // Simulate external storage update (e.g. from background or another component)
+      localStorage.setItem(
+        'tango_v1_preferences',
+        JSON.stringify({
+          theme: 'sakura',
+          language: 'vi',
+          soundEnabled: true,
+        })
+      );
+
+      // reloadState followed immediately by updatePreferences without React rerender
+      capturedContext!.reloadState();
+      capturedContext!.updatePreferences({ language: 'en' });
+
+      const stored = JSON.parse(
+        localStorage.getItem('tango_v1_preferences') || '{}'
+      );
+      expect(stored).toEqual({
+        theme: 'sakura',
+        language: 'en',
+        soundEnabled: true,
+      });
+
+      expect(mockDocumentElement.dataset.theme).toBe('sakura');
+      expect(mockDocumentElement.lang).toBe('en');
+    });
   });
 });
