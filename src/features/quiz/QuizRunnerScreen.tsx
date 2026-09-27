@@ -292,13 +292,6 @@ const ActiveQuiz: React.FC<{ session: QuizSessionState }> = ({ session }) => {
               onSubmit={submit}
             />
           )}
-          {correctFeedback && (
-            <div className="mt-4 flex justify-center">
-              <Button variant="quiet" onClick={goNext} trailingIcon={<IconArrowRight size={18} stroke={2} />}>
-                {t('quiz.next')}
-              </Button>
-            </div>
-          )}
         </section>
       </main>
 
