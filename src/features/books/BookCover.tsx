@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { IconBook } from '@tabler/icons-react';
 import { getCoverBlob } from '../../lib/storage';
 import { useI18n } from '../../hooks/useI18n';
@@ -16,47 +16,72 @@ export const BookCover: React.FC<BookCoverProps> = ({
 }) => {
   const { t } = useI18n();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const activeUrlRef = useRef<string | null>(null);
+
+  const revokeActiveUrl = () => {
+    if (activeUrlRef.current) {
+      if (typeof URL !== 'undefined' && typeof URL.revokeObjectURL === 'function') {
+        try {
+          URL.revokeObjectURL(activeUrlRef.current);
+        } catch {
+          // Ignore revocation errors
+        }
+      }
+      activeUrlRef.current = null;
+    }
+  };
 
   useEffect(() => {
+    // Immediately clear previously displayed image state and revoke any active URL
+    // so a revoked or stale image is not retained in UI state while loading new cover
+    revokeActiveUrl();
+    setImageUrl(null);
+
     if (!coverImageId) {
-      setImageUrl(null);
       return;
     }
 
-    let isMounted = true;
-    let currentUrl: string | null = null;
+    let isCancelled = false;
 
     getCoverBlob(coverImageId)
       .then((blob) => {
-        if (!isMounted) return;
+        if (isCancelled) return;
         if (blob && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
           try {
-            currentUrl = URL.createObjectURL(blob);
-            setImageUrl(currentUrl);
+            const url = URL.createObjectURL(blob);
+            if (isCancelled) {
+              URL.revokeObjectURL(url);
+              return;
+            }
+            activeUrlRef.current = url;
+            setImageUrl(url);
           } catch {
+            revokeActiveUrl();
             setImageUrl(null);
           }
         } else {
+          revokeActiveUrl();
           setImageUrl(null);
         }
       })
       .catch(() => {
-        if (isMounted) {
+        if (!isCancelled) {
+          revokeActiveUrl();
           setImageUrl(null);
         }
       });
 
     return () => {
-      isMounted = false;
-      if (currentUrl && typeof URL !== 'undefined' && typeof URL.revokeObjectURL === 'function') {
-        try {
-          URL.revokeObjectURL(currentUrl);
-        } catch {
-          // Ignore revocation errors on unmount
-        }
-      }
+      isCancelled = true;
+      revokeActiveUrl();
     };
   }, [coverImageId]);
+
+  const handleImageError = () => {
+    // Revoke current object URL before falling back to placeholder
+    revokeActiveUrl();
+    setImageUrl(null);
+  };
 
   if (imageUrl) {
     return (
@@ -65,7 +90,7 @@ export const BookCover: React.FC<BookCoverProps> = ({
           src={imageUrl}
           alt={t('aria.bookCover', { title })}
           className="w-full h-full object-cover"
-          onError={() => setImageUrl(null)}
+          onError={handleImageError}
         />
       </div>
     );

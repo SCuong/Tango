@@ -114,6 +114,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
 
     // 2. TopBar wordmark and theme
     expect(html).toContain('TANGO');
+    expect(html).toContain('min-h-touch');
     expect(html).toContain('Giao diện hiện tại: Sáng');
 
     // 3. Book titles and section
@@ -146,7 +147,15 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('Tùy chọn nhiều bài học trên tất cả giáo trình để kiểm tra');
   });
 
-  it('renders English Home when preferences.language is "en"', () => {
+  it('preserves an interactive TANGO wordmark button with 48px minimum touch-target class', () => {
+    const html = renderHome(populatedState);
+
+    expect(html).toContain('TANGO');
+    expect(html).toContain('min-h-touch');
+    expect(html).toMatch(/<button[^>]*class="[^"]*min-h-touch[^"]*"[^>]*>[^<]*TANGO[^<]*<\/button>/);
+  });
+
+  it('renders English Home with correct singular and plural count labels', () => {
     const enState: UserStudyState = {
       ...populatedState,
       preferences: {
@@ -174,9 +183,50 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('Vocabulary');
     expect(html).toContain('Kanji');
 
-    // 5. English counters
+    // 5. English plural counters
     expect(html).toContain('2 lessons');
     expect(html).toContain('4 items');
+    expect(html).toContain('5 items');
+
+    // 6. English singular counter on Kanji card (mockLesson2 is 1 lesson)
+    expect(html).toContain('1 lesson');
+    expect(html).not.toContain('1 lessons');
+  });
+
+  it('renders English singular item count correctly for a single-item lesson', () => {
+    const singleItemState: UserStudyState = {
+      ...populatedState,
+      preferences: {
+        ...populatedState.preferences,
+        language: 'en',
+      },
+      books: {
+        'book-single': {
+          id: 'book-single',
+          title: 'Single Item Book',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          updatedAt: '2026-01-01T00:00:00.000Z',
+        },
+      },
+      lessons: {
+        'lesson-single': {
+          id: 'lesson-single',
+          bookId: 'book-single',
+          category: 'kanji',
+          title: 'Single Kanji Lesson',
+          items: [{ id: 'item-single', japanese: '日', vietnamese: ['ngày'] }],
+        },
+      },
+      progressByItem: {},
+    };
+
+    const html = renderHome(singleItemState);
+
+    // 1 lesson and 1 item in English
+    expect(html).toContain('1 lesson');
+    expect(html).not.toContain('1 lessons');
+    expect(html).toContain('1 item');
+    expect(html).not.toContain('1 items');
   });
 
   it('renders calm empty state when no books exist, without add/import/delete controls', () => {

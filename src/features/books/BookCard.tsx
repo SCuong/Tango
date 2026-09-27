@@ -44,9 +44,23 @@ export const BookCard: React.FC<BookCardProps> = ({
 
         {/* Metadata row */}
         <div className="text-xs sm:text-sm text-text-secondary mt-1 flex items-center gap-1.5 flex-wrap">
-          <span>{t('metrics.lessonCount', { count: metrics.lessonCount })}</span>
+          <span>
+            {t(
+              metrics.lessonCount === 1
+                ? 'metrics.lessonCount.one'
+                : 'metrics.lessonCount.other',
+              { count: metrics.lessonCount }
+            )}
+          </span>
           <span aria-hidden="true">·</span>
-          <span>{t('metrics.itemCount', { count: metrics.itemCount })}</span>
+          <span>
+            {t(
+              metrics.itemCount === 1
+                ? 'metrics.itemCount.one'
+                : 'metrics.itemCount.other',
+              { count: metrics.itemCount }
+            )}
+          </span>
           <span className="sm:hidden" aria-hidden="true">·</span>
           <span className="sm:hidden font-semibold text-text-primary">
             {t('metrics.coverage', { percent: metrics.coveragePercent })}

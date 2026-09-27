@@ -65,8 +65,10 @@ export const VI_DICTIONARY = {
   'home.emptyBooks.description': 'Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung.',
 
   // Metrics & Counters
-  'metrics.lessonCount': '{count} bài',
-  'metrics.itemCount': '{count} mục',
+  'metrics.lessonCount.one': '{count} bài',
+  'metrics.lessonCount.other': '{count} bài',
+  'metrics.itemCount.one': '{count} mục',
+  'metrics.itemCount.other': '{count} mục',
   'metrics.coverage': '{percent}%',
 
   // Accessibility / ARIA
@@ -139,8 +141,10 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'home.emptyBooks.description': 'You can add study books from: Settings → Content Management.',
 
   // Metrics & Counters
-  'metrics.lessonCount': '{count} lessons',
-  'metrics.itemCount': '{count} items',
+  'metrics.lessonCount.one': '{count} lesson',
+  'metrics.lessonCount.other': '{count} lessons',
+  'metrics.itemCount.one': '{count} item',
+  'metrics.itemCount.other': '{count} items',
   'metrics.coverage': '{percent}%',
 
   // Accessibility / ARIA

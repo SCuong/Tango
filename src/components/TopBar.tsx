@@ -27,7 +27,7 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
         <button
           type="button"
           onClick={() => navigate({ type: 'home' })}
-          className="font-bold text-xl tracking-wider text-text-primary hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg px-1 py-0.5"
+          className="inline-flex items-center min-h-touch px-2 font-bold text-xl tracking-wider text-text-primary hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
           aria-label={t('nav.home')}
         >
           TANGO

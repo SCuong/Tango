@@ -171,11 +171,21 @@ export const HomeStudyHub: React.FC = () => {
                 </h3>
                 <div className="text-xs sm:text-sm text-text-secondary mt-0.5 flex items-center gap-1.5 flex-wrap">
                   <span>
-                    {t('metrics.lessonCount', { count: vocabMetrics.lessonCount })}
+                    {t(
+                      vocabMetrics.lessonCount === 1
+                        ? 'metrics.lessonCount.one'
+                        : 'metrics.lessonCount.other',
+                      { count: vocabMetrics.lessonCount }
+                    )}
                   </span>
                   <span aria-hidden="true">·</span>
                   <span>
-                    {t('metrics.itemCount', { count: vocabMetrics.itemCount })}
+                    {t(
+                      vocabMetrics.itemCount === 1
+                        ? 'metrics.itemCount.one'
+                        : 'metrics.itemCount.other',
+                      { count: vocabMetrics.itemCount }
+                    )}
                   </span>
                 </div>
               </div>
@@ -208,11 +218,21 @@ export const HomeStudyHub: React.FC = () => {
                 </h3>
                 <div className="text-xs sm:text-sm text-text-secondary mt-0.5 flex items-center gap-1.5 flex-wrap">
                   <span>
-                    {t('metrics.lessonCount', { count: kanjiMetrics.lessonCount })}
+                    {t(
+                      kanjiMetrics.lessonCount === 1
+                        ? 'metrics.lessonCount.one'
+                        : 'metrics.lessonCount.other',
+                      { count: kanjiMetrics.lessonCount }
+                    )}
                   </span>
                   <span aria-hidden="true">·</span>
                   <span>
-                    {t('metrics.itemCount', { count: kanjiMetrics.itemCount })}
+                    {t(
+                      kanjiMetrics.itemCount === 1
+                        ? 'metrics.itemCount.one'
+                        : 'metrics.itemCount.other',
+                      { count: kanjiMetrics.itemCount }
+                    )}
                   </span>
                 </div>
               </div>
