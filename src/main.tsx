@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { bootstrapAppState, applyDocumentPreferences } from './lib/appState';
 import { AppStateProvider } from './hooks/useAppState';
+import { NavigationProvider } from './hooks/useNavigation';
 import './index.css';
 
 // 1. Bootstrap runtime state once before rendering
@@ -14,7 +15,9 @@ applyDocumentPreferences(initialAppState.preferences);
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <AppStateProvider initialState={initialAppState}>
-      <App />
+      <NavigationProvider>
+        <App />
+      </NavigationProvider>
     </AppStateProvider>
   </React.StrictMode>
 );
