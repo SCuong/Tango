@@ -4,6 +4,11 @@
 > This domain file is authoritative for the detailed screen layouts, wireframes, and interaction flows of **Study Screens (SCREEN 01 through SCREEN 06)**.
 >
 > **Design Tokens & Components:** Styled exclusively using the Soft Claymorphism design system in [`docs/DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md).
+>
+> **Study Metrics & Progress Indicators Contract:**
+> - **Book Progress (SCREEN 01, 02):** Percentage values displayed on book cards and book headers represent **Study Coverage** (`coveragePercent`), i.e. the percentage of items in the book that have been tested at least once (`progress.totalAttempts > 0`).
+> - **Lesson Accuracy (SCREEN 03, 04, 05):** Badges and metrics displayed on lesson rows and lesson headers represent **Answer Accuracy** (`accuracyPercent`), i.e. `(correctCount / totalAttempts) * 100`. When unattempted (`totalAttempts === 0`), the UI renders `--`.
+> - **No "Mastery" / "Tỷ lệ thuộc":** Tango MVP intentionally does NOT define or calculate an arbitrary "mastery" or "tỷ lệ thuộc" score. Progress indicators are strictly partitioned into Study Coverage (breadth) and Answer Accuracy (correctness).
 
 ---
 
@@ -297,7 +302,7 @@ MOBILE (< 640px)
 │ [IconArrowLeft]  Hán tự · 中級へ行こう        │
 ├───────────────────────────────────────────────┤
 │ Bài 2: Hành động & Đi lại                     │
-│ 18 mục học · Tỷ lệ thuộc: 75%                 │
+│ 18 mục học · Độ chính xác: 75%                │
 │                                               │
 │ HÀNH ĐỘNG HỌC TẬP                             │
 │ ┌───────────────────────────────────────────┐ │

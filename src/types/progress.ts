@@ -8,7 +8,7 @@ export interface ItemProgress {
   incorrectCount: number;         // Times answered incorrectly
   lastMistakeAt?: string;         // ISO timestamp of last incorrect response
   lastStudiedAt: string;          // ISO timestamp of last interaction
-  isMarkedWeak: boolean;          // Flagged if error rate exceeds threshold
+  isMarkedWeak: boolean;          // Persisted weak/review flag; read selectors consume it as-is
 }
 
 export type AppTheme = 'light' | 'dark' | 'sakura';

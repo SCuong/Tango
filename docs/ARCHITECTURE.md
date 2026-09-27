@@ -223,6 +223,7 @@ src/
 ├── lib/                       # Pure utility functions (no React dependencies)
 │   ├── storage.ts             # LocalStorage & IndexedDB cover store manager
 │   ├── quizEngine.ts          # Multi-lesson pool aggregator, question generator
+│   ├── studyMetrics.ts        # Pure study metrics & browsing progress calculators
 │   ├── importer.ts            # Delimiter detection, parsing, deduplication
 │   └── textNormalization.ts   # Japanese and Vietnamese unicode matchers
 ├── types/                     # Shared TypeScript domain interfaces
@@ -240,4 +241,5 @@ src/
 - `src/features/quiz/`: The **single, reusable quiz system** that powers Practice Mode, Quick Tests, Book Tests, Mixed Tests, and Review Sessions.
 - `src/lib/quizEngine.ts`: Algorithmic engine that takes `lessonIds: string[]`, collects items, deduplicates, and generates questions.
 - `src/lib/storage.ts`: Dual-tier client storage handling `localStorage` metadata and IndexedDB binary cover blobs with cascade cleanup.
+- `src/lib/studyMetrics.ts`: Pure study metrics calculators for Study Coverage, Answer Accuracy, and Weak counts across lesson, book, and category scopes.
 - `src/types/`: Centralized interfaces guaranteeing strict data symmetry across all books and categories.

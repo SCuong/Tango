@@ -293,7 +293,7 @@ export interface ItemProgress {
   incorrectCount: number;         // Times answered incorrectly
   lastMistakeAt?: string;         // ISO timestamp of last incorrect response
   lastStudiedAt: string;          // ISO timestamp of last interaction
-  isMarkedWeak: boolean;          // Flagged if error rate exceeds threshold
+  isMarkedWeak: boolean;          // Persisted weak/review flag; read selectors consume it as-is
 }
 
 export type AppTheme = 'light' | 'dark' | 'sakura';
@@ -340,3 +340,29 @@ Any affected history session is **deleted entirely** rather than partially rewri
 1. When any question is answered incorrectly, `targetItem.id` is added to `QuizSessionResult.missedItemIds`.
 2. Clicking **"Ôn lại từ sai" (Review Missed Words)** gathers the corresponding `StudyItem` records across all tested lessons and launches a focused practice session exclusively for those items.
 3. Once an item is answered correctly in subsequent review sessions, `isMarkedWeak` is cleared.
+
+### 4.4 Study Metrics Contract & Read Selectors
+Study browsing and progress visualization are powered by pure read selectors (`src/lib/studyMetrics.ts`) with no React or storage side effects:
+
+- **Study Coverage (`coveragePercent`):**
+  - Measures the proportion of items in scope that have been tested at least once (`progressByItem[item.id]?.totalAttempts > 0`).
+  - Formula: `Math.round((studiedItemCount / itemCount) * 100)`.
+  - When `itemCount === 0`, coverage is `0`.
+- **Answer Accuracy (`accuracyPercent`):**
+  - Measures overall accuracy across all attempts on items in scope (`correctCount / totalAttempts`).
+  - Formula: `Math.round((correctCount / totalAttempts) * 100)`.
+  - When `totalAttempts === 0`, accuracy is `null` (rendered as `--` in the UI).
+- **Weak Items (`weakItemCount`):**
+  - Count of scoped items where `progressByItem[item.id]?.isMarkedWeak === true`.
+  - Read selectors consume this persisted flag directly; they do not calculate or infer weak thresholds.
+- **Absence of Mastery / "Tỷ lệ thuộc" Metrics:**
+  - Tango MVP intentionally does not compute or display a composite "mastery" or "tỷ lệ thuộc" percentage. Book cards display Study Coverage; lesson rows display Answer Accuracy.
+- **Scope Semantics:**
+  - *Lesson:* Evaluates `lesson.items`.
+  - *Study Book:* Evaluates all lessons where `lesson.bookId === bookId` across both vocabulary and kanji; unassigned lessons are excluded.
+  - *Category in Book:* Evaluates lessons where `lesson.category === category && lesson.bookId === optionalBookId`.
+  - *Global Category:* Evaluates all lessons where `lesson.category === category` (including unassigned lessons).
+- **Curriculum Symmetry & Safety:**
+  - All calculations evaluate actual `StudyItem` curriculum records. Quiz lexical deduplication is NOT performed for metrics calculation.
+  - Missing progress records contribute 0 attempts and are not weak.
+  - Orphaned progress records outside the scoped items are ignored.
