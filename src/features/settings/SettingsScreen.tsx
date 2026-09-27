@@ -1,9 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {
   IconAlertTriangle,
-  IconChevronDown,
   IconChevronRight,
-  IconChevronUp,
   IconCards,
   IconFolders,
   IconHome,
@@ -169,8 +167,8 @@ const THEME_BY_VALUE = Object.fromEntries(THEMES.map((theme) => [theme.value, th
 
 /**
  * Theme previews: each miniature sets its own `data-theme`, so it renders with that theme's real
- * tokens. The header action (`Xem thêm` / `More`, then `Quay lại` / `Back`) swaps only the third
- * slot between Sakura and Meo's World with a vertical reel transition; it never selects a theme.
+ * tokens. The round header toggle (a cat, then a sakura blossom) swaps only the third slot between
+ * Sakura and Meo's World with a vertical reel transition; it never selects a theme.
  */
 export const ThemePicker: React.FC<{
   value: AppTheme;
@@ -217,7 +215,7 @@ export const ThemePicker: React.FC<{
         <p id="settings-theme" className="text-sm font-semibold text-text-primary">
           {t('settings.theme')}
         </p>
-        <RevealAction revealed={meoRevealed} onToggle={() => setMeoRevealed((revealed) => !revealed)} />
+        <RevealToggle revealed={meoRevealed} onToggle={() => setMeoRevealed((revealed) => !revealed)} />
       </div>
       <div role="radiogroup" aria-labelledby="settings-theme" className="grid grid-cols-3 gap-2.5 sm:gap-3">
         {card('light')}
@@ -253,26 +251,81 @@ const ThemeSlot: React.FC<{ id: string; showSecond: boolean; children: [React.Re
   </div>
 );
 
-/** Quiet header action that reveals (or hides) Meo's World in the third slot; it never selects. */
-const RevealAction: React.FC<{ revealed: boolean; onToggle: () => void }> = ({ revealed, onToggle }) => {
+/**
+ * Small round header toggle that swaps the third slot between Sakura and Meo's World; it never
+ * selects a theme. It shows a cat while Sakura is in the slot and a sakura blossom once Meo's
+ * World is revealed (the icon names what pressing brings into the slot).
+ */
+const RevealToggle: React.FC<{ revealed: boolean; onToggle: () => void }> = ({ revealed, onToggle }) => {
   const { t } = useI18n();
-  const { pressHandlers } = usePressFeedback();
-  const Icon = revealed ? IconChevronUp : IconChevronDown;
+  const { isPressed, pressHandlers } = usePressFeedback();
+  // The icon pops only after a press, never on first render
+  const [swapped, setSwapped] = useState(false);
+  const label = t(revealed ? 'settings.themeBack' : 'settings.themeMore');
   return (
     <button
       type="button"
       {...pressHandlers}
-      onClick={onToggle}
-      aria-label={t(revealed ? 'settings.themeBack' : 'settings.themeMore')}
+      onClick={() => {
+        setSwapped(true);
+        onToggle();
+      }}
+      aria-label={label}
+      title={label}
       aria-controls="settings-theme-slot"
       data-theme-reveal={revealed ? 'back' : 'more'}
-      className={`flat-interactive shrink-0 inline-flex items-center gap-1 min-h-touch -my-3 -mr-2 px-2.5 rounded-xl text-sm font-semibold text-primary ${FOCUS_RING}`}
+      className={`theme-reveal-toggle shrink-0 -my-3 -mr-1.5 w-12 h-12 flex items-center justify-center rounded-full ${FOCUS_RING}`}
     >
-      {t(revealed ? 'settings.themeBackShort' : 'settings.themeMoreShort')}
-      <Icon size={16} stroke={2.4} aria-hidden="true" />
+      <span
+        aria-hidden="true"
+        className={`theme-reveal-puck flex items-center justify-center w-9 h-9 rounded-full bg-surface border border-border-subtle ${
+          isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'
+        }`}
+      >
+        {/* Keyed so the new icon pops in on every swap */}
+        <span key={revealed ? 'sakura' : 'cat'} className={swapped ? 'theme-reveal-icon theme-reveal-icon-pop flex' : 'theme-reveal-icon flex'} data-reveal-icon={revealed ? 'sakura' : 'cat'}>
+          {revealed ? <SakuraBlossomIcon /> : <SmirkCatIcon />}
+        </span>
+      </span>
     </button>
   );
 };
+
+/** Smirking Tango-style cat face (the Meo's World hint), in the mascot's own colors. */
+const SmirkCatIcon: React.FC = () => (
+  <svg viewBox="0 0 24 24" className="w-6 h-6" focusable="false">
+    <g stroke="var(--brand-outline)" strokeWidth="1.4" strokeLinejoin="round" fill="var(--brand-fur)">
+      <path d="M4.8 10 L5.8 3.6 L10.4 6.8 Z" />
+      <path d="M19.2 10 L18.2 3.6 L13.6 6.8 Z" />
+      <path d="M3.4 14.2 C3.4 9.3 7.2 6.2 12 6.2 C16.8 6.2 20.6 9.3 20.6 14.2 C20.6 18.6 16.8 21 12 21 C7.2 21 3.4 18.6 3.4 14.2 Z" />
+    </g>
+    <path d="M10.8 7.2 L11.2 9.6 M12 7 V9.4 M13.2 7.2 L12.8 9.6" stroke="var(--brand-stripe)" strokeWidth="1.2" strokeLinecap="round" />
+    <ellipse cx="12" cy="16.6" rx="4.2" ry="2.8" fill="var(--brand-cream)" />
+    <g stroke="var(--brand-outline)" strokeWidth="1.3" strokeLinecap="round" fill="none">
+      <path d="M7.4 12.6 Q9 11.4 10.6 12.4" />
+      <path d="M13.4 12.4 Q15 11.4 16.6 12.6" />
+      <path d="M10.2 16.8 Q12.2 18.1 14.6 16" />
+    </g>
+    <path d="M11.2 14.7 H12.8 L12 15.6 Z" fill="var(--brand-outline)" />
+  </svg>
+);
+
+/** Pink five-petal sakura blossom (brings Sakura back into the slot). */
+const SakuraBlossomIcon: React.FC = () => (
+  <svg viewBox="0 0 24 24" className="w-6 h-6" focusable="false">
+    <g fill="var(--brand-sakura-petal)" stroke="var(--brand-sakura-edge)" strokeWidth="0.9" strokeLinejoin="round">
+      {[0, 72, 144, 216, 288].map((angle) => (
+        <path key={angle} d="M12 12 C9.4 10.4 9 6.6 10.4 3.8 L12 5.2 L13.6 3.8 C15 6.6 14.6 10.4 12 12 Z" transform={`rotate(${angle} 12 12)`} />
+      ))}
+    </g>
+    <circle cx="12" cy="12" r="2" fill="var(--brand-sakura-core)" />
+    <g fill="var(--brand-sakura-edge)">
+      {[36, 108, 180, 252, 324].map((angle) => (
+        <circle key={angle} cx="12" cy="8.6" r="0.7" transform={`rotate(${angle} 12 12)`} />
+      ))}
+    </g>
+  </svg>
+);
 
 const ThemeCard = React.forwardRef<
   HTMLButtonElement,

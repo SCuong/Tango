@@ -64,7 +64,7 @@ describe('theme slot model', () => {
 });
 
 describe('Settings theme picker (SSR)', () => {
-  it('defaults the third slot to Sakura, with a quiet More action in the section header', () => {
+  it('defaults the third slot to Sakura, with a round cat toggle in the section header', () => {
     const html = renderSettings('light');
     // Header row: the title and the action on the same row, before the cards
     const title = html.indexOf('id="settings-theme"');
@@ -73,12 +73,20 @@ describe('Settings theme picker (SSR)', () => {
     expect(action).toBeGreaterThan(title);
     expect(action).toBeLessThan(html.indexOf('role="radiogroup" aria-labelledby="settings-theme"'));
     const more = revealAction(html);
-    expect(more).toContain('>Xem thêm<');
+    // Icon-only round toggle: a cat while Sakura is in the slot, with a localized accessible name
+    expect(more).toContain('data-reveal-icon="cat"');
     expect(more).toContain('aria-label="Xem thêm chủ đề"');
+    expect(more).toContain('title="Xem thêm chủ đề"');
     expect(more).toContain('aria-controls="settings-theme-slot"');
-    expect(more).toContain('min-h-touch');
+    expect(more).toMatch(/class="theme-reveal-toggle[^"]*w-12 h-12[^"]*rounded-full/);
     expect(more).toContain('focus-visible:ring-2');
+    expect(more).toContain('data-pressed="false"');
     expect(more).not.toContain('cta-raised');
+    // No text label and no emoji glyph: the icons are drawn SVGs
+    expect(more).not.toMatch(/>(Xem thêm|More)</);
+    expect(more).not.toMatch(/😼|🌸/u);
+    // The icon only pops after a press, never on first render
+    expect(more).not.toContain('theme-reveal-icon-pop');
     // Sakura shown, Meo resting above the slot (hidden and unfocusable)
     expect(slotItems(html)).toEqual(['shown', 'above']);
     expect(cardTag(html, 'sakura')).toContain('data-offscreen="false"');
@@ -95,11 +103,13 @@ describe('Settings theme picker (SSR)', () => {
     expect(slotItems(revealed)).toEqual(['below', 'shown']);
     expect(cardTag(revealed, 'meo')).toContain('data-offscreen="false"');
     expect(cardTag(revealed, 'sakura')).toContain('aria-hidden="true"');
-    expect(revealAction(revealed)).toContain('>Quay lại<');
+    // Revealed: the toggle turns into a sakura blossom
+    expect(revealAction(revealed)).toContain('data-reveal-icon="sakura"');
+    expect(revealAction(revealed)).toContain('aria-label="Quay lại Sakura"');
 
     const restored = renderPicker('light', false);
     expect(slotItems(restored)).toEqual(['shown', 'above']);
-    expect(revealAction(restored)).toContain('>Xem thêm<');
+    expect(revealAction(restored)).toContain('data-reveal-icon="cat"');
   });
 
   it('keeps Light and Dark present, visible, and outside the slot in both states', () => {
@@ -128,24 +138,22 @@ describe('Settings theme picker (SSR)', () => {
     }
   });
 
-  it('opens with Meo visible and a Back action when Meo is the persisted theme', () => {
+  it('opens with Meo visible and the sakura toggle when Meo is the persisted theme', () => {
     const html = renderSettings('meo', 'en');
     expect(slotItems(html)).toEqual(['below', 'shown']);
     const meo = cardTag(html, 'meo');
     expect(meo).toContain('aria-checked="true"');
     expect(meo).toContain('tabindex="0"');
     const back = revealAction(html);
-    expect(back).toContain('>Back<');
-    expect(back).toContain('aria-label="Back to previous themes"');
+    expect(back).toContain('data-reveal-icon="sakura"');
+    expect(back).toContain('aria-label="Back to Sakura"');
   });
 
-  it('uses localized labels: Xem thêm / Quay lại and More / Back', () => {
-    expect(revealAction(renderPicker('light', false, 'vi'))).toContain('>Xem thêm<');
-    expect(revealAction(renderPicker('light', true, 'vi'))).toContain('>Quay lại<');
-    const more = revealAction(renderPicker('light', false, 'en'));
-    expect(more).toContain('>More<');
-    expect(more).toContain('aria-label="More themes"');
-    expect(revealAction(renderPicker('light', true, 'en'))).toContain('>Back<');
+  it('uses localized accessible names for both toggle states', () => {
+    expect(revealAction(renderPicker('light', false, 'vi'))).toContain('aria-label="Xem thêm chủ đề"');
+    expect(revealAction(renderPicker('light', true, 'vi'))).toContain('aria-label="Quay lại Sakura"');
+    expect(revealAction(renderPicker('light', false, 'en'))).toContain('aria-label="More themes"');
+    expect(revealAction(renderPicker('light', true, 'en'))).toContain('aria-label="Back to Sakura"');
   });
 
   it('names the fourth theme Mèo mập 😺 in Vietnamese and Meo\'s World in English', () => {
@@ -203,10 +211,16 @@ describe('theme slot styles', () => {
     expect(css).toMatch(/\.theme-slot-item\[data-slot="below"\]\s*\{[^}]*translateY\(10\d%\)/);
   });
 
-  it('swaps instantly without vertical travel under reduced motion', () => {
+  it('swaps instantly without vertical travel or icon pop under reduced motion', () => {
     const block = css.match(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.theme-slot-item\s*\{[\s\S]*?\n  \}\n/);
     expect(block).not.toBeNull();
     expect(block![0]).toContain('transition: none');
     expect(block![0]).toMatch(/data-slot="below"\][\s\S]*transform:\s*none/);
+    expect(block![0]).toMatch(/\.theme-reveal-icon-pop\s*\{\s*animation:\s*none;/);
+  });
+
+  it('gives the round toggle explicit pressed depth and a hover lift only on fine pointers', () => {
+    expect(css).toMatch(/@media \(hover: hover\) and \(pointer: fine\)\s*\{\s*\.theme-reveal-toggle:hover:not\(\[data-pressed="true"\]\) \.theme-reveal-puck/);
+    expect(css).not.toMatch(/\.theme-reveal-[a-z-]+:active/);
   });
 });

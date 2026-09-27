@@ -27,6 +27,15 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-14: 56px;
+
+  /* Fixed brand colors (the Tango mascot and a sakura blossom), identical in every theme */
+  --brand-fur: #F6BA6A;
+  --brand-stripe: #EE7F2F;
+  --brand-cream: #FDEED6;
+  --brand-outline: #5E270E;
+  --brand-sakura-petal: #F8BBCD;
+  --brand-sakura-edge: #D9577E;
+  --brand-sakura-core: #E8799A;
 }
 
 /* 1. LIGHT THEME (Default): Cool Pearl / Japanese Stationery */
@@ -425,6 +434,30 @@
     pointer-events: none;
   }
 
+  /*
+   * Round header toggle for the third slot: explicit pressed depth from usePressFeedback, a hover
+   * lift only on fine pointers, and a small pop when its icon swaps (cat <-> sakura).
+   */
+  .theme-reveal-toggle {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .theme-reveal-puck {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .theme-reveal-icon-pop {
+    animation: theme-reveal-pop 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .theme-reveal-toggle:hover:not([data-pressed="true"]) .theme-reveal-puck {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-clay-card-hover);
+      background-color: var(--bg-surface-elevated);
+    }
+  }
+
   /* Reduced motion: an instant swap, no vertical travel */
   @media (prefers-reduced-motion: reduce) {
     .theme-slot-item {
@@ -434,6 +467,10 @@
     .theme-slot-item[data-slot="above"],
     .theme-slot-item[data-slot="below"] {
       transform: none;
+    }
+
+    .theme-reveal-icon-pop {
+      animation: none;
     }
   }
 
@@ -908,6 +945,11 @@
 @keyframes tango-dialog-in {
   from { opacity: 0; transform: translateY(8px) scale(0.98); }
   to { opacity: 1; transform: none; }
+}
+
+@keyframes theme-reveal-pop {
+  from { transform: scale(0.6) rotate(-12deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }
 
 @keyframes tango-root-enter {
