@@ -175,6 +175,7 @@ const ThemeCard = React.forwardRef<
       type="button"
       role="radio"
       aria-checked={selected}
+      aria-label={t(theme.nameKey)}
       aria-describedby={descId}
       tabIndex={selected ? 0 : -1}
       {...pressHandlers}
