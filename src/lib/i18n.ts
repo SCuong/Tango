@@ -56,8 +56,6 @@ export const VI_DICTIONARY = {
   'state.notImplemented': 'Tính năng đang được phát triển',
 
   // Home Screen (SCREEN 01)
-  'home.greeting': 'Bạn muốn học gì hôm nay?',
-  'home.greetingHint': 'Chọn một lối học để bắt đầu.',
   'home.studyBooks': 'Giáo trình',
   'home.learnByType': 'Học theo loại',
   'home.mixedTest': 'Kiểm tra tổng hợp',
@@ -73,7 +71,6 @@ export const VI_DICTIONARY = {
   'metrics.coverage': '{percent}%',
 
   // Accessibility / ARIA
-  'aria.currentTheme': 'Giao diện hiện tại: {theme}',
   'aria.openBook': 'Mở giáo trình {title}',
   'aria.bookCover': 'Bìa giáo trình {title}',
   'aria.learnCategory': 'Học theo loại: {category}',
@@ -133,8 +130,6 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'state.notImplemented': 'Feature in development',
 
   // Home Screen (SCREEN 01)
-  'home.greeting': 'What would you like to learn today?',
-  'home.greetingHint': 'Pick a study path to begin.',
   'home.studyBooks': 'Study Books',
   'home.learnByType': 'Learn by Type',
   'home.mixedTest': 'Mixed Test',
@@ -150,7 +145,6 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'metrics.coverage': '{percent}%',
 
   // Accessibility / ARIA
-  'aria.currentTheme': 'Current theme: {theme}',
   'aria.openBook': 'Open study book: {title}',
   'aria.bookCover': 'Book cover: {title}',
   'aria.learnCategory': 'Learn by type: {category}',

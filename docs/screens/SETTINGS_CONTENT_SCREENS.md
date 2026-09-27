@@ -37,7 +37,12 @@ App preferences management and intentional gateway to administrative content ope
 #### Content Sections:
 1. **Giao diện & Tùy chọn (Appearance & Preferences):**
    - **Language:** Segmented control `[ Tiếng Việt ]` | `[ English ]`
-   - **Theme:** 3 visual clay swatches `[ Sáng / Light ]` | `[ Tối / Dark ]` | `[ Sakura / Sakura ]`
+   - **Theme (Chủ đề màu sắc):**
+     - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
+     - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
+     - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
+     - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
+     - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.
    - **Sound Effects:** Segmented control `[ Off / Tắt ]` | `[ On / Bật ]` (Default: **Off**)
 2. **Nội dung học (Study Content):**
    - Clickable row: `Quản lý giáo trình và bài học` $\rightarrow$ navigates to [SCREEN 17: Content Management](#screen-17-content-management-quản-lý-nội-dung).
@@ -54,7 +59,12 @@ SETTINGS PANEL
 │ [ (•) Tiếng Việt ]     [ ( ) English ]        │
 │                                               │
 │ Chủ đề màu sắc                                │
-│ [ Sáng ]          [ Tối ]          [ Sakura ] │
+│ ┌───────────┐  ┌───────────┐  ┌───────────┐  │
+│ │ ▢▢ ▬      │  │ ▢▢ ▬      │  │ ▢▢ ▬      │  │  <- each card previews its
+│ │ page/card │  │ page/card │  │ page/card │  │     own page, surface and
+│ │ accent    │  │ accent    │  │ accent    │  │     accent colors
+│ │ Sáng   [✓]│  │ Tối       │  │ Sakura    │  │
+│ └───────────┘  └───────────┘  └───────────┘  │
 │                                               │
 │ Âm thanh hiệu ứng                             │
 │ [ (•) Tắt (Off) ]      [ ( ) Bật (On) ]       │

@@ -38,75 +38,68 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
   - Tapping `[IconSettings]` $\rightarrow$ [SCREEN 16: Settings](./SETTINGS_CONTENT_SCREENS.md#screen-16-settings) (`/settings`).
 
 #### Responsive Layout Strategy:
-- **Top Bar:** Solid matte clay surface (`bg-surface`, `border-b border-subtle`, zero blur), with tactile `rounded-full` controls for theme status and Settings.
-- **Composition order (all breakpoints):** Greeting (with one localized supporting line) → Study paths (Learn by Type tiles + Mixed Test CTA) → Study Books. Study paths are always available, so they come first and stay in the first viewport regardless of how many books exist.
-- **Mobile (< 640px):** Vocabulary and Kanji as a 2-column pair of tactile semantic clay tiles; Mixed Test as a full-width solid primary CTA below them; Study Books as a vertical stack of compact horizontal cards (3:4 cover thumbnail, title, counts, Study Coverage bar).
-- **Tablet (640px – 1024px):** Same study path arrangement with larger tiles; Study Books in a 2-column grid of compact horizontal cards.
-- **Desktop (> 1024px):** Centered container (`max-w-4xl`). Vocabulary, Kanji, and Mixed Test form one aligned 3-column row of equal-height tiles; Study Books form a 3-column grid on the same column rhythm below.
-- **Visual hierarchy:** Neutral white book cards < visibly tinted semantic category tiles (`--category-vocabulary-*`, `--category-kanji-*`, each with a raised icon puck and its Japanese category name `語彙` / `漢字` as a low-opacity typographic mark) < solid Mixed Test CTA (`--cta-*`, `shadow-clay-button`).
-- **Tactile Clay Recipe:** All interactive cards and buttons adhere strictly to `hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`, with default elevation `shadow-clay-card` (Mixed Test: `shadow-clay-button`).
+- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Mixed Test are secondary.
+- **Top Bar:** Solid matte clay surface (`bg-surface`, `border-b border-subtle`, zero blur) with the `TANGO` wordmark and a tactile `rounded-full` Settings button only. No theme status or theme control on Home.
+- **No greeting, no visible section labels:** Semantic structure uses visually hidden headings (`sr-only` page `h1`, `sr-only` `h2` for "Giáo trình" and "Học theo loại").
+- **Composition order (all breakpoints):** Study Books → Vocabulary / Kanji shortcuts → Mixed Test.
+- **Mobile (< 640px):** Study Books as stacked horizontal cards where the large 3:4 cover (`w-20`), title (up to 3 lines), and Study Coverage bar dominate. Below them, a compact 2-column Vocabulary / Kanji shortcut row, then a compact full-width Mixed Test CTA.
+- **Tablet (640px – 1024px):** Study Books in a 2-column grid (cover `w-24`); shortcuts as above.
+- **Desktop (> 1024px):** Centered container (`max-w-4xl`). Study Books in a 2-column primary grid (cover `w-28`). One compact shortcut row below: Vocabulary and Kanji in the wider track, Mixed Test in the narrower track (`lg:grid-cols-[3fr_2fr]`).
+- **Book titles:** `.font-study-title` (UI font for Latin/Vietnamese, Japanese stack for Kana/Kanji), `line-clamp-3`, full title in the native `title` attribute for hover.
+- **Visual hierarchy:** Large neutral book cards > compact tinted category shortcuts (`--category-vocabulary-*`, `--category-kanji-*`, raised icon puck, `語彙` / `漢字` mark from `sm`) ≈ compact solid Mixed Test CTA (`--cta-*`, `shadow-clay-button`).
+- **Tactile Clay Recipe:** Every interactive Home card and button uses `.clay-interactive` (hover lift only under `@media (hover: hover) and (pointer: fine)`) plus `usePressFeedback` (explicit `data-pressed` state that swaps in `translate-y-px shadow-clay-pressed`). Never Tailwind `hover:*` / `active:*` elevation utilities, which stick on touch screens. Focus ring: `focus-visible:ring-2 ring-primary ring-offset-2 ring-offset-page`. See [`docs/DESIGN_SYSTEM.md` §3.1](../DESIGN_SYSTEM.md#31-canonical-clay-interaction-recipe).
 
 #### Wireframes:
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ TANGO                   [Theme] [IconSettings]│
+│ TANGO                            [IconSettings]│
 ├───────────────────────────────────────────────┤
-│ Bạn muốn học gì hôm nay?                      │
-│ Chọn một lối học để bắt đầu.                  │
-│                                               │
-│ HỌC THEO LOẠI                                 │
+│ ┌───────────────────────────────────────────┐ │
+│ │ ┌───────┐  中級へ行こう 日本語の文型と   │ │
+│ │ │ Cover │  表現55 第2版                  │ │  <- primary: large 3:4 cover,
+│ │ │  3:4  │  2 bài · 20 mục                │ │     title up to 3 lines,
+│ │ └───────┘  [━━━━━━░░░░░░]           45%  │ │     Study Coverage bar
+│ └───────────────────────────────────────────┘ │
+│ ┌───────────────────────────────────────────┐ │
+│ │ ┌───────┐  耳から覚える 日本語能力試験   │ │
+│ │ │ Cover │  文法トレーニング N3           │ │
+│ │ └───────┘  1 bài · 10 mục   [━━░░░] 30%  │ │
+│ └───────────────────────────────────────────┘ │
 │ ┌────────────────────┐ ┌────────────────────┐ │
-│ │ [IconBook]    語彙 │ │ [IconWriting] 漢字 │ │
-│ │                    │ │                    │ │
-│ │ Từ vựng            │ │ Hán tự             │ │
-│ │ 16 bài · 320 mục   │ │ 12 bài · 194 mục   │ │
+│ │ [IconBook] Từ vựng │ │ [IconWriting] Hán tự│ │  <- secondary shortcuts
+│ │ 2 bài · 22 mục     │ │ 1 bài · 8 mục      │ │
 │ └────────────────────┘ └────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
-│ │ [IconBolt] Kiểm tra tổng hợp          (→) │ │  <- solid primary CTA
-│ │            Tùy chọn nhiều bài học ...     │ │
-│ └───────────────────────────────────────────┘ │
-│                                               │
-│ GIÁO TRÌNH                                    │
-│ ┌───────────────────────────────────────────┐ │
-│ │ [Cover 3:4] 中級へ行こう                  │ │
-│ │             8 bài · 164 mục               │ │
-│ │             [━━━━━━░░░░]  65%             │ │
+│ │ [IconBolt] Kiểm tra tổng hợp          (→) │ │  <- compact CTA
 │ └───────────────────────────────────────────┘ │
 └───────────────────────────────────────────────┘
 
 DESKTOP (> 1024px - max-w-4xl Centered)
 ┌────────────────────────────────────────────────────────────────────────┐
-│ TANGO                                            [Theme] [IconSettings]│
+│ TANGO                                                    [IconSettings]│
 ├────────────────────────────────────────────────────────────────────────┤
-│ Bạn muốn học gì hôm nay?                                               │
-│ Chọn một lối học để bắt đầu.                                           │
-│                                                                        │
-│ HỌC THEO LOẠI                                                          │
-│ ┌─────────────────────┐ ┌─────────────────────┐ ┌────────────────────┐ │
-│ │ [IconBook]     語彙 │ │ [IconWriting]  漢字 │ │ [IconBolt]     (→) │ │
-│ │                     │ │                     │ │                    │ │
-│ │ Từ vựng             │ │ Hán tự              │ │ Kiểm tra tổng hợp  │ │
-│ │ 16 bài · 320 mục    │ │ 12 bài · 194 mục    │ │ Tùy chọn nhiều ... │ │
-│ └─────────────────────┘ └─────────────────────┘ └────────────────────┘ │
-│                                                                        │
-│ GIÁO TRÌNH                                                             │
-│ ┌─────────────────────┐ ┌─────────────────────┐ ┌────────────────────┐ │
-│ │ [Cover] 中級へ行こう│ │ [Cover] Mimikara    │ │ [Cover] Soumatome  │ │
-│ │ 3:4     8 bài · 164 │ │ 3:4     5 bài · 110 │ │ 3:4     6 bài · 140│ │
-│ │         [━━━░] 65%  │ │         [━━░░] 40%  │ │         [░░░░] 0%  │ │
-│ └─────────────────────┘ └─────────────────────┘ └────────────────────┘ │
+│ ┌──────────────────────────────────┐ ┌───────────────────────────────┐ │
+│ │ ┌────────┐ 中級へ行こう 日本語の │ │ ┌────────┐ 耳から覚える      │ │
+│ │ │ Cover  │ 文型と表現55 第2版    │ │ │ Cover  │ 日本語能力試験    │ │
+│ │ │  3:4   │ 2 bài · 20 mục        │ │ │  3:4   │ 文法トレーニング  │ │
+│ │ └────────┘ [━━━━━░░░░]      45%  │ │ └────────┘ [━━░░░░░]    30%  │ │
+│ └──────────────────────────────────┘ └───────────────────────────────┘ │
+│ ┌───────────────────┐ ┌───────────────────┐ ┌────────────────────────┐ │
+│ │ [IconBook] Từ vựng│ │[IconWriting] Hán tự│ │ [IconBolt] Kiểm tra (→)│ │
+│ │ 2 bài · 22 mục 語彙│ │ 1 bài · 8 mục 漢字 │ │ tổng hợp               │ │
+│ └───────────────────┘ └───────────────────┘ └────────────────────────┘ │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
 #### Keyboard Navigation (Desktop):
-- Arrow keys navigate cards; `Enter` opens active card; `Alt+S` opens Settings.
+- Arrow keys move through Home study cards in order: Study Books, Vocabulary, Kanji, Mixed Test. `Enter` / `Space` open the focused card; `Alt+S` opens Settings.
 
 #### Empty State:
-- If 0 books exist, the Study Books section renders an inline, full-width recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`) instead of a floating centered card: icon puck, *"Chưa có giáo trình nào."*, *"Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung."*, and a tactile `[IconSettings] Cài đặt` button (right-aligned on desktop, under the text on mobile). Because study paths come first, the empty shelf never dominates the first viewport. Never places an "+ Add Book" button directly on Home.
+- If 0 books exist, the primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`) instead of a large floating card: icon puck, *"Chưa có giáo trình nào."*, *"Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung."*, and a tactile `[IconSettings] Cài đặt` button (right-aligned on desktop, under the text on mobile). The category shortcuts and Mixed Test follow directly below. Never places an "+ Add Book" button directly on Home.
 
 ```text
-GIÁO TRÌNH
+EMPTY (0 Study Books) - same primary book area
 ┌──────────────────────────────────────────────────────────────────────┐
 │ [IconBooks]  Chưa có giáo trình nào.                  [⚙ Cài đặt]    │
 │              Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý ... │

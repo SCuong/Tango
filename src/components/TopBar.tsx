@@ -1,7 +1,6 @@
 import React from 'react';
-import { IconSun, IconMoon, IconFlower, IconSettings } from '@tabler/icons-react';
+import { IconSettings } from '@tabler/icons-react';
 import { useNavigation } from '../hooks/useNavigation';
-import { useAppState } from '../hooks/useAppState';
 import { useI18n } from '../hooks/useI18n';
 import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../hooks/usePressFeedback';
 
@@ -11,16 +10,9 @@ export interface TopBarProps {
 
 export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
   const { navigate } = useNavigation();
-  const { state } = useAppState();
   const { t } = useI18n();
   const { isPressed: isSettingsPressed, pressHandlers: settingsPressHandlers } =
     usePressFeedback();
-
-  const theme = state.preferences.theme;
-  const themeLabel = t(`preferences.theme.${theme}`);
-  const currentThemeAria = t('aria.currentTheme', { theme: themeLabel });
-
-  const ThemeIcon = theme === 'dark' ? IconMoon : theme === 'sakura' ? IconFlower : IconSun;
 
   return (
     <header
@@ -36,29 +28,17 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
           TANGO
         </button>
 
-        <div className="flex items-center gap-2">
-          {/* Active theme status indicator (read-only, non-interactive) */}
-          <div
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-elevated text-text-secondary border border-border-subtle shadow-sm"
-            aria-label={currentThemeAria}
-            title={currentThemeAria}
-          >
-            <ThemeIcon size={20} stroke={2} aria-hidden="true" />
-            <span className="sr-only">{currentThemeAria}</span>
-          </div>
-
-          {/* Settings button */}
-          <button
-            type="button"
-            {...settingsPressHandlers}
-            onClick={() => navigate({ type: 'settings' })}
-            aria-label={t('nav.settings')}
-            title={t('nav.settings')}
-            className={`clay-interactive clay-hover-surface flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border-subtle text-text-primary ${isSettingsPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch`}
-          >
-            <IconSettings size={22} stroke={2} aria-hidden="true" />
-          </button>
-        </div>
+        {/* Settings button (theme and language are chosen only inside Settings) */}
+        <button
+          type="button"
+          {...settingsPressHandlers}
+          onClick={() => navigate({ type: 'settings' })}
+          aria-label={t('nav.settings')}
+          title={t('nav.settings')}
+          className={`clay-interactive clay-hover-surface flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border-subtle text-text-primary ${isSettingsPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch`}
+        >
+          <IconSettings size={22} stroke={2} aria-hidden="true" />
+        </button>
       </div>
     </header>
   );

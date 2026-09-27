@@ -27,33 +27,37 @@ Tango is built for focused, daily retention drills. The visual design prioritize
 The Home screen is dedicated purely to reading and studying. Administrative, import, or destructive controls are strictly barred from this screen to prevent accidental mis-taps (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)):
 
 ```text
+MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ TANGO                   [Theme] [IconSettings]│
-│                                               │
-│ Bạn muốn học gì hôm nay?                      │
-│ Chọn một lối học để bắt đầu.                  │
-│                                               │
-│ HỌC THEO LOẠI (LEARN BY TYPE)                 │
+│ TANGO                            [IconSettings]│
+├───────────────────────────────────────────────┤
+│ ┌───────────────────────────────────────────┐ │
+│ │ ┌───────┐  中級へ行こう 日本語の文型と   │ │
+│ │ │ Cover │  表現55 第2版                  │ │  <- primary: large 3:4 cover,
+│ │ │  3:4  │  2 bài · 20 mục                │ │     title up to 3 lines,
+│ │ └───────┘  [━━━━━━░░░░░░]           45%  │ │     Study Coverage bar
+│ └───────────────────────────────────────────┘ │
+│ ┌───────────────────────────────────────────┐ │
+│ │ ┌───────┐  耳から覚える 日本語能力試験   │ │
+│ │ │ Cover │  文法トレーニング N3           │ │
+│ │ └───────┘  1 bài · 10 mục   [━━░░░] 30%  │ │
+│ └───────────────────────────────────────────┘ │
 │ ┌────────────────────┐ ┌────────────────────┐ │
-│ │ [IconBook]    語彙 │ │ [IconWriting] 漢字 │ │
-│ │ Từ vựng            │ │ Hán tự             │ │
+│ │ [IconBook] Từ vựng │ │ [IconWriting] Hán tự│ │  <- secondary shortcuts
+│ │ 2 bài · 22 mục     │ │ 1 bài · 8 mục      │ │
 │ └────────────────────┘ └────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
-│ │ [IconBolt] Kiểm tra tổng hợp          (→) │ │
+│ │ [IconBolt] Kiểm tra tổng hợp          (→) │ │  <- compact CTA
 │ └───────────────────────────────────────────┘ │
-│                                               │
-│ GIÁO TRÌNH (STUDY BOOKS)                      │
-│ ┌──────────────────────┐ ┌──────────────────┐ │
-│ │ [Cover] 中級へ行こう │ │ [Cover] Mimikara │ │
-│ │ 8 bài · 164 mục      │ │ 5 bài · 110 mục  │ │
-│ └──────────────────────┘ └──────────────────┘ │
 └───────────────────────────────────────────────┘
 ```
 
-- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
-- **GIÁO TRÌNH Cards:** Tapping a book opens its **Book Study View**. (Never triggers edit/delete).
-- **HỌC THEO LOẠI:** Browse lessons by category across all textbooks.
-- **[IconBolt] Kiểm tra tổng hợp:** Direct access to the global multi-lesson quiz builder across books.
+- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Mixed Test are secondary.
+- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
+- **No greeting and no visible section labels:** Section headings exist only for screen readers.
+- **Study Book cards:** Large 3:4 cover, title (up to 3 lines, full title on hover), counts, and Study Coverage. Tapping a book opens its **Book Study View**. (Never triggers edit/delete).
+- **Vocabulary / Kanji shortcuts:** Compact secondary tiles to browse lessons by category across all textbooks.
+- **[IconBolt] Kiểm tra tổng hợp:** Compact CTA to the global multi-lesson quiz builder across books.
 - **Strict Safety Rule:** Zero Add, Import, Edit, or Delete controls on Home.
 
 ---
@@ -235,7 +239,12 @@ Nghĩa:
 
 A clean, minimalist preferences modal/sheet:
 - **Language (Ngôn ngữ):** Segmented control `[ Tiếng Việt ]` | `[ English ]`.
-- **Theme (Giao diện):** 3 live color swatches `[ Sáng / Light ]` | `[ Tối / Dark ]` | `[ Sakura / Sakura ]`.
+- **Theme (Giao diện):**
+  - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
+  - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
+  - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
+  - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
+  - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.
 - **Sound Effects (Âm thanh hiệu ứng):** Segmented toggle `[ Off / On ]` (Default: **Off** / Tắt). Never plays sound unless explicitly enabled.
 - **Nội dung học (Study Content):** Dedicated section with row **"Quản lý giáo trình và bài học" (Manage books and lessons)** linking to the Content Management screen.
 - Preferences automatically persist to local storage.

@@ -122,32 +122,30 @@ Every card or button on the Home study area leads toward **browsing, reading, or
 
 ## 4. Home Screen Navigation Layout
 
+Home mirrors the content hierarchy **Study Book → Category → Lesson → StudyItem**: books first and visually dominant, then category shortcuts, then the Mixed Test.
+
 ```text
 ┌────────────────────────────────────────────────────────┐
-│ TANGO                           [Theme] [IconSettings] │
+│ TANGO                                   [IconSettings] │
 │                                                        │
-│ Bạn muốn học gì hôm nay?                               │
-│                                                        │
-│ HỌC THEO LOẠI (LEARN BY TYPE)                          │
+│ ┌────────────────────────┐ ┌─────────────────────────┐ │
+│ │ ┌──────┐ 中級へ行こう  │ │ ┌──────┐ 耳から覚える  │ │
+│ │ │Cover │ 8 bài · 164   │ │ │Cover │ 1 bài · 10    │ │
+│ │ └──────┘ [━━━━░░] 65%  │ │ └──────┘ [━░░░░] 30%   │ │
+│ └────────────────────────┘ └─────────────────────────┘ │
 │ ┌────────────────────────┐ ┌─────────────────────────┐ │
 │ │ [IconBook] Từ vựng     │ │ [IconWriting] Hán tự    │ │
 │ └────────────────────────┘ └─────────────────────────┘ │
 │ ┌────────────────────────────────────────────────────┐ │
-│ │ [IconBolt] Kiểm tra tổng hợp (Mixed Test)          │ │
+│ │ [IconBolt] Kiểm tra tổng hợp (Mixed Test)      (→) │ │
 │ └────────────────────────────────────────────────────┘ │
-│                                                        │
-│ GIÁO TRÌNH (STUDY BOOKS)                               │
-│ ┌──────────────────────┐    ┌──────────────────────┐   │
-│ │ [Cover] 中級へ行こう │    │ [Cover] Mimikara     │   │
-│ │ 8 bài · 164 mục      │    │ 5 bài · 110 mục      │   │
-│ └──────────────────────┘    └──────────────────────┘   │
 └────────────────────────────────────────────────────────┘
 ```
 
-- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
-- **HỌC THEO LOẠI:** Direct entry to browse lessons by category across all books. Shown first because it is always available.
-- **GIÁO TRÌNH:** Compact tactile cards with 3:4 cover thumbnails, stacked on mobile and in a 2-3 column grid on tablet/desktop (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). Tapping a card opens the **Book Study View**.
-- **Kiểm tra tổng hợp:** Direct access to global multi-lesson quiz selection.
+- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only (`IconSettings` opens Settings; Content Management is accessed from the Study Content section inside Settings). No theme status or theme control on Home.
+- **GIÁO TRÌNH (primary):** Large tactile book cards with 3:4 covers, stacked on mobile and in a 2-column grid on tablet/desktop (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). The section label is screen-reader only. Tapping a card opens the **Book Study View**.
+- **HỌC THEO LOẠI (secondary):** Compact Vocabulary / Kanji shortcuts to browse lessons by category across all books. The section label is screen-reader only.
+- **Kiểm tra tổng hợp:** Compact CTA for global multi-lesson quiz selection.
 
 ### 4.1 Safe Empty States (Zero Management Clutter on Study Screens)
 Because the Home screen intentionally excludes `+ Add Book` or `Import` buttons, Tango provides helpful, calming empty states that direct learners to Settings:

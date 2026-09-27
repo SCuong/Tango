@@ -113,18 +113,18 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     );
   };
 
-  it('renders Vietnamese Home with correct titles, greeting, and metrics', () => {
+  it('renders Vietnamese Home with correct titles and metrics', () => {
     const html = renderHome(populatedState);
 
-    // 1. Vietnamese Greeting
-    expect(html).toContain('Bạn muốn học gì hôm nay?');
+    // 1. No visible greeting
+    expect(html).not.toContain('Bạn muốn học gì hôm nay?');
 
-    // 2. TopBar wordmark and theme
+    // 2. TopBar wordmark and Settings
     expect(html).toContain('TANGO');
     expect(html).toContain('min-h-touch');
-    expect(html).toContain('Giao diện hiện tại: Sáng');
+    expect(html).toContain('aria-label="Cài đặt"');
 
-    // 3. Book titles and section
+    // 3. Book titles and (screen-reader) section heading
     expect(html).toContain('Giáo trình');
     expect(html).toContain('Chūkyū e Ikō');
 
@@ -174,11 +174,10 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
 
     const html = renderHome(enState);
 
-    // 1. English Greeting
-    expect(html).toContain('What would you like to learn today?');
-
-    // 2. English TopBar Theme
-    expect(html).toContain('Current theme: Dark');
+    // 1. No visible greeting and no theme status in the TopBar
+    expect(html).not.toContain('What would you like to learn today?');
+    expect(html).not.toContain('Current theme');
+    expect(html).toContain('aria-label="Settings"');
 
     // 3. English section headers
     expect(html).toContain('Study Books');
@@ -433,28 +432,86 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toMatch(/<button[^>]*class="[^"]*min-h-touch[^"]*"[^>]*>(?:(?!<\/button>).)*Cài đặt<\/button>/);
   });
 
-  it('places the always-available study paths before Study Books', () => {
-    const html = renderHome(populatedState);
+  it('renders Study Books first, then Vocabulary / Kanji shortcuts, then Mixed Test', () => {
+    for (const html of [renderHome(populatedState), renderHome({ ...populatedState, books: {} })]) {
+      const booksIndex = html.indexOf('id="home-study-books-heading"');
+      const learnIndex = html.indexOf('id="home-learn-by-type-heading"');
+      const vocabIndex = html.indexOf('data-category="vocabulary"');
+      const kanjiIndex = html.indexOf('data-category="kanji"');
+      const mixedIndex = html.indexOf('id="home-mixed-test-heading"');
 
-    const greetingIndex = html.indexOf('id="home-greeting-heading"');
-    const learnIndex = html.indexOf('id="home-learn-by-type-heading"');
-    const mixedIndex = html.indexOf('id="home-mixed-test-heading"');
-    const booksIndex = html.indexOf('id="home-study-books-heading"');
-
-    expect(greetingIndex).toBeGreaterThan(-1);
-    expect(learnIndex).toBeGreaterThan(greetingIndex);
-    expect(mixedIndex).toBeGreaterThan(learnIndex);
-    expect(booksIndex).toBeGreaterThan(mixedIndex);
+      expect(booksIndex).toBeGreaterThan(-1);
+      expect(learnIndex).toBeGreaterThan(booksIndex);
+      expect(vocabIndex).toBeGreaterThan(learnIndex);
+      expect(kanjiIndex).toBeGreaterThan(vocabIndex);
+      expect(mixedIndex).toBeGreaterThan(kanjiIndex);
+    }
   });
 
-  it('renders a localized supporting line under the greeting', () => {
-    expect(renderHome(populatedState)).toContain('Chọn một lối học để bắt đầu.');
+  it('renders no visible greeting and keeps section headings screen-reader only', () => {
+    for (const language of ['vi', 'en'] as const) {
+      const html = renderHome({
+        ...populatedState,
+        preferences: { ...populatedState.preferences, language },
+      });
 
-    const enHtml = renderHome({
+      expect(html).not.toContain('home-greeting-heading');
+      expect(html).not.toContain('Chọn một lối học để bắt đầu.');
+      expect(html).not.toContain('Pick a study path to begin.');
+
+      // A single screen-reader page heading
+      expect(html.match(/<h1[^>]*>/g)).toHaveLength(1);
+      expect(html).toMatch(/<h1 class="sr-only">/);
+    }
+
+    const html = renderHome(populatedState);
+    expect(html).toContain('<h2 id="home-study-books-heading" class="sr-only">Giáo trình</h2>');
+    expect(html).toContain('<h2 id="home-learn-by-type-heading" class="sr-only">Học theo loại</h2>');
+
+    // Every h2 on Home is visually hidden (no visible "Giáo trình" / "Học theo loại" labels)
+    const h2Tags = html.match(/<h2[^>]*>/g) ?? [];
+    expect(h2Tags).toHaveLength(2);
+    for (const tag of h2Tags) {
+      expect(tag).toContain('class="sr-only"');
+    }
+  });
+
+  it('renders no theme status or theme control on Home while keeping the Settings button', () => {
+    for (const theme of ['light', 'dark', 'sakura'] as const) {
+      const html = renderHome({
+        ...populatedState,
+        preferences: { ...populatedState.preferences, theme },
+      });
+      expect(html).not.toContain('Giao diện hiện tại');
+      expect(html).not.toContain('tabler-icon-sun');
+      expect(html).not.toContain('tabler-icon-moon');
+      expect(html).not.toContain('tabler-icon-flower');
+
+      const settingsButton = html.match(/<button[^>]*aria-label="Cài đặt"[^>]*>/);
+      expect(settingsButton).not.toBeNull();
+      expect(settingsButton![0]).toContain('min-h-touch');
+      expect(settingsButton![0]).toContain('clay-interactive');
+    }
+  });
+
+  it('exposes the full book title for hover and renders it with the Japanese-safe title font', () => {
+    const longTitle = '耳から覚える 日本語能力試験 文法トレーニング N3';
+    const html = renderHome({
       ...populatedState,
-      preferences: { ...populatedState.preferences, language: 'en' },
+      books: { 'book-01': { ...mockBook1, title: longTitle } },
     });
-    expect(enHtml).toContain('Pick a study path to begin.');
+
+    const cardTag = html.match(/<button[^>]*aria-label="Mở giáo trình [^"]*"[^>]*>/);
+    expect(cardTag).not.toBeNull();
+    expect(cardTag![0]).toContain('title="' + longTitle + '"');
+
+    const titleHeading = html.match(/<h3[^>]*>耳から覚える[^<]*<\/h3>/);
+    expect(titleHeading).not.toBeNull();
+    expect(titleHeading![0]).toContain('font-study-title');
+    expect(titleHeading![0]).toContain('line-clamp-3');
+
+    const css = readFileSync(resolve(__dirname, '../../../index.css'), 'utf-8');
+    expect(css).toMatch(/\.font-study-title\s*\{\s*font-family:\s*"Be Vietnam Pro",\s*var\(--font-japanese\);/);
   });
 
   it('gives Vocabulary and Kanji tiles distinct category identities and accessible labels', () => {
@@ -470,7 +527,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>語彙<\/span>/);
     expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>漢字<\/span>/);
 
-    // Study action order for arrow-key navigation: Vocabulary, Kanji, Mixed Test, then books
+    // Study action order for arrow-key navigation: books, Vocabulary, Kanji, then Mixed Test
     const cardOrder = Array.from(
       html.matchAll(/<button[^>]*data-study-card="true"[^>]*>/g),
       (match) => {
@@ -481,7 +538,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
         return 'book';
       }
     );
-    expect(cardOrder).toEqual(['vocabulary', 'kanji', 'mixed', 'book']);
+    expect(cardOrder).toEqual(['book', 'vocabulary', 'kanji', 'mixed']);
   });
 
   it('renders a single Study Coverage progress bar per book card', () => {
@@ -530,15 +587,6 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       for (const tag of emptyTags) {
         expect(tag).toContain('data-pressed="false"');
       }
-    });
-
-    it('keeps the read-only theme indicator non-interactive', () => {
-      const html = renderHome(populatedState);
-      const indicator = html.match(/<div[^>]*aria-label="Giao diện hiện tại: Sáng"[^>]*>/);
-      expect(indicator).not.toBeNull();
-      expect(indicator![0]).not.toContain('clay-interactive');
-      expect(indicator![0]).not.toContain('data-pressed');
-      expect(indicator![0]).not.toContain('tabindex');
     });
 
     it('gates hover elevation behind a real hovering pointer and drives pressed depth from state', () => {

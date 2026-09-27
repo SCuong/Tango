@@ -226,6 +226,17 @@
   }
 }
 
+/*
+ * Study-content titles (e.g. Study Book titles) may mix Vietnamese/Latin text with Japanese.
+ * Latin and Vietnamese glyphs come from the UI font; Kana/Kanji come from the Japanese stack
+ * instead of an arbitrary system CJK fallback that could render Chinese glyph forms.
+ */
+@layer utilities {
+  .font-study-title {
+    font-family: "Be Vietnam Pro", var(--font-japanese);
+  }
+}
+
 body {
   font-family: var(--font-ui);
   min-height: 100vh;

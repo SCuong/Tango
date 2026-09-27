@@ -77,27 +77,18 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, metrics, onClick 
       {...pressHandlers}
       onClick={onClick}
       aria-label={t('aria.learnCategory', { category: label })}
-      className={`clay-interactive w-full text-left border rounded-2xl p-4 sm:p-5 min-h-[148px] sm:min-h-[168px] flex flex-col justify-between gap-4 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
+      className={`clay-interactive w-full h-full text-left border rounded-2xl p-3 sm:p-4 min-h-[72px] flex items-center gap-3 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div
-          className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-surface border flex items-center justify-center shrink-0 shadow-clay-card ${tile.puck}`}
-          aria-hidden="true"
-        >
-          <tile.Icon size={26} stroke={1.75} />
-        </div>
-        <span
-          lang="ja"
-          aria-hidden="true"
-          className={`font-japanese font-bold leading-none text-2xl sm:text-4xl opacity-40 select-none ${tile.glyphColor}`}
-        >
-          {tile.glyph}
-        </span>
+      <div
+        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-surface border flex items-center justify-center shrink-0 shadow-clay-card ${tile.puck}`}
+        aria-hidden="true"
+      >
+        <tile.Icon size={22} stroke={1.75} />
       </div>
 
-      <div className="min-w-0">
-        <h3 className={`font-bold text-lg sm:text-xl leading-snug ${tile.title}`}>{label}</h3>
-        <div className="text-xs sm:text-sm text-text-secondary mt-1 flex items-center gap-x-1.5 gap-y-0.5 flex-wrap">
+      <div className="flex-1 min-w-0">
+        <h3 className={`font-bold text-base leading-snug ${tile.title}`}>{label}</h3>
+        <div className="text-xs text-text-secondary flex items-center gap-x-1.5 gap-y-0.5 flex-wrap">
           <span>
             {t(
               metrics.lessonCount === 1 ? 'metrics.lessonCount.one' : 'metrics.lessonCount.other',
@@ -112,6 +103,14 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, metrics, onClick 
           </span>
         </div>
       </div>
+
+      <span
+        lang="ja"
+        aria-hidden="true"
+        className={`hidden sm:block font-japanese font-bold leading-none text-2xl opacity-40 select-none shrink-0 ${tile.glyphColor}`}
+      >
+        {tile.glyph}
+      </span>
     </button>
   );
 };
@@ -194,103 +193,17 @@ export const HomeStudyHub: React.FC = () => {
       {/* Top Bar with TANGO wordmark, active theme indicator, and Settings button */}
       <TopBar />
 
-      {/* Main Home study canvas */}
+      {/* Main Home study canvas: Study Books first, then category shortcuts, then Mixed Test */}
       <main
         ref={containerRef}
         onKeyDown={handleKeyDown}
-        className="flex-1 w-full max-w-4xl mx-auto px-4 pt-6 pb-10 sm:pt-10 sm:pb-14 space-y-8 sm:space-y-10"
+        className="flex-1 w-full max-w-4xl mx-auto px-4 pt-5 pb-10 sm:pt-8 sm:pb-14 space-y-6 sm:space-y-8"
       >
-        {/* Study paths: greeting sits directly above the always-available study actions */}
-        <div className="space-y-5 sm:space-y-6">
-          <section aria-labelledby="home-greeting-heading" className="space-y-1">
-            <h1
-              id="home-greeting-heading"
-              className="text-2xl sm:text-3xl font-bold tracking-tight leading-snug text-text-primary"
-            >
-              {t('home.greeting')}
-            </h1>
-            <p className="text-sm sm:text-base text-text-secondary">{t('home.greetingHint')}</p>
-          </section>
+        <h1 className="sr-only">{t('nav.home')}</h1>
 
-          <div className="grid gap-4 sm:gap-5 lg:grid-cols-3">
-            {/* Learn by Type: two semantic clay tiles */}
-            <section
-              aria-labelledby="home-learn-by-type-heading"
-              className="space-y-3 lg:col-span-2"
-            >
-              <h2
-                id="home-learn-by-type-heading"
-                className="text-sm leading-5 font-semibold tracking-wider text-text-secondary uppercase"
-              >
-                {t('home.learnByType')}
-              </h2>
-
-              <div className="grid grid-cols-2 gap-3 sm:gap-5">
-                <CategoryTile
-                  category="vocabulary"
-                  metrics={vocabMetrics}
-                  onClick={() =>
-                    navigate({
-                      type: 'learn_by_type',
-                      category: 'vocabulary',
-                    })
-                  }
-                />
-                <CategoryTile
-                  category="kanji"
-                  metrics={kanjiMetrics}
-                  onClick={() =>
-                    navigate({
-                      type: 'learn_by_type',
-                      category: 'kanji',
-                    })
-                  }
-                />
-              </div>
-            </section>
-
-            {/* Mixed Test: solid primary clay CTA. On desktop it becomes the third tile
-                of the study row, offset by the Learn by Type heading (20px + 12px gap). */}
-            <section aria-labelledby="home-mixed-test-heading" className="flex flex-col lg:pt-8">
-              <button
-                type="button"
-                id="home-mixed-test-heading"
-                data-study-card="true"
-                {...mixedTestPressHandlers}
-                onClick={() => navigate({ type: 'mixed_quiz_config' })}
-                className={`clay-interactive relative flex-1 w-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl p-4 sm:p-5 min-h-[88px] flex items-center gap-4 lg:flex-col lg:items-start lg:justify-between ${isMixedTestPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-button'} ${FOCUS_RING}`}
-              >
-                <div
-                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0"
-                  aria-hidden="true"
-                >
-                  <IconBolt size={26} stroke={1.75} />
-                </div>
-                <div className="flex-1 min-w-0 lg:flex-none">
-                  <h3 className="font-bold text-base sm:text-xl leading-snug text-cta-text">
-                    {t('home.mixedTest')}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-cta-text-secondary mt-0.5 leading-snug">
-                    {t('home.mixedTestSubtitle')}
-                  </p>
-                </div>
-                <div
-                  className="w-9 h-9 rounded-full bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0 clay-hover-nudge transition-transform duration-150 lg:absolute lg:top-5 lg:right-5"
-                  aria-hidden="true"
-                >
-                  <IconArrowRight size={18} stroke={2} />
-                </div>
-              </button>
-            </section>
-          </div>
-        </div>
-
-        {/* Study Books Section */}
-        <section aria-labelledby="home-study-books-heading" className="space-y-3">
-          <h2
-            id="home-study-books-heading"
-            className="text-sm leading-5 font-semibold tracking-wider text-text-secondary uppercase"
-          >
+        {/* Study Books: primary content */}
+        <section aria-labelledby="home-study-books-heading">
+          <h2 id="home-study-books-heading" className="sr-only">
             {t('home.studyBooks')}
           </h2>
 
@@ -306,7 +219,7 @@ export const HomeStudyHub: React.FC = () => {
               }}
             />
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
+            <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
               {bookList.map((book) => (
                 <BookCard
                   key={book.id}
@@ -319,6 +232,71 @@ export const HomeStudyHub: React.FC = () => {
             </div>
           )}
         </section>
+
+        {/* Secondary shortcuts: Vocabulary / Kanji, then Mixed Test */}
+        <div className="grid gap-3 sm:gap-4 lg:grid-cols-[3fr_2fr]">
+          <section aria-labelledby="home-learn-by-type-heading">
+            <h2 id="home-learn-by-type-heading" className="sr-only">
+              {t('home.learnByType')}
+            </h2>
+
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 h-full">
+              <CategoryTile
+                category="vocabulary"
+                metrics={vocabMetrics}
+                onClick={() =>
+                  navigate({
+                    type: 'learn_by_type',
+                    category: 'vocabulary',
+                  })
+                }
+              />
+              <CategoryTile
+                category="kanji"
+                metrics={kanjiMetrics}
+                onClick={() =>
+                  navigate({
+                    type: 'learn_by_type',
+                    category: 'kanji',
+                  })
+                }
+              />
+            </div>
+          </section>
+
+          {/* Mixed Test: compact solid CTA, visually below the books in hierarchy */}
+          <section aria-labelledby="home-mixed-test-heading">
+            <button
+              type="button"
+              id="home-mixed-test-heading"
+              data-study-card="true"
+              {...mixedTestPressHandlers}
+              onClick={() => navigate({ type: 'mixed_quiz_config' })}
+              className={`clay-interactive w-full h-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl p-3 sm:p-4 min-h-[72px] flex items-center gap-3 ${isMixedTestPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-button'} ${FOCUS_RING}`}
+            >
+              <div
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0"
+                aria-hidden="true"
+              >
+                <IconBolt size={22} stroke={1.75} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-base leading-snug text-cta-text">
+                  {t('home.mixedTest')}
+                </h3>
+                <p className="text-xs text-cta-text-secondary leading-snug line-clamp-2">
+                  {t('home.mixedTestSubtitle')}
+                </p>
+              </div>
+              <div
+                className="w-8 h-8 rounded-full bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0 clay-hover-nudge transition-transform duration-150"
+                aria-hidden="true"
+              >
+                <IconArrowRight size={16} stroke={2} />
+              </div>
+            </button>
+          </section>
+        </div>
       </main>
     </div>
   );

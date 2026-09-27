@@ -172,7 +172,7 @@ Tango requires seamless typographic harmony between Vietnamese diacritical accen
 | Token | Size | Line Height | Weight | Target Usage |
 |---|---|---|---|---|
 | `text-display` | 36px–40px | 1.25 | Bold (700) | Main Japanese Quiz Prompt (Kanji/Kana) |
-| `text-h1` | 24px–28px | 1.3 | Bold (700) | Screen titles, Home greeting, Result score |
+| `text-h1` | 24px–28px | 1.3 | Bold (700) | Screen titles, Result score |
 | `text-h2` | 20px–22px | 1.35 | SemiBold (600) | Section headers, Category card titles |
 | `text-h3` | 17px–19px | 1.4 | SemiBold (600) | Lesson card titles, Quiz answer text |
 | `text-body` | 15px–16px | 1.5 | Regular (400) / Medium (500) | Explanations, definitions, options subtext |
@@ -183,6 +183,7 @@ Tango requires seamless typographic harmony between Vietnamese diacritical accen
 1. **No Cramped Kanji:** Japanese body text must never drop below `16px`. Quiz prompts must use `36px` to `40px` so intricate Kanji strokes (e.g. `観`, `警`, `議`) are immediately distinct.
 2. **Diacritic Protection:** Line heights on Vietnamese text are set to a minimum of `1.4` to prevent stacked diacritical marks (e.g. `ẩ`, `ễ`, `ớ`) from colliding with borders or adjacent lines.
 3. **Weight Restraint:** Avoid heavy black weights (`900`) for Japanese characters, as heavy strokes cause complex Kanji to bleed together on mobile screens.
+4. **Mixed-Script Study Titles:** User-provided study-content titles (e.g. Study Book titles such as `中級へ行こう 日本語の文型と表現55`) use `.font-study-title` (`"Be Vietnam Pro", var(--font-japanese)`): Latin and Vietnamese glyphs come from the UI font, Kana/Kanji from the Japanese stack. This prevents the browser from falling back to an arbitrary system CJK font that could render Chinese glyph forms under the Vietnamese document language.
 
 ---
 
@@ -543,26 +544,21 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 ## 16. Screen Design Specifications
 
 ### 16.1 Home Screen (Safe Study Hub)
-- **Top Bar:** Solid surface (`bg-surface`, `border-b border-subtle`), matte clay finish with zero translucent frosted glass or blur. Contains Tango wordmark, appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`), and `IconSettings` wrapped in tactile `rounded-full` clay icon action controls. (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
-- **Composition order:** Greeting → Study paths (Learn by Type + Mixed Test) → Study Books. The always-available study paths come first so they sit in the first viewport on every device, whether or not any Study Book exists.
-- **Greeting:** `text-2xl sm:text-3xl` bold heading `"Bạn muốn học gì hôm nay?"` / `"What would you like to learn today?"` with a single localized supporting line (`home.greetingHint`). No avatars, streaks, stats, or decorative phrases.
-- **Study path row:**
-  - **Mobile / tablet:** Vocabulary and Kanji as a 2-column pair of tiles, Mixed Test as a full-width horizontal CTA below.
-  - **Desktop (`lg`):** One 3-column row inside `max-w-4xl`: Vocabulary, Kanji, Mixed Test as three equal-height tiles. Mixed Test is offset by the Learn by Type heading height so the three tiles align.
-- **Learn by Type tiles (Học theo loại):** Solid, clearly visible semantic clay surfaces (never near-white washes). Each tile is a tactile object:
-  - Raised white icon puck (`bg-surface`, category border, `shadow-clay-card`) holding the category icon.
-  - The Japanese category name as a large, low-opacity typographic mark (`語彙` for Vocabulary, `漢字` for Kanji; `font-japanese`, `lang="ja"`, `aria-hidden`). It is study content, not UI locale, and not decoration without meaning.
-  - Localized category name and lesson/item counts anchored to the bottom of the tile.
-  - **[IconBook] Từ vựng (Vocabulary):** `--category-vocabulary-*` (cool indigo / slate).
-  - **[IconWriting] Hán tự (Kanji):** `--category-kanji-*` (warm amber / plum).
-- **Mixed Test CTA:** The only solid-color surface on Home: `bg-cta-surface border-cta-border text-cta-text shadow-clay-button`, translucent matte icon puck (`--cta-puck-*`) and a trailing `IconArrowRight` puck. Hierarchy: neutral book cards < semantic category tiles < solid Mixed Test CTA.
-- **Study Books Section (Giáo trình):**
-  - Compact horizontal cards: 3:4 cover thumbnail, title (2-line clamp), lesson/item counts, and one Study Coverage bar. Stacked on mobile, 2 columns on tablet, 3 columns on desktop (aligned with the study path row).
-  - Fallback placeholder uses a theme-aware primary-tinted cover with a spine band and `IconBook` (no emojis).
+Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts and the Mixed Test are secondary.
+
+- **Top Bar:** Solid surface (`bg-surface`, `border-b border-subtle`), matte clay finish with zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
+- **No visible greeting, no visible section labels:** Home renders no greeting line and no visible "Giáo trình" / "Học theo loại" headings. Semantic structure is kept with visually hidden headings (`sr-only` `h1` for the page and `h2` per section).
+- **Composition order:** Study Books → Vocabulary / Kanji shortcuts → Mixed Test.
+- **Study Books (primary, visually dominant):**
+  - Neutral clay cards (`bg-surface`, `shadow-clay-card`) with a large 3:4 cover (`w-20` mobile, `w-24` tablet, `w-28` desktop), title, lesson/item counts, and one Study Coverage bar with percentage.
+  - Mobile: stacked horizontal cards. Tablet/desktop: a 2-column primary book grid inside `max-w-4xl` (never squeezed into a 3-4 column secondary grid).
+  - Titles use `.font-study-title` (§6.3), wrap up to 3 lines (`line-clamp-3`), and expose the full title on hover via the native `title` attribute.
+  - Fallback cover: theme-aware primary-tinted placeholder with a spine band and `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
-- **Interaction:** All interactive tiles, cards, the empty-state action, and the Settings button apply the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. The read-only theme indicator stays non-interactive.
-- **Zero-Book Empty State:**
-  - Renders inline inside the Study Books section as a full-width recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, title, and description in one row, with a tactile `[IconSettings] Cài đặt` button (right-aligned on desktop, under the text on mobile). Never a centered floating card. Never places an "+ Add Book" button directly on Home.
+- **Vocabulary / Kanji shortcuts (secondary):** A compact 2-column row of smaller semantic clay tiles (`min-h-[72px]`) below the books. Each keeps its identity: `--category-vocabulary-*` (cool indigo / slate, `IconBook`) and `--category-kanji-*` (warm amber / plum, `IconWriting`), a raised white icon puck, lesson/item counts, and from `sm` up the Japanese category name `語彙` / `漢字` as a small low-opacity mark (`lang="ja"`, `aria-hidden`).
+- **Mixed Test (compact CTA):** Solid `--cta-*` surface with `shadow-clay-button`, icon puck, title, subtitle, and arrow puck, at the same compact height as the category shortcuts. Full width under the shortcuts on mobile/tablet; the third column of the shortcut row on desktop (`lg:grid-cols-[3fr_2fr]`). It stays recognizable as an action but never outweighs the books.
+- **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: books, Vocabulary, Kanji, Mixed Test.
+- **Zero-Book Empty State:** The same primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, *"Chưa có giáo trình nào."*, the Settings → Content Management hint, and a tactile `[IconSettings] Cài đặt` button. Never a large floating card. Never places an "+ Add Book" button directly on Home.
 - **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
 ### 16.2 Lesson List & Category Screens
@@ -597,10 +593,12 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 ### 16.5 Settings Screen
 - Full-screen route on mobile; centered modal card (`max-w-lg`) on tablet and desktop (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)).
 - **Language Section:** Segmented clay toggle: `[ Tiếng Việt ]` | `[ English ]`.
-- **Theme Section:** 3 visual clay swatches with live color previews:
-  - `[ Sáng / Light ]`
-  - `[ Tối / Dark ]`
-  - `[ Sakura / Sakura ]`
+- **Theme Section (Chủ đề màu sắc):**
+  - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
+  - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
+  - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
+  - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
+  - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.
 - **Sound Effects Section (Âm thanh hiệu ứng):**
   - Segmented toggle: `[ Off / On ]` (Tắt / Bật).
   - Default: **Off** (Tắt). Never plays audio until explicitly enabled.

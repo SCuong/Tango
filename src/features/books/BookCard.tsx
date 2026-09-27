@@ -32,47 +32,50 @@ export const BookCard: React.FC<BookCardProps> = ({
       onClick={onClick}
       data-study-card="true"
       aria-label={t('aria.openBook', { title: book.title })}
-      className={`clay-interactive w-full text-left bg-surface border border-border-subtle rounded-2xl p-3 sm:p-4 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page flex items-stretch gap-3.5 sm:gap-4 min-h-[56px] ${className}`}
+      title={book.title}
+      className={`clay-interactive w-full h-full text-left bg-surface border border-border-subtle rounded-2xl p-3 sm:p-4 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page flex items-stretch gap-4 sm:gap-5 ${className}`}
     >
-      {/* 3:4 book cover thumbnail */}
-      <div className="w-14 sm:w-16 aspect-[3/4] rounded-lg overflow-hidden shrink-0 border border-border-subtle shadow-clay-card self-center">
+      {/* Primary 3:4 book cover */}
+      <div className="w-20 sm:w-24 lg:w-28 aspect-[3/4] rounded-xl overflow-hidden shrink-0 border border-border-subtle shadow-clay-card self-start">
         <BookCover coverImageId={book.coverImageId} title={book.title} />
       </div>
 
       {/* Book information */}
-      <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-        <h3 className="font-bold text-text-primary text-base leading-snug line-clamp-2">
-          {book.title}
-        </h3>
+      <div className="flex-1 min-w-0 flex flex-col justify-between gap-3 py-0.5">
+        <div className="space-y-1.5">
+          <h3 className="font-study-title font-bold text-text-primary text-base sm:text-lg leading-snug line-clamp-3 break-words">
+            {book.title}
+          </h3>
 
-        {/* Metadata row */}
-        <div className="text-xs sm:text-sm text-text-secondary flex items-center gap-1.5 flex-wrap">
-          <span>
-            {t(
-              metrics.lessonCount === 1
-                ? 'metrics.lessonCount.one'
-                : 'metrics.lessonCount.other',
-              { count: metrics.lessonCount }
-            )}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span>
-            {t(
-              metrics.itemCount === 1
-                ? 'metrics.itemCount.one'
-                : 'metrics.itemCount.other',
-              { count: metrics.itemCount }
-            )}
-          </span>
+          {/* Metadata row */}
+          <div className="text-xs sm:text-sm text-text-secondary flex items-center gap-1.5 flex-wrap">
+            <span>
+              {t(
+                metrics.lessonCount === 1
+                  ? 'metrics.lessonCount.one'
+                  : 'metrics.lessonCount.other',
+                { count: metrics.lessonCount }
+              )}
+            </span>
+            <span aria-hidden="true">·</span>
+            <span>
+              {t(
+                metrics.itemCount === 1
+                  ? 'metrics.itemCount.one'
+                  : 'metrics.itemCount.other',
+                { count: metrics.itemCount }
+              )}
+            </span>
+          </div>
         </div>
 
         {/* Study Coverage row */}
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex items-center gap-2.5">
           <ProgressBar
             value={metrics.coveragePercent}
             ariaLabel={t('aria.progressCoverage', { percent: metrics.coveragePercent })}
           />
-          <span className="text-xs font-semibold text-text-secondary min-w-[2.5rem] text-right">
+          <span className="text-sm font-semibold text-text-primary min-w-[2.75rem] text-right">
             {t('metrics.coverage', { percent: metrics.coveragePercent })}
           </span>
         </div>
