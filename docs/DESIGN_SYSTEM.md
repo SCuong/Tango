@@ -4,8 +4,102 @@ This document is the authoritative visual design system and UX specification for
 
 Before building or modifying user-facing components, contributors must consult:
 1. `PROJECT_RULES.md`
-2. `docs/DESIGN_SYSTEM.md` (this document)
-3. Relevant product specifications (`docs/PRODUCT_SPEC.md`, `docs/UI_UX.md`, `docs/IMPORT_SPEC.md`)
+2. `docs/DESIGN_SYSTEM.md` (this document), starting with the [Canonical Cross-Screen UI Baseline](#canonical-cross-screen-ui-baseline)
+3. Relevant screen and product specifications (`docs/SCREEN_SPEC.md`, `docs/screens/*.md`, `docs/CONTENT_LIBRARY_SPEC.md`, `docs/PRODUCT_SPEC.md`, `docs/UI_UX.md`, `docs/IMPORT_SPEC.md`)
+
+---
+
+## Canonical Cross-Screen UI Baseline
+
+> [!IMPORTANT]
+> This section is the **locked, authoritative baseline** for every Tango screen. It summarizes the rules; the numbered sections below hold the details and tokens. Screen documents may **specialize** these rules for their purpose but must **never redefine** Tango's visual or interaction language. When anything else conflicts with this section, this section wins.
+
+**Home is a reference implementation of this design language, not a layout template.** Future screens must not copy Home's composition by default. Dense lists, content management, import tables, and quiz screens adapt the same language (tokens, clay hierarchy, interaction contract, typography, ambience rules) to their own purpose: for example, flat rows with 1px dividers for dense lists, and a narrow focused canvas for quizzes.
+
+### B1. Visual Identity
+- Mature **Soft Claymorphism** (§3): matte, tactile, restrained; never cartoon 3D, glossy plastic, or blurry neumorphism.
+- **Calm does not mean colorless** (§8.1): every theme has its own atmosphere, visible from canvas, surfaces, borders, and elevation, not only from accents.
+- **Japanese personality without generic SaaS appearance** (§2): no dashboards of fake stats, no admin-template look.
+- **Content always outranks decoration:** study content (book covers, titles, Japanese prompts) is always the strongest element on screen.
+- **Never:** glassmorphism as a surface style, neon or glow, random decorative blobs, emoji as UI icons, or cards nested inside cards.
+
+### B2. Theme Ambience (§8.2)
+- **Light — Cool Pearl / Japanese daytime:** shoji window and washi paper feeling, one restrained geometric Japanese motif (seigaiha), cool pearl/indigo accents.
+- **Dark — Midnight Ink / Japanese night:** moonlight, a warmly lit shoji window or paper lantern, a few warm firefly points; never cyberpunk.
+- **Sakura — Warm Blossom Paper:** a restrained blossom branch, a few petals, soft kasumi/washi feeling in rose/plum.
+- Ambience is **decorative only**: behind all content, `aria-hidden`, `pointer-events: none`, low contrast, and never competing with content.
+- **Deterministic:** fixed positions, never re-randomized per render; objects are never flipped or turned upside-down.
+- **Motion:** only a few very slow translate/fade motions where appropriate; `prefers-reduced-motion` makes the layer fully static.
+- **Feather, don't chop:** decorative motifs cut by an edge fade out toward that edge (alpha mask) instead of ending in a hard line.
+
+### B3. Color-Role Hierarchy (§8.1, §9)
+- **Canvas = atmosphere. Category surfaces = identity. CTA = action emphasis.**
+- These three roles must never collapse into the same hue family: keep canvas and neutral cards low-saturation, give each category its own clearly different hue, and reserve the most saturated color on screen for the primary action.
+- Components use semantic tokens only; never raw hex values.
+
+### B4. Content Hierarchy & Progressive Disclosure
+- Browsing screens show only the information needed to choose the next action (identity + progress + primary actions).
+- Detailed inventory and statistics (lesson/item counts, accuracy breakdowns) belong on detail screens.
+- Real content (e.g. Study Books with their covers) visually outranks shortcuts and generic actions.
+
+### B5. Clay Hierarchy (§3, §3.1, §13)
+| Level | Used for | Treatment |
+|---|---|---|
+| **Content cards** | Study Books, lesson cards, results cards | Soft clay elevation (`--shadow-clay-card`), neutral or semantic surface |
+| **Secondary controls** | Category shortcuts, icon buttons, segmented controls, secondary buttons | Restrained clay; press = 1px sink with compressed shadow (`CLAY_PRESSED_CLASSES`) |
+| **Primary CTA** | The main action of a screen (Home `Kiểm tra`, `Bắt đầu`, `Tiếp tục`, `Đã hiểu — Tiếp tục`) | Visibly raised physical button: `--cta-*` surface plus a solid depth lip (`--cta-depth`, `.cta-raised`) |
+| **Flat** | Dense lists, dictionary rows, settings lists, import tables, form inputs | Flat surface with 1px dividers; no clay stacking |
+
+- The pressed state must look like the control **physically compressing** (moving down onto its lip or base), not merely gaining or losing a shadow.
+- Quiz answer choices keep their own positional treatment (§10–§12); they are not primary CTAs.
+
+### B6. Interaction Contract (§3.1)
+- Press state comes from `usePressFeedback`, **never** CSS `:active`.
+- Hover effects only under `@media (hover: hover) and (pointer: fine)`; never Tailwind `hover:*` / `group-hover:*` for clay elevation.
+- Drag-out, pointer cancel, blur, and releases outside the control reset the press cleanly and **never** navigate or act.
+- A primary raised navigation CTA may guarantee ~100ms of visible press feedback before navigating (`MIN_PRESS_FEEDBACK_MS`). Longer presses act immediately on release; keyboard `Enter` acts immediately. No perceptible artificial lag.
+- Every interactive element has a `focus-visible` primary ring with a 2px page-colored offset; focus never relies on shadow alone.
+- Minimum touch target **48px** (quiz answers 56px).
+- `prefers-reduced-motion`: transitions become instant and ambience is static; state changes (pressed depth, selection) stay visible.
+
+### B7. Typography (§6)
+- **Be Vietnam Pro** for Vietnamese/English UI; the **Noto Sans JP** stack for Japanese content.
+- `.font-study-title` for mixed-script user titles (Latin/Vietnamese from the UI font, Kana/Kanji from the Japanese stack).
+- Vietnamese diacritics must never clip (line-height ≥ 1.4 for body text; no tight clipping containers).
+- Japanese must never wrap into awkward vertical columns on narrow viewports: reduce size/tracking or change layout instead (`whitespace-nowrap` for short Japanese labels).
+
+### B8. Mobile (First-Class Target, §4.1)
+- Design mobile first; explicitly validate at **~360px and ~390px**.
+- Zero horizontal scrolling.
+- Do not simply shrink the desktop layout; compose for the small screen.
+- Paired cards (e.g. two category tiles) stay equal in size and visually balanced.
+- Reduce typography and spacing before allowing broken wrapping; use a deliberate responsive fallback only when a layout genuinely cannot fit.
+- High-frequency actions respect the thumb zone; bottom action bars respect safe-area insets.
+
+### B9. Desktop / Laptop (§4.2)
+- Centered, constrained canvases (`max-w-4xl` for browsing; `max-w-xl`–`max-w-2xl` for quiz and focused study).
+- Use extra width intentionally (e.g. 2-column book grids, shortcut rows); never stretch mobile cards edge to edge.
+- Browsing layouts may use 2–3 columns where it is meaningful; quiz and study focus screens stay narrow.
+
+### B10. Illustrations & Japanese Motifs
+- An illustration must improve recognition or identity (e.g. the Vocabulary `あ` / Kanji `字` study-card illustrations).
+- Decorative assets are `aria-hidden` (and `focusable="false"` for SVG).
+- One coherent cultural motif is better than a collage of Japanese clichés.
+- A Study Book cover already provides identity; do not add redundant decoration to book cards.
+
+### B11. TopBar
+- Restrained. Home reference: `TANGO` wordmark + Settings only.
+- No theme switch or theme status on Home or other study screens; **theme selection exists only in Settings** (§16.5).
+- A hard divider is not mandatory. Where scrolling content meets or slides beneath a persistent surface, a soft page-colored feather may replace a hard cut.
+
+### B12. Documentation Map
+| Document | Responsibility |
+|---|---|
+| `docs/DESIGN_SYSTEM.md` (this file) | **Source of truth** for cross-screen visual and interaction rules, tokens, and palettes |
+| `docs/SCREEN_SPEC.md` | Screen inventory, routes, breakpoints, global platform/responsive invariants, reusable component roles |
+| `docs/screens/*.md` | Screen-specific composition, states, and wireframes (specializations only) |
+| `docs/CONTENT_LIBRARY_SPEC.md` | Product/content-management semantics (books, lessons, study-only Home, deletion, ordering) |
+| `docs/UI_UX.md` | Narrative UX flows and overview wireframes; defers to this file for visual rules |
 
 ---
 
@@ -25,15 +119,15 @@ Tango strictly rejects visual clichés commonly associated with low-effort or te
 
 ### Anti-Patterns Strictly Prohibited:
 - **No generic template or SaaS dashboard layouts:** No sidebar menus stuffed with fake productivity stats, "Welcome back, User!" hero banners, or pointless telemetry widgets.
-- **No exaggerated neon gradients or glowing borders:** No rainbow halos, iridescent chromatic aberrations, or radioactive accent buttons.
+- **No exaggerated neon gradients or glowing borders:** No rainbow halos, iridescent chromatic aberrations, or radioactive accent buttons. Gradients are never used as visible color fills; they appear only as alpha masks or page-colored feathers that soften a cut edge (see B2 / B11).
 - **No floating gradient blobs or decorative geometric shapes:** Every element on screen must serve a clear study or navigation function. The only exception is the restrained, fixed ambience layer defined in §8.2.
-- **No glassmorphism everywhere:** No blurry frosted-glass panels stacked over complex backgrounds that degrade text readability.
+- **No glassmorphism:** Surfaces, cards, and bars are opaque. Blurry frosted-glass panels over content are prohibited. A modal or bottom sheet may dim (and lightly blur) the page *behind* it, but the dialog panel itself stays opaque.
 - **No nested cards inside cards inside cards:** Flat, intentional grouping with clean negative space.
 - **No random emoji as primary UI icons:** Emojis are reserved exclusively for natural Japanese/Vietnamese study content. System navigation and status indicators use Tabler stroke iconography only (e.g. streak indicator `[IconFlame] 4`).
 - **No excessive pill badges:** Do not turn every word or metadata label into a colored rounded badge.
 - **No uniform 24px border-radius everywhere:** Shape language must be nuanced and scaled according to element size and hierarchy.
 - **No giant empty whitespace:** Layouts must feel comfortable, information-dense where appropriate (word lists, preview tables), and focused during quizzes.
-- **No bouncing, springing, or distracting animations:** Motion must be restrained (150–220ms), purposeful, and easily disabled via `prefers-reduced-motion`.
+- **No bouncing, springing, or distracting animations:** UI motion must be restrained (70–220ms), purposeful, and easily disabled via `prefers-reduced-motion`. The only slow motion allowed is the ambient background layer (§8.2).
 
 > **Guiding Axiom:** Study clarity and typographic legibility always take precedence over decorative visual trends.
 
@@ -51,9 +145,9 @@ Tango adopts **Soft Claymorphism** as its signature visual language. Claymorphis
 ### Where Claymorphism Belongs:
 - Study Book cards and Learn by Type cards (Từ vựng, Hán tự)
 - Lesson selection cards
-- Primary action buttons (CTA, Start Quiz, Next Question)
+- Primary action buttons (CTA, Start Quiz, Next Question) — as **raised** primary CTAs with a solid depth lip (see B5, §3.1)
 - Multiple-choice answer buttons
-- Theme selection swatches
+- Theme preview cards (Settings only)
 - Import file drop zones
 - Results & score summary cards
 
@@ -88,7 +182,7 @@ All primary interactive clay surfaces (Study Book cards, Learn by Type cards, pr
   - Do not use Tailwind `hover:*` / `group-hover:*` utilities for clay elevation, and strictly NO generic Tailwind shadows (`hover:shadow-md`, `hover:shadow-lg`).
 - **Pressed (explicit pointer state, never CSS `:active`):**
   - Mobile browsers can leave `:active` / `:hover` stuck after a touch is dragged off a control and released, so pressed depth is component state from `usePressFeedback`.
-  - The press starts on pointer down (primary mouse button, touch, or pen) or `Space`, and clears on pointer up, pointer cancel, pointer leave, pointer moving outside the control bounds, blur, and any pointer/key release in the window.
+  - The press starts on pointer down (primary mouse button, touch, or pen) or `Space`. A release on the control (pointer up / `Space` up) completes it. Pointer cancel, pointer leave, pointer moving outside the control bounds, blur, and any pointer/key release outside the control cancel it; a cancelled press never triggers the action.
   - Pointer capture is not used, so native click cancellation on drag-out is unchanged.
   - While pressed, the control swaps its resting shadow for `CLAY_PRESSED_CLASSES` (`translate-y-px shadow-clay-pressed`) and exposes `data-pressed="true"`.
 - **Raised primary CTA (e.g. Home `Kiểm tra`):**
@@ -113,12 +207,12 @@ Tango is built around high-frequency, short-duration study sessions. Ergonomic c
   - Minimum touch target for any interactive button: **48px**.
   - Multiple-choice answer buttons: minimum height **56px** (comfortable for one-handed thumb tapping on phones).
   - Vertical spacing between answer choices: minimum **12px** to prevent accidental mis-taps.
-- **Viewport Bounds:** Strict `100vw` layout with zero horizontal scrolling (`overflow-x: hidden`).
+- **Viewport Bounds:** Strict `100vw` layout with zero horizontal scrolling (`overflow-x: hidden`). Validate every screen at ~360px and ~390px.
 - **Safe Area Insets:** All bottom-docked action bars respect device safe areas (`env(safe-area-inset-bottom)`).
 
 ### 4.2 Desktop Ergonomics
 - **Constrained Study Canvas:** On wide desktop screens, the active quiz interface is centered with a constrained max-width (`max-w-xl` / ~600px). This eliminates broad eye-scanning fatigue and preserves the focused rhythm of mobile drills.
-- **Balanced Browsing Layouts:** Lesson lists and import interfaces expand into structured 2-column or 3-column grids (`max-w-4xl` to `max-w-6xl`) with clear hierarchy.
+- **Balanced Browsing Layouts:** Browsing screens (Home, lesson lists, import interfaces) use extra width intentionally with 2-column or 3-column grids where it is meaningful (`max-w-4xl` to `max-w-6xl`); never stretch mobile cards edge to edge.
 - **Clear Focus Indicators:** Prominent `:focus-visible` rings (2px-3px solid with 2px offset) ensuring complete keyboard navigability.
 
 ---
@@ -187,7 +281,8 @@ Tango requires seamless typographic harmony between Vietnamese diacritical accen
 1. **No Cramped Kanji:** Japanese body text must never drop below `16px`. Quiz prompts must use `36px` to `40px` so intricate Kanji strokes (e.g. `観`, `警`, `議`) are immediately distinct.
 2. **Diacritic Protection:** Line heights on Vietnamese text are set to a minimum of `1.4` to prevent stacked diacritical marks (e.g. `ẩ`, `ễ`, `ớ`) from colliding with borders or adjacent lines.
 3. **Weight Restraint:** Avoid heavy black weights (`900`) for Japanese characters, as heavy strokes cause complex Kanji to bleed together on mobile screens.
-4. **Mixed-Script Study Titles:** User-provided study-content titles (e.g. Study Book titles such as `中級へ行こう 日本語の文型と表現55`) use `.font-study-title` (`"Be Vietnam Pro", var(--font-japanese)`): Latin and Vietnamese glyphs come from the UI font, Kana/Kanji from the Japanese stack. This prevents the browser from falling back to an arbitrary system CJK font that could render Chinese glyph forms under the Vietnamese document language.
+4. **No Awkward Japanese Wrapping:** Short Japanese labels (e.g. `語彙`, `漢字`) never wrap into vertical columns on narrow screens; use `whitespace-nowrap` and reduce size/tracking or change the layout instead.
+5. **Mixed-Script Study Titles:** User-provided study-content titles (e.g. Study Book titles such as `中級へ行こう 日本語の文型と表現55`) use `.font-study-title` (`"Be Vietnam Pro", var(--font-japanese)`): Latin and Vietnamese glyphs come from the UI font, Kana/Kanji from the Japanese stack. This prevents the browser from falling back to an arbitrary system CJK font that could render Chinese glyph forms under the Vietnamese document language.
 
 ---
 
@@ -219,7 +314,7 @@ Tango stays mature and restrained, but it never falls back to near-white or near
 - **Identity lives in the material, not only the accents:** Theme identity must be visible from the page canvas, surfaces, borders, and elevation. Cards must separate from the canvas by color before any shadow is considered.
 - **Separate the three color roles:** Canvas creates atmosphere; category surfaces create identity; CTA creates action emphasis. These three roles must not collapse into the same hue family. In practice: keep the canvas and neutral card surfaces low-saturation, give each category surface its own clearly different hue, and reserve the most saturated color on screen for the CTA. Sakura is the reference: blush canvas, lavender/peach categories, plum-rose action.
 - **Personality comes only from:** palette, material contrast, typography, the existing study illustrations, and hierarchy.
-- **Never:** gradients, decorative blobs, neon, glow, glassmorphism, or wallpaper illustrations. Sakura petals and Japanese motifs (shoji, moon, lantern, mist) are allowed **only** inside the restrained ambience layer of §8.2.
+- **Never:** gradient color fills, decorative blobs, neon, glow, glassmorphism, or wallpaper illustrations (alpha-mask feathers on cut edges are allowed, §8.2). Sakura petals and Japanese motifs (shoji, seigaiha, moon, lantern, mist, branch) are allowed **only** inside the restrained ambience layer of §8.2. Sakura petals and Japanese motifs (shoji, moon, lantern, mist) are allowed **only** inside the restrained ambience layer of §8.2.
 - **Restraint:** Shadows stay soft and are tinted to each theme's material; never make them heavier to fake personality.
 - **Settings previews:** The palettes in §9 are exactly what the Settings theme preview cards display (§16.5).
 
@@ -547,13 +642,16 @@ All interactive Clay surfaces (cards, buttons, choices) share a predictable, phy
 | **Default** | Resting subtle elevation, dual-layer shadow, top highlight | `transform: translateY(0)` |
 | **Hover (hover-capable fine pointers only)** | Subtle lift (+1px upward), shadow expands faintly | `@media (hover: hover) and (pointer: fine)`: `transform: translateY(-1px)`, transition `150ms ease` |
 | **Pressed** | Tactile depression (+1px downward), shadow compresses | Explicit state (`usePressFeedback`, `data-pressed="true"`): `translate-y-px shadow-clay-pressed`; never CSS `:active` |
+| **Raised CTA (rest / pressed)** | Clearly raised on a solid depth lip; pressed = sinks onto the lip | `.cta-raised`: `0 5px 0 0 var(--cta-depth)` + `--shadow-clay-button`; pressed `translateY(4px)`, 1px lip, 70ms, visible ≥ 100ms before navigation |
 | **Focus-Visible** | High-contrast focus ring (2px solid primary, 2px offset) | `outline: 2px solid var(--primary); outline-offset: 2px` |
 | **Disabled** | Opacity 50%, flat shadow, cursor not-allowed | `opacity: 0.5; filter: grayscale(20%)` |
 
 ### Motion Timing Standards
+- Press feedback on raised CTAs: **70ms** `ease-out`.
 - Short micro-transitions: **150ms–200ms** with `ease-out`.
 - Modal / Bottom Sheet transitions: **250ms–300ms** with `cubic-bezier(0.16, 1, 0.3, 1)`.
-- Always respect `@media (prefers-reduced-motion: reduce)`: replace all translations with instant opacity cuts.
+- Ambient background motion (§8.2) is the only slow motion (tens of seconds, translate/fade only).
+- Always respect `@media (prefers-reduced-motion: reduce)`: transitions become instant, sheets and dialogs appear without sliding, and the ambience layer is fully static. State changes (pressed depth, selection) remain visible.
 
 ---
 
@@ -594,6 +692,8 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 ## 16. Screen Design Specifications
 
 ### 16.1 Home Screen (Safe Study Hub)
+> Home is the reference implementation of the baseline, not a layout template for other screens (see [Canonical Cross-Screen UI Baseline](#canonical-cross-screen-ui-baseline)).
+
 Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts and the Test action are secondary.
 
 - **Top Bar:** Opaque theme canvas (`bg-page`) with **no divider line**, so it belongs to each theme instead of reading as a separate panel. Content scrolling under it fades out through a 14px `--bg-page` feather (`.tango-topbar::after`) instead of a hard cut; zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
@@ -684,7 +784,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
    - Screen readers announce the prompt as a level-1 heading.
    - Answer buttons are semantic `<button>` elements with accessible descriptions (e.g. `aria-label="Lựa chọn: 旅行"`).
 4. **Motion Sensitivity:**
-   - Respects `prefers-reduced-motion: reduce`. All clay translations and sliding bottom sheets transition instantly via simple opacity changes when reduced motion is requested.
+   - Respects `prefers-reduced-motion: reduce`: transitions (including clay translations and sliding sheets) become instant and the ambience layer is fully static, while state changes such as pressed depth remain visible.
 
 ---
 
@@ -900,7 +1000,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
 
 ## 19. Final Design Checklist for Future UI Sessions
 
-When implementing any screen or component in Tango, verify:
+When implementing any screen or component in Tango, verify it against the [Canonical Cross-Screen UI Baseline](#canonical-cross-screen-ui-baseline), including:
 - [ ] Is it styled using semantic tokens rather than raw hex codes?
 - [ ] Is Japanese text rendered in `Noto Sans JP` with generous font size and line height?
 - [ ] Is Vietnamese/English text rendered in `Be Vietnam Pro` with diacritic clearance?
@@ -909,4 +1009,8 @@ When implementing any screen or component in Tango, verify:
 - [ ] Does the element look soft, tactile, and restrained—avoiding bloated cartoon 3D or generic, flat, template-like styling?
 - [ ] Are mobile touch targets at least 48px high (and quiz answer buttons at least 56px)?
 - [ ] Does the layout work seamlessly across Light, Dark, and Sakura themes?
-- [ ] Is motion restrained (150–220ms) and compliant with `prefers-reduced-motion`?
+- [ ] Is motion restrained (70–220ms for UI) and compliant with `prefers-reduced-motion`?
+- [ ] Do press states come from `usePressFeedback` (never `:active`), with hover gated to fine pointers?
+- [ ] Is the clay level right (content card / secondary control / raised primary CTA / flat list)?
+- [ ] Do canvas, category surfaces, and the CTA keep separate hue roles?
+- [ ] Was the layout checked at ~360px, ~390px, and desktop with no horizontal scroll and no awkward Japanese wrapping?

@@ -3,7 +3,7 @@
 > **Master Specification Reference:** [`docs/SCREEN_SPEC.md`](../SCREEN_SPEC.md) is the authoritative master index, route map, and responsive foundation for Tango.
 > This domain file is authoritative for the detailed screen layouts, wireframes, and interaction flows of **Study Screens (SCREEN 01 through SCREEN 06)**.
 >
-> **Design Tokens & Components:** Styled exclusively using the Soft Claymorphism design system in [`docs/DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md).
+> **Design Tokens & Components:** Styled exclusively using the Soft Claymorphism design system in [`docs/DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md). Every screen here follows its [Canonical Cross-Screen UI Baseline](../DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline); this file only specializes composition per screen.
 >
 > **Study Metrics & Progress Indicators Contract:**
 > - **Book Progress (SCREEN 01, 02):** Percentage values displayed on book cards and book headers represent **Study Coverage** (`coveragePercent`), i.e. the percentage of items in the book that have been tested at least once (`progress.totalAttempts > 0`).
@@ -28,6 +28,8 @@
 #### Purpose:
 The learner's primary gateway. Exclusively focused on reading, exploring textbooks, browsing by category, and launching tests. Contains zero management controls (administrative actions reside strictly in [Settings → Content Management](./SETTINGS_CONTENT_SCREENS.md#screen-17-content-management)).
 
+> Home is the **reference implementation** of the [design baseline](../DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline), not a layout template. Other screens adapt the same language to their own purpose instead of copying Home's composition.
+
 #### Routes & Navigation:
 - **Route:** `/`
 - **Entry:** Application launch, clicking `TANGO` logo, or "Về trang chủ" action.
@@ -51,7 +53,7 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
 - **Category shortcuts:** Equal-height, symmetrical tinted clay tiles (`min-h-[112px]`, `sm:min-h-[128px]`): `語彙` / `漢字` glyph pinned top-left, illustration pinned top-right, localized name pinned bottom-left. Text never wraps (`whitespace-nowrap`); below 380px the glyph and illustration shrink, keeping the 2-column layout clean at 360px and 390px. Still smaller than the book cards.
 - **Test CTA:** Raised primary button (solid depth lip at rest, sinks 4px when pressed and stays visibly pressed for at least 100ms before navigating; drag-out still cancels). Short label `Kiểm tra` / `Test` plus a round `IconPlus` puck; accessible name `Tạo bài kiểm tra` / `Create test`; route `mixed_quiz_config`.
 - **Ambience:** Restrained per-theme Japanese scene behind all content (Light: daylight shoji window, seigaiha fan, one mist band; Dark: moon, lit shoji window, paper lantern, fireflies; Sakura: blossom branch, kasumi clouds, a few falling petals), fixed, `aria-hidden`, very low opacity, motifs cut by the viewport feathered out toward the cut edge, static under reduced motion (see [`docs/DESIGN_SYSTEM.md` §8.2](../DESIGN_SYSTEM.md#82-restrained-japanese-ambience-explicit-exception)).
-- **Tactile Clay Recipe:** Every interactive Home card and button uses `.clay-interactive` (hover lift only under `@media (hover: hover) and (pointer: fine)`) plus `usePressFeedback` (explicit `data-pressed` state that swaps in `translate-y-px shadow-clay-pressed`). The `View all` toggle is a quiet text button, not a clay card. Focus ring: `focus-visible:ring-2 ring-primary ring-offset-2 ring-offset-page`. See [`docs/DESIGN_SYSTEM.md` §3.1](../DESIGN_SYSTEM.md#31-canonical-clay-interaction-recipe).
+- **Tactile Clay Recipe:** Every interactive Home card and button uses `.clay-interactive` (hover lift only under `@media (hover: hover) and (pointer: fine)`) plus `usePressFeedback` (explicit `data-pressed` state, never CSS `:active`). Book cards and category tiles sink 1px (`translate-y-px shadow-clay-pressed`); the Test CTA uses the raised primary treatment (`.cta-raised`, sinks onto its depth lip, ≥ 100ms visible press before navigating). Drag-out or cancel never navigates. The `View all` bridge is a compact dashed-outline text control, not a clay card. Focus ring: `focus-visible:ring-2 ring-primary ring-offset-2 ring-offset-page`. See [`docs/DESIGN_SYSTEM.md` §3.1](../DESIGN_SYSTEM.md#31-canonical-clay-interaction-recipe).
 
 #### Wireframes:
 ```text

@@ -61,7 +61,8 @@ Maintain strict repository hygiene at all times. Distinguish clearly between fil
 ## 5. UI / UX Standards
 
 - **Design Guidance:** The local skill `.agents/skills/ui-ux-pro-max` may be referenced locally for UX patterns, typography, color palettes, and component design principles. The skill itself must never be committed.
-- **Mobile-First Usability:** Mobile responsiveness is a first-class requirement. Touch targets (minimum 44x44px), thumb reachability, and mobile viewport ergonomics must be validated alongside desktop layouts.
+- **Design System First:** Before any UI implementation, read `docs/DESIGN_SYSTEM.md`, especially its **Canonical Cross-Screen UI Baseline**. It is the single source of truth for Tango's visual and interaction language. Screen-specific docs may specialize it for their purpose but must never redefine it.
+- **Mobile-First Usability:** Mobile responsiveness is a first-class requirement. Touch targets (minimum 48px; quiz answers 56px), thumb reachability, and mobile viewport ergonomics must be validated at ~360px and ~390px alongside desktop layouts.
 - **Typographic & Cultural Clarity:** Japanese typography (Kanji, Furigana, Kana) and Vietnamese diacritics must render legibly across devices with appropriate font stacks and spacing.
 - **Accessibility:** Maintain proper semantic HTML, accessible color contrast ratios, clear focus indicators, and screen-reader considerations.
 

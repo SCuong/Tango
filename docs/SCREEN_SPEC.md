@@ -2,7 +2,7 @@
 
 This document is the authoritative master index, architectural route map, and responsive foundation for **Tango**. It establishes the screen inventory, platform invariants, breakpoint tiers, and route hierarchy, linking directly to domain-specific layout specifications.
 
-> **Design System Reference:** All visual tokens, Soft Claymorphism specifications, Light/Dark/Sakura themes, and typography are defined in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
+> **Design System Reference:** All visual and interaction rules, tokens, Soft Claymorphism specifications, Light/Dark/Sakura themes, and typography are defined in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Every screen must follow its [Canonical Cross-Screen UI Baseline](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline); this document covers routes, breakpoints, and global structure only.
 >
 > **Domain Screen Specifications:**
 > - [Study Screens (SCREEN 01 – 06)](./screens/STUDY_SCREENS.md)
@@ -22,7 +22,7 @@ Tango is built as **ONE unified responsive React Single Page Application (SPA) +
 |---|---|---|---|
 | **Mobile** | `< 640px` | Smartphones (iOS, Android, PWA installed on phone) | Single-column stacked flow, thumb-zone action placement, full-screen sub-routes, bottom sheets |
 | **Tablet** | `640px – 1024px` | iPads, Android tablets, Foldables | 2-column content grids, centered modal dialogs, balanced ergonomic touch layout |
-| **Desktop / Laptop** | `> 1024px` | Laptops, Desktops, PWA installed on macOS/Windows/Linux | Centered constrained canvas, 3 to 4-column card grids, master-detail panels, keyboard-first navigation |
+| **Desktop / Laptop** | `> 1024px` | Laptops, Desktops, PWA installed on macOS/Windows/Linux | Centered constrained canvas, 2–3 column browsing grids where meaningful, narrow focused quiz/study canvas, master-detail panels, keyboard-first navigation |
 
 ### Platform Invariants:
 1. **PWA on Laptop / Desktop:** Runs in a standalone window utilizing the **Desktop / Laptop** layout (`max-w-2xl` for study, `max-w-4xl` for management).
@@ -35,28 +35,30 @@ Tango is built as **ONE unified responsive React Single Page Application (SPA) +
 
 1. **Back Navigation Hierarchy:** Every sub-screen features an explicit top `[IconArrowLeft]` button returning predictably to its parent screen. Browser `popstate` closes open modals before navigating backwards.
 2. **Safe-Area Insets:** Top headers incorporate `env(safe-area-inset-top)`; mobile bottom action bars incorporate `env(safe-area-inset-bottom)`.
-3. **No Horizontal Scroll:** Viewports strictly enforce `overflow-x: hidden`. Cards and text wrap cleanly.
-4. **Touch & Click Targets:** Standard action buttons have a minimum height of `48px`; quiz answer buttons have a minimum height of `56px`.
-5. **No Visible Answer Hints:** Answer buttons strictly display **only** question content; no visible letters (`A/B/C/D`) or numbers (`1/2/3/4`) are stamped on the UI.
-6. **Hard Deletion Only:** Deletions are irreversible; hard-delete cascades remove all references and Blob assets atomically (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)). Destructive actions reside exclusively in Content Management under Settings.
-7. **Desktop Keyboard Accelerators:**
+3. **No Horizontal Scroll:** Viewports strictly enforce `overflow-x: hidden`. Cards and text wrap cleanly; short Japanese labels never wrap into vertical columns.
+4. **Mobile First, Desktop Adapted:** Every screen is composed for mobile first and validated at ~360px and ~390px. Desktop/laptop is an intentional adaptation (centered constrained canvas, extra width used for meaningful columns), never a stretched mobile layout and never mobile as a shrunken desktop. See [baseline B8/B9](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline).
+5. **Touch & Click Targets:** Standard action buttons have a minimum height of `48px`; quiz answer buttons have a minimum height of `56px`.
+6. **No Visible Answer Hints:** Answer buttons strictly display **only** question content; no visible letters (`A/B/C/D`) or numbers (`1/2/3/4`) are stamped on the UI.
+7. **Hard Deletion Only:** Deletions are irreversible; hard-delete cascades remove all references and Blob assets atomically (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)). Destructive actions reside exclusively in Content Management under Settings.
+8. **Desktop Keyboard Accelerators:**
    - Multiple choice answer selection: Keys `1`, `2`, `3`, `4`.
    - Confirm / Advance / Dismiss: `Enter` or `Space`.
    - Exit / Cancel: `Escape`.
    - Open Settings from Home: `Alt+S`.
+9. **Press & Hover Behavior:** All tactile controls use explicit press state (`usePressFeedback`), hover only on fine pointers, and cancel cleanly on drag-out; see [baseline B6](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline).
 
 ---
 
 ## 3. Reusable UI Components & Overlays
 
-All screens compose a standardized set of Soft Claymorphism UI primitives specified in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md):
-- **`TopBar`:** Header container with navigation wordmark, optional screen title, and settings icon. It never shows a theme status or theme control; theme selection lives only in Settings.
-- **`Button`:** Tactile clay buttons: Primary (`--primary`), Neutral/Secondary (`--bg-surface`), and Destructive Error (`--error-surface`).
+All screens compose a standardized set of Soft Claymorphism UI primitives specified in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Their clay level follows the [clay hierarchy (B5)](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline):
+- **`TopBar`:** Restrained header with navigation wordmark, optional screen title, and settings icon. It never shows a theme status or theme control; theme selection lives only in Settings. A hard divider is optional; content scrolling beneath it may fade out through a soft page-colored feather.
+- **`Button`:** Three roles. **Primary CTA** (one main action per screen): a visibly raised physical button on `--cta-*` with a solid depth lip (`--cta-depth`) that sinks onto the lip when pressed. **Neutral/Secondary** (`--bg-surface`): restrained clay with a 1px press sink. **Destructive** (`--error-surface`): restrained, never the raised primary treatment.
 - **`AnswerOption`:** Positional choice button with Amber, Sky Blue, Violet, or Rose tint.
 - **`CheckboxRow`:** Touch selection row with `IconSquare` / `IconSquareCheckFilled` and item count badge.
 - **`SegmentedControl`:** Pill container with smooth sliding clay active pill.
-- **`BottomSheet`:** Mobile-only bottom slide-up overlay with drag handle and backdrop blur.
-- **`Modal`:** Centered floating dialog (`max-w-md` to `max-w-lg`) with backdrop blur. Cancel holds initial focus.
+- **`BottomSheet`:** Mobile-only bottom slide-up overlay with drag handle; the page behind is dimmed (optionally lightly blurred) while the sheet itself stays opaque.
+- **`Modal`:** Centered opaque dialog (`max-w-md` to `max-w-lg`) over a dimmed (optionally lightly blurred) backdrop. Cancel holds initial focus.
 - **`StickyBottomBar`:** Mobile-only affixed action bar respecting `env(safe-area-inset-bottom)`. Dissolves into normal document flow on Tablet/Desktop.
 - **`EmptyState`:** Calming ceramic surface with Tabler icon, headline, and safe navigation link.
 

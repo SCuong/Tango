@@ -3,7 +3,7 @@
 > **Master Specification Reference:** [`docs/SCREEN_SPEC.md`](../SCREEN_SPEC.md) is the authoritative master index, route map, and responsive foundation for Tango.
 > This domain file is authoritative for the detailed screen layouts, wireframes, and interaction flows of **Settings & Content Management Screens (SCREEN 16 through SCREEN 20)**.
 >
-> **Design Tokens & Components:** Styled exclusively using the Soft Claymorphism design system in [`docs/DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md).
+> **Design Tokens & Components:** Styled exclusively using the Soft Claymorphism design system in [`docs/DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md). Every screen here follows its [Canonical Cross-Screen UI Baseline](../DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline); dense settings and management lists use the flat level of its clay hierarchy.
 > **Domain Architecture:** Governed by [`docs/CONTENT_LIBRARY_SPEC.md`](../CONTENT_LIBRARY_SPEC.md).
 
 ---
@@ -42,7 +42,8 @@ App preferences management and intentional gateway to administrative content ope
      - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
      - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
      - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
-     - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.
+     - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control; do not add a theme toggle to any TopBar.
+     - The previews use the canonical palettes and ambience identities (Light — Cool Pearl, Dark — Midnight Ink, Sakura — Warm Blossom Paper) defined in [`docs/DESIGN_SYSTEM.md` §9 / §16.5](../DESIGN_SYSTEM.md#9-theme-palette-specifications).
    - **Sound Effects:** Segmented control `[ Off / Tắt ]` | `[ On / Bật ]` (Default: **Off**)
 2. **Nội dung học (Study Content):**
    - Clickable row: `Quản lý giáo trình và bài học` $\rightarrow$ navigates to [SCREEN 17: Content Management](#screen-17-content-management-quản-lý-nội-dung).
