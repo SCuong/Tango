@@ -8,6 +8,9 @@ import { TranslationKey } from '../../lib/i18n';
 import { StudyCategory } from '../../types';
 import { TopBar } from '../../components/TopBar';
 import { EmptyState } from '../../components/EmptyState';
+import { VocabularyIllustration } from '../../components/illustrations/VocabularyIllustration';
+import { KanjiIllustration } from '../../components/illustrations/KanjiIllustration';
+import { IllustrationProps } from '../../components/illustrations/StudyCardIllustration';
 import { BookCard } from './BookCard';
 
 // Focus ring shared by Home study actions. Hover lift comes from `.clay-interactive`
@@ -16,13 +19,14 @@ const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page';
 
 // Full class strings per category so Tailwind detects them statically.
-// `glyph` is the Japanese name of the category (study content, not UI locale) and is the
-// shortcut's visual identity; the localized label sits under it.
+// `glyph` is the Japanese name of the category (study content, not UI locale); the localized
+// label sits under it. `glyphColor` also drives the illustration through `currentColor`.
 const CATEGORY_TILES: Record<
   StudyCategory,
   {
     labelKey: TranslationKey;
     glyph: string;
+    Illustration: React.FC<IllustrationProps>;
     surface: string;
     glyphColor: string;
     title: string;
@@ -31,6 +35,7 @@ const CATEGORY_TILES: Record<
   vocabulary: {
     labelKey: 'category.vocabulary',
     glyph: '語彙',
+    Illustration: VocabularyIllustration,
     surface: 'bg-category-vocabulary-surface border-category-vocabulary-border',
     glyphColor: 'text-category-vocabulary-icon',
     title: 'text-category-vocabulary-text',
@@ -38,6 +43,7 @@ const CATEGORY_TILES: Record<
   kanji: {
     labelKey: 'category.kanji',
     glyph: '漢字',
+    Illustration: KanjiIllustration,
     surface: 'bg-category-kanji-surface border-category-kanji-border',
     glyphColor: 'text-category-kanji-icon',
     title: 'text-category-kanji-text',
@@ -49,7 +55,8 @@ interface CategoryTileProps {
   onClick: () => void;
 }
 
-// Typography-led navigation shortcut: Japanese glyph + localized category name, no counts.
+// Secondary navigation shortcut: Japanese glyph + localized category name with a decorative
+// category illustration. No counts.
 const CategoryTile: React.FC<CategoryTileProps> = ({ category, onClick }) => {
   const { t } = useI18n();
   const { isPressed, pressHandlers } = usePressFeedback();
@@ -64,16 +71,19 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, onClick }) => {
       {...pressHandlers}
       onClick={onClick}
       aria-label={t('aria.learnCategory', { category: label })}
-      className={`clay-interactive w-full h-full text-left border rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 min-h-[72px] flex flex-col justify-center gap-1.5 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
+      className={`clay-interactive w-full h-full text-left border rounded-2xl pl-4 pr-2 py-3 sm:pl-5 sm:pr-3 min-h-[72px] flex items-center justify-between gap-2 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
     >
-      <span
-        lang="ja"
-        aria-hidden="true"
-        className={`font-japanese font-bold leading-none text-2xl sm:text-3xl tracking-wide select-none ${tile.glyphColor}`}
-      >
-        {tile.glyph}
-      </span>
-      <h3 className={`font-semibold text-sm sm:text-base leading-snug ${tile.title}`}>{label}</h3>
+      <div className="min-w-0 flex flex-col gap-1.5">
+        <span
+          lang="ja"
+          aria-hidden="true"
+          className={`font-japanese font-bold leading-none text-2xl sm:text-3xl tracking-wide select-none ${tile.glyphColor}`}
+        >
+          {tile.glyph}
+        </span>
+        <h3 className={`font-semibold text-sm sm:text-base leading-snug ${tile.title}`}>{label}</h3>
+      </div>
+      <tile.Illustration className={`w-14 h-14 sm:w-[4.5rem] sm:h-[4.5rem] shrink-0 ${tile.glyphColor}`} />
     </button>
   );
 };

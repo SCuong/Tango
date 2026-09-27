@@ -482,15 +482,38 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>語彙<\/span><h3[^>]*>Từ vựng<\/h3>/);
     expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>漢字<\/span><h3[^>]*>Hán tự<\/h3>/);
 
-    // No redundant category icon pucks alongside the glyph
+    // Each tile carries exactly one decorative category illustration (no Tabler icon pucks)
     const tileMarkup = (category: string) => {
       const start = html.indexOf(`data-category="${category}"`);
       return html.slice(start, html.indexOf('</button>', start));
     };
-    for (const category of ['vocabulary', 'kanji']) {
+    const illustrationGlyph = { vocabulary: 'あ', kanji: '字' } as const;
+    const illustrationColor = {
+      vocabulary: 'text-category-vocabulary-icon',
+      kanji: 'text-category-kanji-icon',
+    } as const;
+    for (const category of ['vocabulary', 'kanji'] as const) {
       const markup = tileMarkup(category);
-      expect(markup).not.toContain('<svg');
+      const svgTags = markup.match(/<svg[^>]*>/g) ?? [];
+      expect(svgTags).toHaveLength(1);
+      expect(svgTags[0]).toContain('aria-hidden="true"');
+      expect(svgTags[0]).toContain('focusable="false"');
+      // Color follows the category token through currentColor, not a hardcoded root color
+      expect(svgTags[0]).toContain(illustrationColor[category]);
+      expect(svgTags[0]).not.toMatch(/\scolor="/);
+      expect(markup).not.toContain('tabler-icon');
+      expect(markup).toMatch(new RegExp(`<text[^>]*lang="ja"[^>]*>${illustrationGlyph[category]}</text>`));
       expect(markup).not.toMatch(COUNT_PATTERN);
+    }
+
+    // Filter ids are namespaced per illustration and unique across the rendered page
+    const filterIds = Array.from(html.matchAll(/<filter id="([^"]+)"/g), (m) => m[1]);
+    expect(filterIds).toHaveLength(4);
+    expect(new Set(filterIds).size).toBe(filterIds.length);
+    expect(filterIds).not.toContain('shadow');
+    expect(filterIds).not.toContain('softShadow');
+    for (const id of filterIds) {
+      expect(html).toContain(`filter="url(#${id})"`);
     }
 
     // Study action order for arrow-key navigation: books, Vocabulary, Kanji, then Mixed Test
