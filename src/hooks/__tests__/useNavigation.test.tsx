@@ -4,6 +4,7 @@ import {
   NavigationProvider,
   useNavigation,
   NavigationContextValue,
+  reconcileHistoryStack,
 } from '../useNavigation';
 
 describe('src/hooks/useNavigation.tsx', () => {
@@ -193,6 +194,69 @@ describe('src/hooks/useNavigation.tsx', () => {
 
       capturedContext!.back();
       expect(backSpy).toHaveBeenCalledTimes(1);
+    });
+    it('goUp steps back in history when the previous in-app entry is the parent', () => {
+      let ctx: NavigationContextValue | null = null;
+      const Consumer = () => {
+        ctx = useNavigation();
+        return null;
+      };
+      renderToString(
+        <NavigationProvider initialPath="/">
+          <Consumer />
+        </NavigationProvider>
+      );
+      ctx!.navigate({ type: 'book_study', bookId: 'b1' });
+      ctx!.goUp({ type: 'home' });
+      expect(backSpy).toHaveBeenCalledTimes(1);
+      expect(replaceStateSpy).not.toHaveBeenCalled();
+    });
+
+    it('goUp replaces the entry when the parent is not the previous screen (deep link)', () => {
+      let ctx: NavigationContextValue | null = null;
+      const Consumer = () => {
+        ctx = useNavigation();
+        return null;
+      };
+      renderToString(
+        <NavigationProvider initialPath="/book/b1/category/kanji">
+          <Consumer />
+        </NavigationProvider>
+      );
+      ctx!.goUp({ type: 'book_study', bookId: 'b1' });
+      expect(backSpy).not.toHaveBeenCalled();
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/book/b1');
+    });
+
+    it('goBack uses history only when an in-app previous screen exists', () => {
+      let ctx: NavigationContextValue | null = null;
+      const Consumer = () => {
+        ctx = useNavigation();
+        return null;
+      };
+      renderToString(
+        <NavigationProvider initialPath="/settings">
+          <Consumer />
+        </NavigationProvider>
+      );
+      ctx!.goBack({ type: 'home' });
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/');
+      ctx!.navigate('/settings/content-management');
+      ctx!.goBack({ type: 'home' });
+      expect(backSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('reconcileHistoryStack', () => {
+    it('keeps the position for same-URL marker pops', () => {
+      expect(reconcileHistoryStack(['/', '/quiz/session'], 1, '/quiz/session')).toEqual({ stack: ['/', '/quiz/session'], index: 1 });
+    });
+    it('moves back and forward between neighbors', () => {
+      expect(reconcileHistoryStack(['/', '/a', '/b'], 2, '/a').index).toBe(1);
+      expect(reconcileHistoryStack(['/', '/a', '/b'], 1, '/b').index).toBe(2);
+    });
+    it('restarts the stack for unknown destinations', () => {
+      expect(reconcileHistoryStack(['/a'], 0, '/x')).toEqual({ stack: ['/x'], index: 0 });
     });
   });
 });

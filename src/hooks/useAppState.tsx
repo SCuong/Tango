@@ -18,7 +18,13 @@ import {
   type ReactNode,
 } from 'react';
 import { UserPreferences, UserStudyState } from '../types';
-import { savePreferences } from '../lib/storage';
+import {
+  saveBooks,
+  saveHistory,
+  saveLessons,
+  savePreferences,
+  saveProgress,
+} from '../lib/storage';
 import {
   loadUserStudyState,
   mergePreferences,
@@ -28,10 +34,19 @@ import {
 /**
  * Public minimal interface exposed by useAppState.
  */
+export type StudyDataPatch = Partial<
+  Pick<UserStudyState, 'books' | 'lessons' | 'progressByItem' | 'recentResults'>
+>;
+
 export interface AppStateContextValue {
   state: UserStudyState;
   reloadState: () => void;
   updatePreferences: (patch: Partial<UserPreferences>) => void;
+  /**
+   * Persists the given partitions (each to its own storage key) and then updates in-memory
+   * state. A failed write (e.g. QuotaExceededError) throws before state changes.
+   */
+  commitStudyData: (patch: StudyDataPatch) => void;
 }
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
@@ -85,13 +100,25 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({
     setState(nextState);
   }, []);
 
+  const commitStudyData = useCallback((patch: StudyDataPatch) => {
+    if (patch.books) saveBooks(patch.books);
+    if (patch.lessons) saveLessons(patch.lessons);
+    if (patch.progressByItem) saveProgress(patch.progressByItem);
+    if (patch.recentResults) saveHistory(patch.recentResults);
+
+    const nextState: UserStudyState = { ...stateRef.current, ...patch };
+    stateRef.current = nextState;
+    setState(nextState);
+  }, []);
+
   const contextValue = useMemo<AppStateContextValue>(
     () => ({
       state,
       reloadState,
       updatePreferences,
+      commitStudyData,
     }),
-    [state, reloadState, updatePreferences]
+    [state, reloadState, updatePreferences, commitStudyData]
   );
 
   return (

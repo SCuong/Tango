@@ -48,9 +48,11 @@
 
   --success: #059669;
   --success-surface: #ECFDF5;
+  --success-text: #047857;
   --error: #DC2626;
   --error-surface: #FEF2F2;
   --error-border: #FCA5A5;
+  --error-text: #B91C1C;
   --warning: #D97706;
 
   /* 4 Positional Answer Choices */
@@ -110,9 +112,11 @@
 
   --success: #10B981;
   --success-surface: #064E3B;
+  --success-text: #A7F3D0;
   --error: #EF4444;
   --error-surface: #7F1D1D;
   --error-border: #B91C1C;
+  --error-text: #FECACA;
   --warning: #F59E0B;
 
   /* 4 Positional Answer Choices (Muted Rich Dark Hues) */
@@ -172,9 +176,11 @@
 
   --success: #059669;
   --success-surface: #ECFDF5;
+  --success-text: #047857;
   --error: #DC2626;
   --error-surface: #FEF2F2;
   --error-border: #FCA5A5;
+  --error-text: #B91C1C;
   --warning: #D97706;
 
   /* 4 Positional Answer Choices (Blossom Garden Harmony) */
@@ -243,6 +249,63 @@
     box-shadow: 0 1px 0 0 var(--cta-depth), var(--shadow-clay-pressed);
   }
 
+  /*
+   * Flat interactive rows (dense lists, settings rows, quiet buttons): pressed state tints the
+   * background from usePressFeedback; hover tint only on fine pointers.
+   */
+  .flat-interactive {
+    transition: background-color var(--transition-fast);
+  }
+
+  .flat-interactive[data-pressed="true"] {
+    background-color: var(--bg-surface-elevated);
+  }
+
+  /* Mobile sticky action bar: content scrolling under it fades out toward the bar */
+  .tango-bottombar::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 14px;
+    pointer-events: none;
+    background: linear-gradient(to top, var(--bg-page), transparent);
+  }
+
+  @media (min-width: 640px) {
+    .tango-bottombar::before {
+      display: none;
+    }
+  }
+
+  /* Dialog backdrop dims (and lightly blurs) the page behind; the panel itself stays opaque */
+  .tango-backdrop {
+    background-color: rgba(10, 12, 20, 0.48);
+    animation: tango-fade-in 200ms ease-out;
+  }
+
+  .tango-dialog-panel {
+    animation: tango-dialog-in 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (min-width: 640px) {
+    .tango-route-panel {
+      animation: tango-dialog-in 240ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .tango-route-panel .tango-topbar::after,
+    .tango-route-panel .tango-bottombar::before {
+      display: none;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .tango-sheet {
+      animation: tango-sheet-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+
   /* Home TopBar: content scrolling under it fades out instead of being cut by a hard edge */
   .tango-topbar::after {
     content: "";
@@ -267,6 +330,10 @@
 
     .clay-interactive:hover:not([data-pressed="true"]) .clay-hover-nudge {
       transform: translateX(2px);
+    }
+
+    .flat-interactive:hover:not([data-pressed="true"]):not(:disabled) {
+      background-color: color-mix(in srgb, var(--bg-surface-elevated) 55%, transparent);
     }
 
     .clay-interactive.cta-raised:hover:not([data-pressed="true"]) {
@@ -381,6 +448,21 @@
   .ambience-petal-3 { top: 90%; left: 70%; animation: ambience-fall 70s linear -34s infinite; }
   .ambience-petal-4 { top: 55%; left: 94%; animation: ambience-fall 82s linear -45s infinite; }
   .ambience-petal-5 { top: 68%; left: 4%; animation: ambience-fall 88s linear -50s infinite; }
+}
+
+@keyframes tango-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tango-dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes tango-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: none; }
 }
 
 @keyframes ambience-drift {

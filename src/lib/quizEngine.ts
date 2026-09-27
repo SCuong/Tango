@@ -29,6 +29,12 @@ export interface QuizEngineConfig {
   allowedTypes: QuestionType[];
   questionCount?: number | 'all';
   mode?: QuizConfig['mode'];
+  /**
+   * Optional review focus (Review Missed Words). When present, only lexical groups containing
+   * one of these real StudyItem IDs are eligible, and the target item is always one of them.
+   * Distractors are still drawn from every other lexical group of the selected lesson pool.
+   */
+  focusItemIds?: string[];
 }
 
 /**
@@ -112,9 +118,11 @@ function getGroupPrimaryVietnamese(items: StudyItem[]): string | undefined {
  */
 function findTargetItemForType(
   items: StudyItem[],
-  type: QuestionType
+  type: QuestionType,
+  focus?: ReadonlySet<string>
 ): StudyItem | undefined {
   for (const item of items) {
+    if (focus && !focus.has(item.id)) continue;
     switch (type) {
       case 'kana_to_japanese':
         if (item.kana && normalizeKana(item.kana) !== '') {
@@ -187,9 +195,10 @@ function getDistractorCandidates(
 function isGroupCompatibleWithType(
   group: LexicalGroup,
   type: QuestionType,
-  allGroups: LexicalGroup[]
+  allGroups: LexicalGroup[],
+  focus?: ReadonlySet<string>
 ): boolean {
-  const targetItem = findTargetItemForType(group.items, type);
+  const targetItem = findTargetItemForType(group.items, type, focus);
   if (!targetItem) return false;
 
   if (type === 'vi_to_text') {
@@ -198,6 +207,10 @@ function isGroupCompatibleWithType(
 
   const distractorCandidates = getDistractorCandidates(group, targetItem, type, allGroups);
   return distractorCandidates.length >= 3;
+}
+
+function toFocusSet(focusItemIds?: string[]): ReadonlySet<string> | undefined {
+  return Array.isArray(focusItemIds) ? new Set(focusItemIds) : undefined;
 }
 
 /**
@@ -236,13 +249,14 @@ export function getQuizEligibility(
   const allowedTypes = Array.isArray(firstArg)
     ? (allowedTypesParam || [])
     : firstArg.allowedTypes;
+  const focus = toFocusSet(Array.isArray(firstArg) ? undefined : firstArg.focusItemIds);
 
   const { rawItemCount, groups } = collectLexicalGroups(lessonIds, lessons);
 
   let eligibleCount = 0;
   for (const group of groups) {
     const isEligible = allowedTypes.some((type) =>
-      isGroupCompatibleWithType(group, type, groups)
+      isGroupCompatibleWithType(group, type, groups, focus)
     );
     if (isEligible) {
       eligibleCount++;
@@ -279,6 +293,7 @@ export function generateQuizQuestions(
   rng: () => number = Math.random
 ): QuizQuestion[] {
   const { lessonIds, allowedTypes, questionCount } = config;
+  const focus = toFocusSet('focusItemIds' in config ? config.focusItemIds : undefined);
   const { groups } = collectLexicalGroups(lessonIds, lessons);
 
   // 1. Identify eligible groups and their compatible types
@@ -286,7 +301,7 @@ export function generateQuizQuestions(
 
   for (const group of groups) {
     const compatibleTypes = allowedTypes.filter((type) =>
-      isGroupCompatibleWithType(group, type, groups)
+      isGroupCompatibleWithType(group, type, groups, focus)
     );
     if (compatibleTypes.length > 0) {
       eligibleGroupsWithTypes.push({ group, compatibleTypes });
@@ -306,7 +321,7 @@ export function generateQuizQuestions(
         ? compatibleTypes[0]
         : compatibleTypes[Math.floor(rng() * compatibleTypes.length)];
 
-    const targetItem = findTargetItemForType(group.items, chosenType)!;
+    const targetItem = findTargetItemForType(group.items, chosenType, focus)!;
 
     let prompt: string;
     let subPrompt: string | undefined;
