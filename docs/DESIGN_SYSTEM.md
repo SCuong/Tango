@@ -814,7 +814,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - If the persisted theme is `meo`, Settings opens on the second position so the selected card is visible. Choosing Dark or Sakura there does not force the carousel back; arrow-key selection of a hidden theme brings it into view.
   - The previews display the §9 palettes (Cool Pearl, Midnight Ink, Warm Blossom Paper, and the §9.4 Meo's World cat palette, whose preview wears cat ears and a tiny Tango face so it clearly reads as a different world).
   - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
-  - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
+  - Selected state: primary border plus a 2px primary ring (a shape cue, never a color change alone), no check badge; the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
   - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
   - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.
 - **Sound Effects Section (Âm thanh hiệu ứng):**

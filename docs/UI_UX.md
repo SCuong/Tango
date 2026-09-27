@@ -244,7 +244,7 @@ A clean, minimalist preferences modal/sheet:
 - **Theme (Giao diện):**
   - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`; an arrow beside the group reveals the special fourth theme `Mèo mập 😺` / `Meo's World` (see [`DESIGN_SYSTEM.md` §16.5](./DESIGN_SYSTEM.md#165-settings-screen)).
   - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
-  - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
+  - Selected state: primary border plus a 2px primary ring (a shape cue, never a color change alone), no check badge; the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
   - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
   - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.
 - **Sound Effects (Âm thanh hiệu ứng):** Segmented toggle `[ Off / On ]` (Default: **Off** / Tắt). Never plays sound unless explicitly enabled.

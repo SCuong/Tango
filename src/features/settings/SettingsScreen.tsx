@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   IconAlertTriangle,
-  IconCheck,
   IconChevronLeft,
   IconChevronRight,
   IconFolders,
@@ -316,15 +315,8 @@ const ThemeCard = React.forwardRef<
       } ${isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'} ${FOCUS_RING}`}
     >
       <ThemeMiniature theme={theme.value} />
-      <span className="flex items-start justify-between gap-1 px-1 pt-2 pb-0.5">
-        <span className="min-w-0 text-[13px] sm:text-sm font-semibold text-text-primary leading-snug break-words">
-          {t(theme.nameKey)}
-        </span>
-        {selected && (
-          <span aria-hidden="true" className="w-5 h-5 shrink-0 rounded-full bg-primary text-page flex items-center justify-center">
-            <IconCheck size={14} stroke={3} />
-          </span>
-        )}
+      <span className="block px-1 pt-2 pb-0.5 min-w-0 text-[13px] sm:text-sm font-semibold text-text-primary leading-snug break-words">
+        {t(theme.nameKey)}
       </span>
       <span id={descId} className="hidden sm:block px-1 pb-1 text-xs text-text-muted leading-snug">
         {t(theme.descKey)}
