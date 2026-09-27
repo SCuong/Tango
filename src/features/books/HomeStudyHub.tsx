@@ -13,6 +13,8 @@ import { VocabularyIllustration } from '../../components/illustrations/Vocabular
 import { KanjiIllustration } from '../../components/illustrations/KanjiIllustration';
 import { IllustrationProps } from '../../components/illustrations/StudyCardIllustration';
 import { BookCard } from './BookCard';
+import { useMeoShowcase } from '../../hooks/useMeoShowcase';
+import { MeoHoldIndicator, MeoShowcaseExitLayer } from '../../components/MeoShowcase';
 
 // Home previews only the first books; the rest are revealed in place by "View all".
 // Reordering belongs to the future full Books list / management view, never to Home.
@@ -94,6 +96,8 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, onClick }) => {
 
 export const HomeStudyHub: React.FC = () => {
   const { state } = useAppState();
+  // Meo's World easter egg: long-press empty Home canvas to show the background artwork alone
+  const showcase = useMeoShowcase(state.preferences.theme === 'meo');
   const { navigate } = useNavigation();
   const { t } = useI18n();
   const [showAllBooks, setShowAllBooks] = useState(false);
@@ -167,7 +171,7 @@ export const HomeStudyHub: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-page text-text-primary flex flex-col">
+    <div className="min-h-screen bg-page text-text-primary flex flex-col" {...showcase.zoneHandlers}>
       {/* Restrained per-theme Japanese ambience, behind all content */}
       <ThemeAmbience />
 
@@ -258,6 +262,9 @@ export const HomeStudyHub: React.FC = () => {
           </div>
         </section>
       </main>
+
+      {showcase.hold && <MeoHoldIndicator key={showcase.hold.key} hold={showcase.hold} />}
+      {showcase.active && <MeoShowcaseExitLayer onExit={showcase.exit} />}
     </div>
   );
 };
