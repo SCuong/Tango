@@ -82,19 +82,18 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, onClick }) => {
       {...pressHandlers}
       onClick={onClick}
       aria-label={t('aria.learnCategory', { category: label })}
-      className={`clay-interactive w-full h-full text-left border rounded-2xl pl-4 pr-3 py-4 sm:pl-6 sm:pr-4 sm:py-5 min-h-[96px] sm:min-h-[112px] flex items-center justify-between gap-3 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
+      className={`clay-interactive relative w-full h-full text-left border rounded-2xl p-4 sm:p-5 min-h-[112px] sm:min-h-[128px] flex flex-col justify-between gap-3 overflow-hidden ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
     >
-      <div className="min-w-0 flex flex-col gap-2">
-        <span
-          lang="ja"
-          aria-hidden="true"
-          className={`font-japanese font-bold leading-none text-[1.75rem] sm:text-4xl tracking-wide select-none ${tile.glyphColor}`}
-        >
-          {tile.glyph}
-        </span>
-        <h3 className={`font-semibold text-sm sm:text-base leading-snug ${tile.title}`}>{label}</h3>
-      </div>
-      <tile.Illustration className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 ${tile.glyphColor}`} />
+      {/* Glyph pinned top-left (never wraps), label pinned bottom-left, illustration top-right */}
+      <span
+        lang="ja"
+        aria-hidden="true"
+        className={`font-japanese font-bold leading-none whitespace-nowrap text-2xl min-[380px]:text-[1.75rem] sm:text-4xl tracking-normal min-[380px]:tracking-wide select-none ${tile.glyphColor}`}
+      >
+        {tile.glyph}
+      </span>
+      <h3 className={`font-semibold text-sm sm:text-base leading-snug whitespace-nowrap truncate ${tile.title}`}>{label}</h3>
+      <tile.Illustration className={`absolute top-2.5 right-2 w-12 h-12 min-[380px]:w-14 min-[380px]:h-14 sm:top-3 sm:right-3 sm:w-20 sm:h-20 ${tile.glyphColor}`} />
     </button>
   );
 };
@@ -221,13 +220,13 @@ export const HomeStudyHub: React.FC = () => {
                       {moreBooks.map(renderBookCard)}
                     </div>
                   )}
-                  <div className="flex justify-end mt-2">
+                  <div className="flex justify-center mt-3 sm:mt-4">
                     <button
                       type="button"
                       onClick={() => setShowAllBooks((value) => !value)}
                       aria-expanded={showAllBooks}
                       aria-controls="home-more-books"
-                      className={`inline-flex items-center gap-1.5 min-h-touch px-3 rounded-xl text-sm font-semibold text-text-secondary ${FOCUS_RING}`}
+                      className={`inline-flex items-center justify-center gap-1.5 w-[62%] sm:w-auto sm:px-10 min-h-touch rounded-2xl border border-dashed border-border-strong text-sm font-semibold text-text-secondary ${FOCUS_RING}`}
                     >
                       {t(showAllBooks ? 'home.showFewerBooks' : 'home.viewAllBooks')}
                       {showAllBooks ? (

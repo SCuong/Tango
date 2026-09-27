@@ -43,14 +43,14 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
 - **No greeting, no visible section labels:** Semantic structure uses visually hidden headings (`sr-only` page `h1`, `sr-only` `h2` for "Giáo trình" and "Học theo loại").
 - **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Test = short label `Kiểm tra` with a `+` affordance. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
 - **Composition order (all breakpoints):** Study Books → Vocabulary / Kanji shortcuts → Test.
-- **Study Books:** Only the first 2 books render as large cards. When more exist, a quiet `Xem tất cả ⌄` / `View all ⌄` toggle (`aria-expanded`, `aria-controls="home-more-books"`) reveals the rest in place and then reads `Thu gọn` / `Show less`. Home never offers drag-reordering; ordering belongs to the future full Books list / management view.
+- **Study Books:** Only the first 2 books render as large cards. When more exist, a compact, centered dashed-outline `Xem tất cả ⌄` / `View all ⌄` bridge (≈62% width on mobile, natural width on desktop, 48px tall; `aria-expanded`, `aria-controls="home-more-books"`) reveals the rest in place and then reads `Thu gọn` / `Show less`. Home never offers drag-reordering; ordering belongs to the future full Books list / management view.
 - **Mobile (< 640px):** Stacked horizontal book cards where the large 3:4 cover (`w-24`), full title (up to 3 lines), and Study Coverage bar fill the card. Below them, a 2-column Vocabulary / Kanji shortcut row, then a full-width Test CTA.
 - **Tablet (640px – 1024px):** Book cards in a 2-column grid (cover `w-28`); shortcuts as above.
 - **Desktop (> 1024px):** Centered container (`max-w-4xl`). Book cards in a 2-column primary grid (cover `w-32`). One shortcut row below: Vocabulary and Kanji in the wider track, Test in the narrower track (`lg:grid-cols-[3fr_2fr]`).
 - **Book titles:** `.font-study-title` (UI font for Latin/Vietnamese, Japanese stack for Kana/Kanji), `line-clamp-3`, full title in the native `title` attribute for hover.
-- **Category shortcuts:** Spacious tinted clay tiles (`min-h-[96px]`, `sm:min-h-[112px]`) with the `語彙` / `漢字` glyph, localized name, and the category study-card illustration; still smaller than the book cards.
+- **Category shortcuts:** Equal-height, symmetrical tinted clay tiles (`min-h-[112px]`, `sm:min-h-[128px]`): `語彙` / `漢字` glyph pinned top-left, illustration pinned top-right, localized name pinned bottom-left. Text never wraps (`whitespace-nowrap`); below 380px the glyph and illustration shrink, keeping the 2-column layout clean at 360px and 390px. Still smaller than the book cards.
 - **Test CTA:** Short label `Kiểm tra` / `Test` plus a round `IconPlus` puck; accessible name `Tạo bài kiểm tra` / `Create test`; route `mixed_quiz_config`.
-- **Ambience:** Restrained per-theme Japanese scene behind all content (Light daytime shoji / mist / washi sun, Dark moon / stars / lantern, Sakura branch / few falling petals), fixed, `aria-hidden`, very low opacity, static under reduced motion (see [`docs/DESIGN_SYSTEM.md` §8.2](../DESIGN_SYSTEM.md#82-restrained-japanese-ambience-explicit-exception)).
+- **Ambience:** Restrained per-theme Japanese scene behind all content (Light: daylight shoji window, seigaiha fan, one mist band; Dark: moon, lit shoji window, paper lantern, fireflies; Sakura: blossom branch, kasumi clouds, a few falling petals), fixed, `aria-hidden`, very low opacity, static under reduced motion (see [`docs/DESIGN_SYSTEM.md` §8.2](../DESIGN_SYSTEM.md#82-restrained-japanese-ambience-explicit-exception)).
 - **Tactile Clay Recipe:** Every interactive Home card and button uses `.clay-interactive` (hover lift only under `@media (hover: hover) and (pointer: fine)`) plus `usePressFeedback` (explicit `data-pressed` state that swaps in `translate-y-px shadow-clay-pressed`). The `View all` toggle is a quiet text button, not a clay card. Focus ring: `focus-visible:ring-2 ring-primary ring-offset-2 ring-offset-page`. See [`docs/DESIGN_SYSTEM.md` §3.1](../DESIGN_SYSTEM.md#31-canonical-clay-interaction-recipe).
 
 #### Wireframes:
@@ -69,10 +69,13 @@ MOBILE (< 640px)
 │ │ │  Cover  │  文法トレーニング N3         │ │
 │ │ └─────────┘  [━━━░░░░░░░░░░]        30%  │ │
 │ └───────────────────────────────────────────┘ │
-│                              Xem tất cả ⌄     │  <- only when > 2 books
+│          ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐          │  <- dashed bridge, only
+│          ╎    Xem tất cả ⌄     ╎          │     when > 2 books
+│          └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘          │
 │ ┌────────────────────┐ ┌────────────────────┐ │
-│ │ 語彙         [あ]  │ │ 漢字         [字]  │ │  <- glyph + name + illustration
-│ │ Từ vựng            │ │ Hán tự             │ │
+│ │ 語彙         [あ]  │ │ 漢字         [字]  │ │  <- glyph top-left, art top-right
+│ │                    │ │                    │ │
+│ │ Từ vựng            │ │ Hán tự             │ │  <- label bottom-left
 │ └────────────────────┘ └────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
 │ │ Kiểm tra                              (+) │ │  <- "Tạo bài kiểm tra"
@@ -89,7 +92,9 @@ DESKTOP (> 1024px - max-w-4xl Centered)
 │ │ │  3:4   │                       │ │ │  3:4   │ 文法トレーニング  │ │
 │ │ └────────┘ [━━━━━░░░░░]     45%  │ │ └────────┘ [━━░░░░░░]   30%  │ │
 │ └──────────────────────────────────┘ └───────────────────────────────┘ │
-│                                                        Xem tất cả ⌄    │
+│                        ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐                        │
+│                        ╎    Xem tất cả ⌄    ╎                        │
+│                        └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘                        │
 │ ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────────────┐ │
 │ │ 語彙       [あ]  │ │ 漢字       [字]  │ │ Kiểm tra             (+) │ │
 │ │ Từ vựng          │ │ Hán tự           │ │                          │ │

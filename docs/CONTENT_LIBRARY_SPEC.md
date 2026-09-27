@@ -134,7 +134,9 @@ Home mirrors the content hierarchy **Study Book → Category → Lesson → Stud
 │ │ │Cover │ 日本語の文型… │ │ │Cover │ 文法トレーニ… │ │
 │ │ └──────┘ [━━━━░░] 45%  │ │ └──────┘ [━░░░░] 30%   │ │
 │ └────────────────────────┘ └─────────────────────────┘ │
-│                                        Xem tất cả ⌄    │
+│                ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐                │
+│                ╎    Xem tất cả ⌄    ╎                │
+│                └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘                │
 │ ┌────────────────────────┐ ┌─────────────────────────┐ │
 │ │ 語彙             [あ]  │ │ 漢字              [字]  │ │
 │ │ Từ vựng                │ │ Hán tự                  │ │
@@ -146,7 +148,7 @@ Home mirrors the content hierarchy **Study Book → Category → Lesson → Stud
 ```
 
 - **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only, no divider line (`IconSettings` opens Settings; Content Management is accessed from the Study Content section inside Settings). No theme status or theme control on Home.
-- **GIÁO TRÌNH (primary):** The first 2 books as large tactile cards (3:4 cover, title, Study Coverage); `Xem tất cả` reveals the rest in place (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). Lesson/item counts appear in the Book Study View, not on Home. The section label is screen-reader only. Tapping a card opens the **Book Study View**.
+- **GIÁO TRÌNH (primary):** The first 2 books as large tactile cards (3:4 cover, title, Study Coverage); a centered, compact dashed `Xem tất cả` bridge reveals the rest in place (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). Lesson/item counts appear in the Book Study View, not on Home. The section label is screen-reader only. Tapping a card opens the **Book Study View**.
 - **Book order:** Home shows books in library order and offers no reordering. Drag-reordering / manual ordering belongs to the future full Books list / management view.
 - **HỌC THEO LOẠI (secondary):** `語彙 Từ vựng` / `漢字 Hán tự` shortcuts with their illustrations to browse lessons by category across all books. Counts appear in Learn by Type, not on Home. The section label is screen-reader only.
 - **Kiểm tra (+):** Compact CTA ("Tạo bài kiểm tra") for global multi-lesson test selection.

@@ -593,6 +593,14 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       }
     });
 
+    it('renders "View all" as a centered, compact dashed bridge under the preview books', () => {
+      const html = renderHome({ ...populatedState, books: makeBooks(3) });
+      const wrapperAndToggle = html.match(/<div class="([^"]*)"><button[^>]*aria-controls="home-more-books"[^>]*>/);
+      expect(wrapperAndToggle).not.toBeNull();
+      expect(wrapperAndToggle![1]).toContain('justify-center');
+      expect(wrapperAndToggle![0]).toContain('border-dashed');
+    });
+
     it('localizes the toggle label', () => {
       const html = renderHome({
         ...populatedState,
@@ -600,6 +608,28 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
         preferences: { ...populatedState.preferences, language: 'en' },
       });
       expect(html).toContain('View all');
+    });
+  });
+
+  describe('category shortcut composition', () => {
+    it('pins the glyph and label so Japanese and Vietnamese text never wrap', () => {
+      const html = renderHome(populatedState);
+      for (const [category, glyph, label] of [
+        ['vocabulary', '語彙', 'Từ vựng'],
+        ['kanji', '漢字', 'Hán tự'],
+      ] as const) {
+        const start = html.indexOf(`data-category="${category}"`);
+        const markup = html.slice(start, html.indexOf('</button>', start));
+        const glyphTag = markup.match(new RegExp(`<span lang="ja" aria-hidden="true"[^>]*>${glyph}</span>`));
+        expect(glyphTag).not.toBeNull();
+        expect(glyphTag![0]).toContain('whitespace-nowrap');
+        const labelTag = markup.match(new RegExp(`<h3[^>]*>${label}</h3>`));
+        expect(labelTag).not.toBeNull();
+        expect(labelTag![0]).toContain('whitespace-nowrap');
+        // Illustration is pinned to the top-right corner
+        const svgTag = markup.match(/<svg[^>]*>/);
+        expect(svgTag![0]).toMatch(/class="[^"]*absolute[^"]*top-[^"]*right-/);
+      }
     });
   });
 
@@ -612,6 +642,13 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       for (const scene of ['ambience-light', 'ambience-dark', 'ambience-sakura']) {
         expect(html).toContain(`ambience-scene ${scene}`);
       }
+      // A few intentional Japanese motifs per theme
+      expect(html).toContain('ambience-shoji-window');
+      expect(html).toContain('ambience-seigaiha');
+      expect(html).toContain('ambience-lantern');
+      expect(html).toContain('ambience-night-window');
+      expect(html).toContain('ambience-branch');
+      expect(html).toContain('ambience-kasumi');
       // Ambience sits before (behind) the TopBar and main content
       expect(html.indexOf('tango-ambience')).toBeLessThan(html.indexOf('<header'));
       expect(html.indexOf('tango-ambience')).toBeLessThan(html.indexOf('<main'));

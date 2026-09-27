@@ -220,18 +220,18 @@ Tango stays mature and restrained, but it never falls back to near-white or near
 - **Settings previews:** The palettes in §9 are exactly what the Settings theme preview cards display (§16.5).
 
 ### 8.2 Restrained Japanese Ambience (Explicit Exception)
-Each theme may show a quiet ambient scene behind all content. This is the **only** exception to the "no decorative shapes / no petals / no Japanese patterns" rules in §2 and §8.1, and it applies only to this fixed background layer (`ThemeAmbience`, used on Home).
+Each theme shows a quiet but recognizably Japanese scene behind all content. This is the **only** exception to the "no decorative shapes / no petals / no Japanese patterns" rules in §2 and §8.1, and it applies only to this fixed background layer (`ThemeAmbience`, used on Home). Use a few intentional motifs per theme, never a collage of clichés.
 
-- **Light — Japanese daytime:** a pale washi sun, soft sky mist bands (kasumi), and a faint shoji lattice.
-- **Dark — Japanese night:** a dim moon with a soft halo, a few 3px stars, and one small paper lantern.
-- **Sakura — warm blossom paper:** one quiet branch with a few small blossoms and a few slowly falling petals.
+- **Light — Japanese daytime:** daylight through a washi shoji window (kumiko lattice), a quarter fan of seigaiha waves in cool pearl-indigo, and one soft mist band.
+- **Dark — Japanese night:** a dim moon, a warmly lit shoji window, one paper lantern, four warm firefly points, and a few 3px stars. Warm and quiet, never neon or cyberpunk.
+- **Sakura — warm blossom paper:** one blossom branch, soft kasumi cloud bands, and a few slowly falling petals in rose/plum.
 
 Rules:
-- **Behind everything:** a `position: fixed`, `pointer-events: none`, `aria-hidden` layer rendered before the TopBar and main content. Cards and controls are opaque, so the scene only shows in the gaps and empty space.
-- **Very low contrast:** colors come from the per-theme `--ambience-line`, `--ambience-glow`, and `--ambience-accent` tokens (§9) at very low opacity. The scene must never reduce text readability or compete with book covers.
-- **Lightweight:** inline CSS/SVG shapes only; no raster images, no gradients, no loud blobs, no neon, glow, or cyberpunk look.
+- **Behind everything:** a `position: fixed`, `pointer-events: none`, `aria-hidden` layer rendered before the TopBar and main content. Cards and controls are opaque, so the scene only shows in the gaps, margins, and empty space. Book cards always remain the primary content.
+- **Low contrast:** colors come from the per-theme `--ambience-line`, `--ambience-glow`, and `--ambience-accent` tokens (§9) plus `--bg-page` (to occlude seigaiha rings), at low opacity. The scene must never reduce text readability or compete with book covers.
+- **Lightweight:** inline CSS/SVG shapes and one SVG `<pattern>` only; no raster images, no gradients, no loud blobs, no neon, glow, or cyberpunk look.
 - **Deterministic:** every element has a fixed position in CSS; nothing is randomized per render.
-- **Motion:** at most a few very slow elements per theme (Light: 2 mist bands drifting 28px over 48–60s; Dark: 2 stars fading over 9–12s; Sakura: 4 petals falling over 64–82s). Motion is translate or fade only; petals keep one fixed tilt and are never flipped, spun, or turned upside-down.
+- **Motion:** only a few very slow elements per theme (Light: 1 mist band drifting 28px over 56s; Dark: 4 fireflies floating 10–14px and fading over 16–24s; Sakura: 5 petals falling over 64–88s). Motion is translate or fade only; petals keep one fixed tilt and are never flipped, spun, or turned upside-down.
 - **Reduced motion:** under `prefers-reduced-motion: reduce` every ambience animation is removed (`animation: none`) and the scene is fully static.
 - **Theme scoping:** all three scenes are in the DOM; CSS shows only the one matching the active `data-theme`.
 
@@ -347,9 +347,9 @@ A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards bef
 | `--cta-text-secondary` | `#E0E7FF` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte puck on CTA |
 | `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
-| `--ambience-line` | `#1A2033` | Ambience ink lines (shoji lattice), used at ≤6% opacity |
-| `--ambience-glow` | `#FFFFFF` | Ambience washi sun, used at ≤55% opacity on the pearl canvas |
-| `--ambience-accent` | `#8FA3C8` | Ambience sky mist bands, used at ≤14% opacity |
+| `--ambience-line` | `#1A2033` | Ambience kumiko lattice lines, used at ≤7% opacity |
+| `--ambience-glow` | `#FFFFFF` | Ambience washi shoji paper, used at ≤50% opacity on the pearl canvas |
+| `--ambience-accent` | `#8FA3C8` | Ambience seigaiha fan (≤42%) and mist band (≤20%) |
 | `--shadow-clay-card` | `0 4px 14px -1px rgba(30, 38, 64, 0.10), 0 2px 6px -1px rgba(30, 38, 64, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Neutral cool clay lift |
 | `--shadow-clay-card-hover` | `0 8px 20px -2px rgba(30, 38, 64, 0.13), 0 3px 8px -1px rgba(30, 38, 64, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1)` | Tactile hover lift |
 | `--shadow-clay-button` | `0 4px 12px rgba(74, 67, 214, 0.26), 0 1px 3px rgba(30, 38, 64, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.40)` | Indigo CTA depth |
@@ -386,9 +386,9 @@ A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and s
 | `--cta-text-secondary` | `#E6E8FF` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.14)` | Matte puck on CTA |
 | `--cta-puck-border` | `rgba(255, 255, 255, 0.24)` | CTA puck rim highlight |
-| `--ambience-line` | `#C9D2E6` | Ambience moonlit lines (lantern cap/cord), used at ≤18% opacity |
+| `--ambience-line` | `#C9D2E6` | Ambience moonlit lines (lantern cap/cord), used at ≤28% opacity |
 | `--ambience-glow` | `#F3E7C4` | Ambience moonlight and stars, used at ≤10% (moon) / ≤35% (3px stars) |
-| `--ambience-accent` | `#F6AE3D` | Ambience paper-lantern amber, used at ≤22% opacity |
+| `--ambience-accent` | `#F6AE3D` | Ambience lantern and lit shoji window (≤36%) and 5px fireflies (≤55%) |
 | `--shadow-clay-card` | `0 4px 16px rgba(0, 2, 10, 0.45), 0 1px 3px rgba(0, 2, 10, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06)` | Neutral night elevation |
 | `--shadow-clay-card-hover` | `0 8px 24px rgba(0, 2, 10, 0.55), 0 2px 6px rgba(0, 2, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.09)` | Night hover lift |
 | `--shadow-clay-button` | `0 4px 14px rgba(0, 2, 10, 0.50), 0 1px 3px rgba(90, 82, 236, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.16)` | Vivid indigo CTA depth |
@@ -425,9 +425,9 @@ A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted rai
 | `--cta-text-secondary` | `#FDE7EE` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte puck on CTA |
 | `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
-| `--ambience-line` | `#7C5861` | Ambience plum branch, used at ≤10% opacity |
+| `--ambience-line` | `#7C5861` | Ambience plum branch, used at ≤16% opacity |
 | `--ambience-glow` | `#FFFAF8` | Ambience paper glow |
-| `--ambience-accent` | `#E595AC` | Ambience blossoms and petals, used at ≤40% opacity |
+| `--ambience-accent` | `#E595AC` | Ambience blossoms (≤40%), kasumi clouds (≤20%), and petals (≤50%) |
 | `--shadow-clay-card` | `0 4px 14px rgba(150, 80, 95, 0.13), 0 1px 4px rgba(150, 80, 95, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Warm blossom lift |
 | `--shadow-clay-card-hover` | `0 8px 22px rgba(150, 80, 95, 0.18), 0 2px 6px rgba(150, 80, 95, 0.09), inset 0 1px 0 rgba(255, 255, 255, 1)` | Warm blossom hover lift |
 | `--shadow-clay-button` | `0 4px 12px rgba(168, 56, 92, 0.26), 0 1px 3px rgba(150, 80, 95, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.40)` | Plum-rose CTA depth |
@@ -593,13 +593,13 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
 - **Composition order:** Study Books → Vocabulary / Kanji shortcuts → Test.
 - **Study Books (primary, visually dominant):**
   - Home previews only the **first 2 books** as large neutral clay cards (`bg-surface`, `shadow-clay-card`): a large 3:4 cover (`w-24` mobile, `w-28` tablet, `w-32` desktop), the title (`text-lg`/`sm:text-xl`), and one Study Coverage bar with its percentage. No lesson/item counts on Home.
-  - When more than 2 books exist, a quiet text toggle `Xem tất cả ⌄` / `View all ⌄` (`text-text-secondary`, 48px touch target, `aria-expanded`, `aria-controls`) sits under the cards and reveals the remaining books in place; it then reads `Thu gọn` / `Show less`. With 2 or fewer books the toggle is not rendered.
+  - When more than 2 books exist, a compact dashed-outline bridge `Xem tất cả ⌄` / `View all ⌄` is centered under the cards (≈62% width on mobile, naturally sized on desktop, 48px tall, `rounded-2xl`, `border-dashed border-border-strong`, `text-text-secondary`, `aria-expanded`, `aria-controls`). It reveals the remaining books in place and then reads `Thu gọn` / `Show less`. With 2 or fewer books it is not rendered.
   - **No reordering on Home.** Drag-reordering and manual ordering belong to the future full Books list / management view, never to Home.
   - Mobile: stacked horizontal cards. Tablet/desktop: a 2-column primary book grid inside `max-w-4xl`.
   - Titles use `.font-study-title` (§6.3), wrap up to 3 lines (`line-clamp-3`), and expose the full title on hover via the native `title` attribute.
   - Fallback cover: theme-aware primary-tinted placeholder with a spine band and `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
-- **Vocabulary / Kanji shortcuts (secondary):** A 2-column row of spacious semantic clay tiles (`min-h-[96px]`, `sm:min-h-[112px]`) below the books, smaller than the book cards. Each shows the Japanese category name as its identity (`語彙` / `漢字`, `font-japanese`, `lang="ja"`, `aria-hidden`, `--category-*-icon`), the localized name (`Từ vựng` / `Hán tự`) under it, and its study-card illustration (`VocabularyIllustration` / `KanjiIllustration`, `currentColor`). Surfaces keep `--category-vocabulary-*` and `--category-kanji-*`. No counts; the button's `aria-label` carries the localized name.
+- **Vocabulary / Kanji shortcuts (secondary):** A 2-column row of equal-height, symmetrical semantic clay tiles (`min-h-[112px]`, `sm:min-h-[128px]`) below the books, smaller than the book cards. Fixed corners: the Japanese category name (`語彙` / `漢字`, `font-japanese`, `lang="ja"`, `aria-hidden`, `--category-*-icon`) pinned top-left, the study-card illustration (`VocabularyIllustration` / `KanjiIllustration`, `currentColor`) pinned top-right, and the localized name (`Từ vựng` / `Hán tự`) pinned bottom-left. Glyph and label use `whitespace-nowrap`; on narrow phones (< 380px) the glyph and illustration shrink instead of wrapping, so the 2-column layout stays clean at 360px. Surfaces keep `--category-vocabulary-*` and `--category-kanji-*`. No counts; the button's `aria-label` carries the localized name.
 - **Test (compact CTA):** Solid `--cta-*` surface with `shadow-clay-button`, the short label `Kiểm tra` / `Test`, and a round `IconPlus` puck (`--cta-puck-*`) that signals "create / configure a test". The accessible name is explicit: `aria-label="Tạo bài kiểm tra"` / `"Create test"`. Route: `mixed_quiz_config`. Full width under the shortcuts on mobile/tablet; the narrower track of the shortcut row on desktop (`lg:grid-cols-[3fr_2fr]`). It never outweighs the books.
 - **Ambience:** The restrained per-theme Japanese ambience layer (§8.2) sits behind all Home content.
 - **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: visible books, Vocabulary, Kanji, Test.
@@ -749,7 +749,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Ambient background (Japanese daytime: ink lines, washi sun, sky mist); always used at very low opacity */
+  /* Ambient background (Japanese daytime: kumiko ink lines, washi shoji paper, seigaiha/mist accent); low opacity */
   --ambience-line: #1A2033;
   --ambience-glow: #FFFFFF;
   --ambience-accent: #8FA3C8;
@@ -810,7 +810,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
   --cta-puck-border: rgba(255, 255, 255, 0.24);
 
-  /* Ambient background (Japanese night: moonlit lines, moonlight, lantern amber); always used at very low opacity */
+  /* Ambient background (Japanese night: moonlit lines, moonlight, lantern/window/firefly amber); low opacity */
   --ambience-line: #C9D2E6;
   --ambience-glow: #F3E7C4;
   --ambience-accent: #F6AE3D;
@@ -871,7 +871,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Ambient background (Blossom paper: plum branch, paper glow, petal pink); always used at very low opacity */
+  /* Ambient background (Blossom paper: plum branch, paper glow, blossom/kasumi/petal pink); low opacity */
   --ambience-line: #7C5861;
   --ambience-glow: #FFFAF8;
   --ambience-accent: #E595AC;

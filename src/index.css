@@ -78,7 +78,7 @@
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Ambient background (Japanese daytime: ink lines, washi sun, sky mist); always used at very low opacity */
+  /* Ambient background (Japanese daytime: kumiko ink lines, washi shoji paper, seigaiha/mist accent); low opacity */
   --ambience-line: #1A2033;
   --ambience-glow: #FFFFFF;
   --ambience-accent: #8FA3C8;
@@ -139,7 +139,7 @@
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
   --cta-puck-border: rgba(255, 255, 255, 0.24);
 
-  /* Ambient background (Japanese night: moonlit lines, moonlight, lantern amber); always used at very low opacity */
+  /* Ambient background (Japanese night: moonlit lines, moonlight, lantern/window/firefly amber); low opacity */
   --ambience-line: #C9D2E6;
   --ambience-glow: #F3E7C4;
   --ambience-accent: #F6AE3D;
@@ -200,7 +200,7 @@
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Ambient background (Blossom paper: plum branch, paper glow, petal pink); always used at very low opacity */
+  /* Ambient background (Blossom paper: plum branch, paper glow, blossom/kasumi/petal pink); low opacity */
   --ambience-line: #7C5861;
   --ambience-glow: #FFFAF8;
   --ambience-accent: #E595AC;
@@ -254,8 +254,8 @@
 
 /*
  * Restrained Japanese ambience (DESIGN_SYSTEM §8.2). Fixed decorative layer behind all Home
- * content: deterministic positions, very low opacity, only a few slow translate/fade motions,
- * and fully static under prefers-reduced-motion.
+ * content: a few intentional motifs per theme at deterministic positions, low opacity, only a few
+ * slow translate/fade motions, and fully static under prefers-reduced-motion.
  */
 @layer components {
   .tango-ambience {
@@ -278,45 +278,58 @@
   }
 
   .ambience-scene svg,
-  .ambience-star {
+  .ambience-star,
+  .ambience-firefly {
     position: absolute;
     display: block;
   }
 
-  /* Light: daytime sun, mist bands, shoji lattice */
-  .ambience-sun { top: 9%; right: -80px; width: 220px; height: 220px; }
+  /* Light: daylight shoji window, seigaiha fan, one drifting mist band */
+  .ambience-shoji-window { top: 76px; right: -64px; width: 208px; height: 260px; }
+  .ambience-seigaiha { bottom: -24px; left: -24px; width: 300px; height: 300px; }
   .ambience-mist { width: 280px; height: 36px; }
-  .ambience-mist-1 { bottom: 13%; left: -72px; animation: ambience-drift 48s ease-in-out infinite alternate; }
-  .ambience-mist-2 { bottom: 5%; right: -64px; animation: ambience-drift 60s ease-in-out -20s infinite alternate-reverse; }
-  .ambience-shoji { bottom: -48px; right: -40px; width: 176px; height: 220px; opacity: 0.7; }
+  .ambience-mist-1 { bottom: 9%; right: -60px; animation: ambience-drift 56s ease-in-out infinite alternate; }
 
-  /* Dark: moon, stars, paper lantern */
-  .ambience-moon { top: 9%; right: -64px; width: 220px; height: 220px; }
+  /* Dark: moon, warmly lit shoji window, paper lantern, fireflies, a few stars */
+  .ambience-moon { top: 8%; right: -60px; width: 220px; height: 220px; }
+  .ambience-night-window { bottom: -40px; right: -48px; width: 176px; height: 220px; }
+  .ambience-lantern { bottom: 8%; left: 4%; width: 72px; height: 108px; }
+  .ambience-firefly {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: var(--ambience-accent);
+    opacity: 0.55;
+  }
+  .ambience-firefly-1 { bottom: 26%; left: 14%; animation: ambience-float 16s ease-in-out infinite alternate; }
+  .ambience-firefly-2 { bottom: 17%; left: 30%; animation: ambience-float 21s ease-in-out -7s infinite alternate-reverse; }
+  .ambience-firefly-3 { bottom: 31%; right: 12%; animation: ambience-float 18s ease-in-out -11s infinite alternate; }
+  .ambience-firefly-4 { top: 40%; left: 6%; animation: ambience-float 24s ease-in-out -4s infinite alternate-reverse; }
   .ambience-star { width: 3px; height: 3px; border-radius: 9999px; background: var(--ambience-glow); opacity: 0.35; }
-  .ambience-star-1 { top: 22%; left: 7%; animation: ambience-twinkle 9s ease-in-out infinite; }
-  .ambience-star-2 { top: 58%; left: 16%; }
-  .ambience-star-3 { top: 46%; right: 9%; animation: ambience-twinkle 12s ease-in-out -4s infinite; }
-  .ambience-star-4 { top: 78%; right: 24%; }
-  .ambience-star-5 { top: 90%; left: 42%; }
-  .ambience-lantern { bottom: 7%; left: 4%; width: 64px; height: 96px; }
+  .ambience-star-1 { top: 20%; left: 8%; }
+  .ambience-star-2 { top: 33%; right: 22%; }
+  .ambience-star-3 { top: 12%; left: 44%; }
 
-  /* Sakura: branch and falling petals (translate only, fixed tilt, never flipped) */
-  .ambience-branch { top: 72px; left: -36px; width: 300px; height: 206px; }
-  .ambience-petal { width: 14px; height: 14px; }
+  /* Sakura: blossom branch, kasumi clouds, falling petals (translate only, fixed tilt, never flipped) */
+  .ambience-branch { top: 64px; left: -40px; width: 340px; height: 236px; }
+  .ambience-kasumi { bottom: 6%; right: -40px; width: 300px; height: 106px; }
+  .ambience-petal { width: 15px; height: 15px; }
   .ambience-petal-1 { top: 12%; left: 86%; animation: ambience-fall 64s linear -33s infinite; }
   .ambience-petal-2 { top: 80%; left: 12%; animation: ambience-fall 76s linear -38s infinite; }
   .ambience-petal-3 { top: 90%; left: 70%; animation: ambience-fall 70s linear -34s infinite; }
   .ambience-petal-4 { top: 55%; left: 94%; animation: ambience-fall 82s linear -45s infinite; }
+  .ambience-petal-5 { top: 68%; left: 4%; animation: ambience-fall 88s linear -50s infinite; }
 }
 
 @keyframes ambience-drift {
   from { transform: translateX(0); }
-  to { transform: translateX(28px); }
+  to { transform: translateX(-28px); }
 }
 
-@keyframes ambience-twinkle {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.12; }
+@keyframes ambience-float {
+  0% { transform: translate(0, 0); opacity: 0.55; }
+  50% { opacity: 0.2; }
+  100% { transform: translate(10px, -14px); opacity: 0.5; }
 }
 
 @keyframes ambience-fall {
