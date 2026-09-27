@@ -119,16 +119,16 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
   // Matches rendered text only (between tags), so CSS classes like `items-center` are ignored.
   const COUNT_PATTERN = />[^<]*\d+\s*(?:bài|mục|lessons?|items?)(?![\p{L}-])[^<]*</u;
 
-  it('renders Vietnamese Home with book title, Study Coverage, shortcuts, and Mixed Test only', () => {
+  it('renders Vietnamese Home with book title, Study Coverage, and shortcuts (no Test CTA)', () => {
     const html = renderHome(populatedState);
 
     // 1. No visible greeting
     expect(html).not.toContain('Bạn muốn học gì hôm nay?');
 
-    // 2. TopBar wordmark and Settings
+    // 2. TopBar wordmark; primary destinations only in the sm+ header navigation
     expect(html).toContain('TANGO');
     expect(html).toContain('min-h-touch');
-    expect(html).toContain('aria-label="Cài đặt"');
+    expect(html).toMatch(/<nav[^>]*aria-label="Điều hướng chính"[^>]*class="hidden sm:flex/);
 
     // 3. Book title and Study Coverage (3 studied out of 4 items = 75%)
     expect(html).toContain('Chūkyū e Ikō');
@@ -142,9 +142,10 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('漢字');
     expect(html).toContain('Hán tự');
 
-    // 5. Mixed Test action without its explanatory subtitle
-    expect(html).toContain('>Kiểm tra</h3>');
-    expect(html).not.toContain('Tùy chọn nhiều bài học trên tất cả giáo trình để kiểm tra');
+    // 5. Home no longer owns the Mixed Test CTA (Test is a primary destination)
+    expect(html).not.toContain('home-mixed-test-heading');
+    expect(html).not.toContain('cta-raised');
+    expect(html).not.toContain('>Kiểm tra</h3>');
 
     // 6. No lesson/item counts anywhere on Home
     expect(html).not.toMatch(COUNT_PATTERN);
@@ -158,7 +159,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toMatch(/<button[^>]*class="[^"]*min-h-touch[^"]*"[^>]*>[^<]*TANGO[^<]*<\/button>/);
   });
 
-  it('renders English Home labels without counts or the Mixed Test subtitle', () => {
+  it('renders English Home labels without counts or a Test CTA', () => {
     const enState: UserStudyState = {
       ...populatedState,
       preferences: {
@@ -173,13 +174,13 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     // No visible greeting and no theme status in the TopBar
     expect(html).not.toContain('What would you like to learn today?');
     expect(html).not.toContain('Current theme');
-    expect(html).toContain('aria-label="Settings"');
+    expect(html).toContain('aria-label="Primary navigation"');
 
     // Screen-reader section headings and localized labels
     expect(html).toContain('Study Books');
     expect(html).toContain('Learn by Type');
-    expect(html).toContain('>Test</h3>');
-    expect(html).toContain('aria-label="Create test"');
+    expect(html).not.toContain('>Test</h3>');
+    expect(html).not.toContain('aria-label="Create test"');
     expect(html).toContain('Vocabulary');
     expect(html).toContain('Kanji');
     expect(html).toContain('aria-label="Learn by type: Vocabulary"');
@@ -204,8 +205,10 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('Chưa có giáo trình nào.');
     expect(html).toContain('Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung.');
 
-    // 2. Safe navigation action to Settings exists
-    expect(html).toContain('Cài đặt');
+    // 2. No redundant Settings button inside the empty state (Settings is a primary destination)
+    const emptyStart = html.indexOf('Chưa có giáo trình nào.');
+    const emptyMarkup = html.slice(emptyStart, html.indexOf('</section>', emptyStart));
+    expect(emptyMarkup).not.toContain('<button');
 
     // 3. Strict Safety Guard: NO administrative controls on Home
     expect(html).not.toContain('+ Add Book');
@@ -215,10 +218,10 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).not.toContain('Delete');
     expect(html).not.toContain('Edit');
 
-    // 4. Category shortcuts and Mixed Test remain available, still without counts
+    // 4. Category shortcuts remain available, still without counts
     expect(html).toContain('Từ vựng');
     expect(html).toContain('Hán tự');
-    expect(html).toContain('>Kiểm tra</h3>');
+    expect(html).not.toContain('home-mixed-test-heading');
     expect(html).not.toMatch(COUNT_PATTERN);
   });
 
@@ -341,13 +344,9 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('text-category-kanji-icon');
     expect(html).toContain('text-category-kanji-text');
 
-    // Mixed Test uses the dedicated solid primary CTA tokens
-    expect(html).toContain('bg-cta-surface');
-    expect(html).toContain('border-cta-border');
-    expect(html).toContain('text-cta-text');
+    // Home has no raised Test CTA any more (Test lives in the primary navigation)
+    expect(html).not.toContain('bg-cta-surface');
     expect(html).not.toContain('border-primary/20');
-    // Raised primary CTA treatment (depth lip + pressed state in CSS)
-    expect(html).toMatch(/<button[^>]*id="home-mixed-test-heading"[^>]*class="[^"]*cta-raised/);
 
     // Canonical clay interaction is carried by the shared `.clay-interactive` rule
     expect(html).toContain('clay-interactive');
@@ -363,7 +362,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('focus-visible:ring-offset-page');
     expect(html).toContain('focus-visible:outline-none');
 
-    // Test with empty state to check EmptyState action button focus offset
+    // The empty state keeps the same focus-ring contract on its remaining controls
     const emptyHtml = renderHome({
       ...populatedState,
       books: {},
@@ -389,23 +388,24 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(booksSectionStart).toBeGreaterThan(-1);
     expect(emptyTitleIndex).toBeGreaterThan(booksSectionStart);
 
-    // The only action is a real button leading to Settings with a 48px touch target
-    expect(html).toMatch(/<button[^>]*class="[^"]*min-h-touch[^"]*"[^>]*>(?:(?!<\/button>).)*Cài đặt<\/button>/);
+    // No action inside the empty state: the copy points to Settings, a primary destination
+    const emptyMarkup = html.slice(emptyTitleIndex, html.indexOf('</section>', emptyTitleIndex));
+    expect(emptyMarkup).toContain('Cài đặt → Quản lý nội dung');
+    expect(emptyMarkup).not.toContain('<button');
   });
 
-  it('renders Study Books first, then Vocabulary / Kanji shortcuts, then Mixed Test', () => {
+  it('renders Study Books first, then Vocabulary / Kanji shortcuts, and no Mixed Test', () => {
     for (const html of [renderHome(populatedState), renderHome({ ...populatedState, books: {} })]) {
       const booksIndex = html.indexOf('id="home-study-books-heading"');
       const learnIndex = html.indexOf('id="home-learn-by-type-heading"');
       const vocabIndex = html.indexOf('data-category="vocabulary"');
       const kanjiIndex = html.indexOf('data-category="kanji"');
-      const mixedIndex = html.indexOf('id="home-mixed-test-heading"');
 
       expect(booksIndex).toBeGreaterThan(-1);
       expect(learnIndex).toBeGreaterThan(booksIndex);
       expect(vocabIndex).toBeGreaterThan(learnIndex);
       expect(kanjiIndex).toBeGreaterThan(vocabIndex);
-      expect(mixedIndex).toBeGreaterThan(kanjiIndex);
+      expect(html).not.toContain('id="home-mixed-test-heading"');
     }
   });
 
@@ -437,7 +437,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     }
   });
 
-  it('renders no theme status or theme control on Home while keeping the Settings button', () => {
+  it('renders no theme status or theme control on Home; Settings is a header destination from sm up', () => {
     for (const theme of ['light', 'dark', 'sakura'] as const) {
       const html = renderHome({
         ...populatedState,
@@ -448,10 +448,10 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       expect(html).not.toContain('tabler-icon-moon');
       expect(html).not.toContain('tabler-icon-flower');
 
-      const settingsButton = html.match(/<button[^>]*aria-label="Cài đặt"[^>]*>/);
-      expect(settingsButton).not.toBeNull();
-      expect(settingsButton![0]).toContain('min-h-touch');
-      expect(settingsButton![0]).toContain('clay-interactive');
+      const settingsLink = html.match(/<button[^>]*data-nav-destination="settings"[^>]*>/);
+      expect(settingsLink).not.toBeNull();
+      expect(settingsLink![0]).toContain('min-h-touch');
+      expect(settingsLink![0]).not.toContain('aria-current');
     }
   });
 
@@ -523,35 +523,29 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       expect(html).toContain(`filter="url(#${id})"`);
     }
 
-    // Study action order for arrow-key navigation: books, Vocabulary, Kanji, then Mixed Test
+    // Study action order for arrow-key navigation: books, Vocabulary, Kanji
     const cardOrder = Array.from(
       html.matchAll(/<button[^>]*data-study-card="true"[^>]*>/g),
       (match) => {
         const tag = match[0];
         if (tag.includes('data-category="vocabulary"')) return 'vocabulary';
         if (tag.includes('data-category="kanji"')) return 'kanji';
-        if (tag.includes('id="home-mixed-test-heading"')) return 'mixed';
         return 'book';
       }
     );
-    expect(cardOrder).toEqual(['book', 'vocabulary', 'kanji', 'mixed']);
+    expect(cardOrder).toEqual(['book', 'vocabulary', 'kanji']);
   });
 
-  it('renders the Test CTA as a short label with a "+" affordance and an explicit accessible name', () => {
+  it('renders Home / Test / Settings in the sm+ header with Home marked as the current page', () => {
     const html = renderHome(populatedState);
-    const tag = html.match(/<button[^>]*id="home-mixed-test-heading"[^>]*>/);
-    expect(tag).not.toBeNull();
-    expect(tag![0]).toContain('aria-label="Tạo bài kiểm tra"');
-    expect(tag![0]).toContain('data-study-card="true"');
-
-    const start = html.indexOf('id="home-mixed-test-heading"');
-    const markup = html.slice(start, html.indexOf('</button>', start));
-    expect(markup).toContain('>Kiểm tra</h3>');
-    expect(markup).not.toContain('Kiểm tra tổng hợp');
-    expect(markup).not.toMatch(/<p[\s>]/);
-    expect(markup.match(/<svg/g)).toHaveLength(1);
-    expect(markup).toContain('tabler-icon-plus');
-    expect(markup).not.toContain('tabler-icon-arrow-right');
+    const links = Array.from(html.matchAll(/<button[^>]*data-nav-destination="(\w+)"[^>]*>/g), (m) => [m[1], m[0]]);
+    expect(links.map(([id]) => id)).toEqual(['home', 'test', 'settings']);
+    expect(links[0][1]).toContain('aria-current="page"');
+    expect(links[1][1]).not.toContain('aria-current');
+    for (const [, tag] of links) {
+      expect(tag).toContain('min-h-touch');
+      expect(tag).toContain('focus-visible:ring-2');
+    }
   });
 
   describe('book preview limit and "View all"', () => {
@@ -726,8 +720,8 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       const html = renderHome(populatedState);
       const tags = interactiveButtonTags(html);
 
-      // Settings, Vocabulary, Kanji, Mixed Test, and the single book card
-      expect(tags).toHaveLength(5);
+      // Vocabulary, Kanji, and the single book card
+      expect(tags).toHaveLength(3);
       for (const tag of tags) {
         expect(tag).toContain('data-pressed="false"');
         expect(tag).not.toContain(CLAY_PRESSED_CLASSES);
@@ -738,14 +732,14 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
         html.matchAll(/<button[^>]*data-study-card="true"[^>]*>/g),
         (m) => m[0]
       );
-      expect(studyCards).toHaveLength(4);
+      expect(studyCards).toHaveLength(3);
       for (const tag of studyCards) {
         expect(tag).toContain('clay-interactive');
       }
 
-      // Empty-state Settings action uses the same contract
+      // Empty Home keeps only the two category shortcuts as clay controls
       const emptyTags = interactiveButtonTags(renderHome({ ...populatedState, books: {} }));
-      expect(emptyTags).toHaveLength(5); // Settings, Vocabulary, Kanji, Mixed Test, empty-state action
+      expect(emptyTags).toHaveLength(2); // Vocabulary, Kanji
       for (const tag of emptyTags) {
         expect(tag).toContain('data-pressed="false"');
       }

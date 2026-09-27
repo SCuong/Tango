@@ -205,9 +205,10 @@ The most expansive quiz builder in Tango. Combines arbitrary lessons across all 
 
 #### Routes & Navigation:
 - **Route:** `/quiz/mixed-config`
-- **Entry:** [SCREEN 01: Home](./STUDY_SCREENS.md#screen-01-home--study-hub) `[ [IconBolt] Kiểm tra tổng hợp ]`.
+- **Entry:** the **Kiểm tra / Test** primary destination (mobile bottom bar, or the Home header from `sm` up); see [`DESIGN_SYSTEM.md` §16.0](../DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings).
+- **Root destination:** on mobile the screen is a peer of Home and Settings: no back arrow, the bottom navigation stays visible with Test active, and the sticky Start bar sits directly above it. From `sm` up it keeps a back arrow to Home.
 - **Exit:**
-  - `[IconArrowLeft]` Back $\rightarrow$ Home (`/`).
+  - Mobile: the Home / Settings tabs of the primary navigation. Tablet/Desktop: `[IconArrowLeft]` Back or `Escape` $\rightarrow$ Home (`/`).
   - `[ [IconPlayerPlay] Bắt đầu kiểm tra ]` $\rightarrow$ [SCREEN 10: Active Quiz](./QUIZ_SESSION_SCREENS.md#screen-10-active-quiz--practice-session) (`/quiz/session`).
 
 #### Grouping Hierarchy:
@@ -222,7 +223,7 @@ The most expansive quiz builder in Tango. Combines arbitrary lessons across all 
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ [IconArrowLeft]  Kiểm tra tổng hợp            │
+│ Kiểm tra tổng hợp                             │  <- root: no back arrow
 ├───────────────────────────────────────────────┤
 │ 中級へ行こう                                  │
 │   Từ vựng                                     │
@@ -252,6 +253,7 @@ MOBILE (< 640px)
 │ [X] Tiếng Việt → Chữ Hán/Từ                   │
 │                                               │
 │ [StickyBottomBar: [IconPlayerPlay] Bắt đầu ]  │
+│ (floating primary nav: Trang chủ · [Kiểm tra] · Cài đặt) │
 └───────────────────────────────────────────────┘
 
 DESKTOP (> 1024px - max-w-4xl Centered)

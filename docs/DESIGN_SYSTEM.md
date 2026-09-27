@@ -47,7 +47,7 @@ Before building or modifying user-facing components, contributors must consult:
 |---|---|---|
 | **Content cards** | Study Books, lesson cards, results cards | Soft clay elevation (`--shadow-clay-card`), neutral or semantic surface |
 | **Secondary controls** | Category shortcuts, icon buttons, segmented controls, secondary buttons | Restrained clay; press = 1px sink with compressed shadow (`CLAY_PRESSED_CLASSES`) |
-| **Primary CTA** | The main action of a screen (Home `Kiểm tra`, `Bắt đầu`, `Tiếp tục`, `Đã hiểu — Tiếp tục`) | Visibly raised physical button: `--cta-*` surface plus a solid depth lip (`--cta-depth`, `.cta-raised`) |
+| **Primary CTA** | The main action of a screen (`Bắt đầu kiểm tra`, `Kiểm tra giáo trình`, `Đã hiểu — Tiếp tục`) | Visibly raised physical button: `--cta-*` surface plus a solid depth lip (`--cta-depth`, `.cta-raised`) |
 | **Flat** | Dense lists, dictionary rows, settings lists, import tables, form inputs | Flat surface with 1px dividers; no clay stacking. Interactive flat rows use `.flat-interactive`: pressed = background tint from `usePressFeedback`, hover tint only on fine pointers |
 | **Destructive** | Danger Zone actions, confirm-delete buttons | Restrained `--error-surface` / `--error-border` / `--error-text`; never the raised primary treatment |
 
@@ -88,8 +88,9 @@ Before building or modifying user-facing components, contributors must consult:
 - One coherent cultural motif is better than a collage of Japanese clichés.
 - A Study Book cover already provides identity; do not add redundant decoration to book cards.
 
-### B11. TopBar
-- Restrained. Home reference: `TANGO` wordmark + Settings only.
+### B11. TopBar & Primary Navigation
+- Restrained. Home reference: `TANGO` wordmark only on mobile; from `sm` up the same bar carries the compact primary navigation (Home / Test / Settings).
+- **Mobile primary navigation is a root-only floating bottom bar** (Home / Test / Settings); see §16.0 for the canonical rules.
 - No theme switch or theme status on Home or other study screens; **theme selection exists only in Settings** (§16.5).
 - A hard divider is not mandatory. Where scrolling content meets or slides beneath a persistent surface, a soft page-colored feather may replace a hard cut.
 
@@ -186,7 +187,7 @@ All primary interactive clay surfaces (Study Book cards, Learn by Type cards, pr
   - The press starts on pointer down (primary mouse button, touch, or pen) or `Space`. A release on the control (pointer up / `Space` up) completes it. Pointer cancel, pointer leave, pointer moving outside the control bounds, blur, and any pointer/key release outside the control cancel it; a cancelled press never triggers the action.
   - Pointer capture is not used, so native click cancellation on drag-out is unchanged.
   - While pressed, the control swaps its resting shadow for `CLAY_PRESSED_CLASSES` (`translate-y-px shadow-clay-pressed`) and exposes `data-pressed="true"`.
-- **Raised primary CTA (e.g. Home `Kiểm tra`):**
+- **Raised primary CTA (e.g. `Bắt đầu kiểm tra`, `Kiểm tra giáo trình`):**
   - At rest it is clearly raised: a solid depth lip `0 5px 0 0 var(--cta-depth)` under the button plus `--shadow-clay-button` (`.cta-raised`).
   - Pressed (`data-pressed="true"`): it sinks onto the lip (`translateY(4px)`, lip reduced to 1px, `--shadow-clay-pressed`), with a 70ms transition. Hover on fine pointers lifts it 1px with a 6px lip.
   - Minimum visible press: the control uses `usePressFeedback({ minPressMs: MIN_PRESS_FEEDBACK_MS })` (100ms). A quick tap stays pressed until 100ms after pointer down, and the action runs through `runAfterPress`, so navigation happens at that same moment. A press that already lasted 100ms navigates immediately on release. Keyboard `Enter` (no press) acts immediately. Drag-out, pointer cancel, blur, and releases outside the control still cancel the press and never navigate.
@@ -396,7 +397,7 @@ Components **never** reference raw hex colors. All components consume semantic C
   --category-kanji-icon: ...;
   --category-kanji-text: ...;
 
-  /* Primary Study CTA (solid clay action, e.g. the Home Test CTA) */
+  /* Primary Study CTA (solid clay action, e.g. "Bắt đầu kiểm tra") */
   --cta-surface: ...;
   --cta-border: ...;
   --cta-text: ...;
@@ -423,7 +424,7 @@ Components **never** reference raw hex colors. All components consume semantic C
 ## 9. Theme Palette Specifications
 
 ### 9.1 Light Theme (Sáng) — Cool Pearl / Japanese Stationery
-A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards before shadows are considered, with pearl-gray raised surfaces and navy-ink typography. Vocabulary is a clearly lavender-violet surface, Kanji a warm apricot-peach surface, and the Test CTA a strong indigo action. Canvas, Vocabulary, and CTA never share the same blue-purple family.
+A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards before shadows are considered, with pearl-gray raised surfaces and navy-ink typography. Vocabulary is a clearly lavender-violet surface, Kanji a warm apricot-peach surface, and the primary CTA a strong indigo action. Canvas, Vocabulary, and CTA never share the same blue-purple family.
 
 | Token | Value | Visual Role |
 |---|---|---|
@@ -463,7 +464,7 @@ A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards bef
 | `--shadow-clay-pressed` | `0 1px 2px rgba(30, 38, 64, 0.10), inset 0 2px 4px rgba(30, 38, 64, 0.08)` | Tactile pressed state |
 
 ### 9.2 Dark Theme (Tối) — Midnight Ink
-A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and soft off-white text. Vocabulary is a violet-indigo clay, Kanji a warm amber-brown clay, and the Test CTA a vivid indigo action, so layers differ by identity and not only by brightness. Never neutral black and never monochrome navy.
+A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and soft off-white text. Vocabulary is a violet-indigo clay, Kanji a warm amber-brown clay, and the primary CTA a vivid indigo action, so layers differ by identity and not only by brightness. Never neutral black and never monochrome navy.
 
 | Token | Value | Visual Role |
 |---|---|---|
@@ -696,15 +697,29 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 
 ## 16. Screen Design Specifications
 
+### 16.0 Primary Navigation (Home / Test / Settings)
+Tango has exactly three root destinations: **Trang chủ / Home** (`/`), **Kiểm tra / Test** (`/quiz/mixed-config`, the Global Mixed Test builder), and **Cài đặt / Settings** (`/settings`). They are existing canonical routes; primary navigation never adds routes.
+
+- **Mobile (< 640px): floating clay bottom bar** (`MobileBottomNav`), mounted once at the app level and shown **only on the three root destinations**.
+  - Inset 12px from the screen edges, lifted 10px above `env(safe-area-inset-bottom)`, max width 480px, 72px tall, `bg-surface`, `--border-subtle`, `--shadow-clay-card`, 26px radius. Three equal-width destinations, each a ≥ 48px touch target.
+  - Icons are bolder than regular line icons (Tabler stroke 2.4 inactive, 2.7 active): `IconHome`, `IconCards`, `IconSettings`.
+  - Active destination: the icon sits on a small raised `--primary-surface` puck, the label turns `--primary` and bold, and the tab carries `aria-current="page"` (never color alone). Inactive: `--text-secondary` icon and semibold label. No filled navigation slab, no underline.
+  - Press model: `usePressFeedback` (explicit `data-pressed`, drag-out cancels, never CSS `:active`); reduced motion keeps the state change without animating.
+  - Root screens reserve the bar's height (`--tango-bottom-nav-space`) so content and mobile sticky action bars (e.g. the Test `Bắt đầu kiểm tra` bar) always sit above it.
+  - **Hidden on every deeper or focused flow:** Book Study View, Category, Learn by Type, Lesson Detail/Items, Category/Book test setup, the **Active Quiz** (never shows global navigation), Review, Results, Content Management, Add/Manage/Import, and dialogs (dialogs always render above it).
+- **Tablet / Desktop (≥ 640px): no bottom bar.** The Home top bar carries a compact header navigation (`TANGO` left; Home · Test · Settings right as quiet pill links with icon + label, the current one on a `--primary-surface` pill with `aria-current="page"`). The Test root keeps its back arrow to Home and Settings keeps its centered panel with a close button.
+- **Root screens on mobile have no back arrow** whose only purpose is returning Home (Test and Settings are peers of Home). Deeper screens keep their normal back hierarchy (`goUp` / `goBack`, browser Back, dialog history, and the quiz Back guard are unchanged).
+- Home no longer owns a Test CTA and the mobile Home top bar no longer owns a Settings button.
+
 ### 16.1 Home Screen (Safe Study Hub)
 > Home is the reference implementation of the baseline, not a layout template for other screens (see [Canonical Cross-Screen UI Baseline](#canonical-cross-screen-ui-baseline)).
 
-Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts and the Test action are secondary.
+Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts are secondary. Test and Settings are primary navigation destinations (§16.0), not Home content.
 
-- **Top Bar:** Opaque theme canvas (`bg-page`) with **no divider line**, so it belongs to each theme instead of reading as a separate panel. Content scrolling under it fades out through a 14px `--bg-page` feather (`.tango-topbar::after`) instead of a hard cut; zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
+- **Top Bar:** Opaque theme canvas (`bg-page`) with **no divider line**, so it belongs to each theme instead of reading as a separate panel. Content scrolling under it fades out through a 14px `--bg-page` feather (`.tango-topbar::after`) instead of a hard cut; zero translucent frosted glass or blur. On mobile it contains only the `TANGO` wordmark (Home / Test / Settings live in the floating bottom bar); from `sm` up it adds the compact header navigation (§16.0). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
 - **No visible greeting, no visible section labels:** Home renders no greeting line and no visible "Giáo trình" / "Học theo loại" headings. Semantic structure is kept with visually hidden headings (`sr-only` `h1` for the page and `h2` per section).
-- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Test = short action label with a `+` affordance. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. Theme controls remain Settings-only.
-- **Composition order:** Study Books → Vocabulary / Kanji shortcuts → Test.
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. Theme controls remain Settings-only.
+- **Composition order:** Study Books → Vocabulary / Kanji shortcuts. There is no Test tile on Home.
 - **Study Books (primary, visually dominant):**
   - Home previews only the **first 2 books** as large neutral clay cards (`bg-surface`, `shadow-clay-card`): a large 3:4 cover (`w-24` mobile, `w-28` tablet, `w-32` desktop), the title (`text-lg`/`sm:text-xl`), and one Study Coverage bar with its percentage. No lesson/item counts on Home.
   - When more than 2 books exist, a compact dashed-outline bridge `Xem tất cả ⌄` / `View all ⌄` is centered under the cards (≈62% width on mobile, naturally sized on desktop, 48px tall, `rounded-2xl`, `border-dashed border-border-strong`, `text-text-secondary`, `aria-expanded`, `aria-controls`). It reveals the remaining books in place and then reads `Thu gọn` / `Show less`. With 2 or fewer books it is not rendered.
@@ -714,10 +729,9 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Fallback cover: theme-aware primary-tinted placeholder with a spine band and `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
 - **Vocabulary / Kanji shortcuts (secondary):** A 2-column row of equal-height, symmetrical semantic clay tiles (`min-h-[112px]`, `sm:min-h-[128px]`) below the books, smaller than the book cards. Fixed corners: the Japanese category name (`語彙` / `漢字`, `font-japanese`, `lang="ja"`, `aria-hidden`, `--category-*-icon`) pinned top-left, the study-card illustration (`VocabularyIllustration` / `KanjiIllustration`, `currentColor`) pinned top-right, and the localized name (`Từ vựng` / `Hán tự`) pinned bottom-left. Glyph and label use `whitespace-nowrap`; on narrow phones (< 380px) the glyph and illustration shrink instead of wrapping, so the 2-column layout stays clean at 360px. Surfaces keep `--category-vocabulary-*` and `--category-kanji-*`. No counts; the button's `aria-label` carries the localized name.
-- **Test (compact CTA):** Raised primary CTA (§3.1: solid `--cta-*` surface, `--cta-depth` lip, visibly pressed for at least 100ms before navigating), the short label `Kiểm tra` / `Test`, and a round `IconPlus` puck (`--cta-puck-*`) that signals "create / configure a test". The accessible name is explicit: `aria-label="Tạo bài kiểm tra"` / `"Create test"`. Route: `mixed_quiz_config`. Full width under the shortcuts on mobile/tablet; the narrower track of the shortcut row on desktop (`lg:grid-cols-[3fr_2fr]`). It never outweighs the books.
 - **Ambience:** The restrained per-theme Japanese ambience layer (§8.2) sits behind all Home content.
-- **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: visible books, Vocabulary, Kanji, Test.
-- **Zero-Book Empty State:** The same primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, *"Chưa có giáo trình nào."*, the Settings → Content Management hint, and a tactile `[IconSettings] Cài đặt` button. Never a large floating card. Never places an "+ Add Book" button directly on Home.
+- **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: visible books, Vocabulary, Kanji.
+- **Zero-Book Empty State:** The same primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, *"Chưa có giáo trình nào."*, and the Settings → Content Management hint. No extra Settings button (Settings is a primary destination). Never a large floating card. Never places an "+ Add Book" button directly on Home.
 - **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
 ### 16.2 Lesson List & Category Screens
@@ -750,7 +764,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
 - Dismiss CTA: Full-width button `[ Đã hiểu — Tiếp tục ]` (triggers on `Enter`/`Space`).
 
 ### 16.5 Settings Screen
-- Full-screen route on mobile; centered modal card (`max-w-lg`) on tablet and desktop (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)).
+- On mobile a **root destination** (§16.0): full-screen, no back arrow, bottom navigation visible with Settings active. Centered modal card (`max-w-lg`) with a close button on tablet and desktop (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)).
 - **Language Section:** Segmented clay toggle: `[ Tiếng Việt ]` | `[ English ]`.
 - **Theme Section (Chủ đề màu sắc):**
   - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.

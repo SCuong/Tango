@@ -124,13 +124,13 @@ Every card or button on the Home study area leads toward **browsing, reading, or
 
 ## 4. Home Screen Navigation Layout
 
-Home mirrors the content hierarchy **Study Book → Category → Lesson → StudyItem**: books first and visually dominant, then category shortcuts, then the Test action.
+Home mirrors the content hierarchy **Study Book → Category → Lesson → StudyItem**: books first and visually dominant, then category shortcuts. Test and Settings are primary navigation destinations ([`DESIGN_SYSTEM.md` §16.0](./DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings)), not Home content.
 
-**Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Test = short label `Kiểm tra` with a `+` affordance. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
+**Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
 
 ```text
 ┌────────────────────────────────────────────────────────┐
-│ TANGO                                   [IconSettings] │
+│ TANGO              (sm+: Trang chủ · Kiểm tra · Cài đặt)│
 │ ┌────────────────────────┐ ┌─────────────────────────┐ │
 │ │ ┌──────┐ 中級へ行こう  │ │ ┌──────┐ 耳から覚える  │ │
 │ │ │Cover │ 日本語の文型… │ │ │Cover │ 文法トレーニ… │ │
@@ -143,18 +143,16 @@ Home mirrors the content hierarchy **Study Book → Category → Lesson → Stud
 │ │ 語彙             [あ]  │ │ 漢字              [字]  │ │
 │ │ Từ vựng                │ │ Hán tự                  │ │
 │ └────────────────────────┘ └─────────────────────────┘ │
-│ ┌────────────────────────────────────────────────────┐ │
-│ │ Kiểm tra                                       (+) │ │
-│ └────────────────────────────────────────────────────┘ │
+│   (mobile: floating nav  Trang chủ · Kiểm tra · Cài đặt) │
 └────────────────────────────────────────────────────────┘
 ```
 
-- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only, no divider line (`IconSettings` opens Settings; Content Management is accessed from the Study Content section inside Settings). No theme status or theme control on Home.
+- **Top Bar:** Wordmark `TANGO` (mobile) plus the compact Home / Test / Settings header navigation from `sm` up; no divider line. On mobile the same destinations live in the floating bottom navigation. Content Management is accessed from the Study Content section inside Settings. No theme status or theme control on Home.
 - **GIÁO TRÌNH (primary):** The first 2 books as large tactile cards (3:4 cover, title, Study Coverage); a centered, compact dashed `Xem tất cả` bridge reveals the rest in place (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). Lesson/item counts appear in the Book Study View, not on Home. The section label is screen-reader only. Tapping a card opens the **Book Study View**.
 - **Book order:** Home shows books in library order and offers no reordering (no drag, no long-press). Drag-reordering / manual ordering belongs to the future full Books list / management experience.
 - **`Xem tất cả` is browsing, not management:** it reveals the remaining books for study (in place today; a full Books list later). It never enters edit, reorder, or delete modes.
 - **HỌC THEO LOẠI (secondary):** `語彙 Từ vựng` / `漢字 Hán tự` shortcuts with their illustrations to browse lessons by category across all books. Counts appear in Learn by Type, not on Home. The section label is screen-reader only.
-- **Kiểm tra (+):** Compact CTA ("Tạo bài kiểm tra") for global multi-lesson test selection.
+- **Kiểm tra / Test** is a primary navigation destination (the global multi-lesson test builder), not a Home card.
 
 ### 4.1 Safe Empty States (Zero Management Clutter on Study Screens)
 Because the Home screen intentionally excludes `+ Add Book` or `Import` buttons, Tango provides helpful, calming empty states that direct learners to Settings:
@@ -382,7 +380,7 @@ Tango provides three distinct scopes for multi-lesson testing, all powered by th
 |---|---|---|---|
 | **1. Category Multi-Lesson** | Category View inside a Book | Multiple lessons within one category and book | Aggregates selected `lessonIds: string[]` |
 | **2. Book Mixed Test** | Book Study View (`Kiểm tra giáo trình`) | Multiple lessons across Vocab and Kanji within that book | Aggregates selected `lessonIds: string[]` |
-| **3. Global Mixed Test** | Home (`Kiểm tra tổng hợp`) | Any combination of lessons across all books & categories | Aggregates selected `lessonIds: string[]` |
+| **3. Global Mixed Test** | Primary navigation **Kiểm tra / Test** (`/quiz/mixed-config`) | Any combination of lessons across all books & categories | Aggregates selected `lessonIds: string[]` |
 
 ### 10.1 Category Multi-Lesson Test Selector
 ```text

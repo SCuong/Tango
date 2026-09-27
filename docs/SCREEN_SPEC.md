@@ -45,6 +45,7 @@ Tango is built as **ONE unified responsive React Single Page Application (SPA) +
    - Confirm / Advance / Dismiss: `Enter` or `Space`.
    - Exit / Cancel: `Escape`.
    - Open Settings from Home: `Alt+S`.
+10. **Primary Navigation:** Home, Test (`/quiz/mixed-config`), and Settings are the three root destinations. On mobile they share a floating bottom bar shown only on those three screens (never during a quiz or on deeper screens); from `sm` up they appear in the Home header. See [DESIGN_SYSTEM §16.0](./DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings).
 9. **Press & Hover Behavior:** All tactile controls use explicit press state (`usePressFeedback`), hover only on fine pointers, and cancel cleanly on drag-out; see [baseline B6](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline).
 
 ---
@@ -52,7 +53,8 @@ Tango is built as **ONE unified responsive React Single Page Application (SPA) +
 ## 3. Reusable UI Components & Overlays
 
 All screens compose a standardized set of Soft Claymorphism UI primitives specified in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Their clay level follows the [clay hierarchy (B5)](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline):
-- **`TopBar`:** Restrained header with navigation wordmark, optional screen title, and settings icon. It never shows a theme status or theme control; theme selection lives only in Settings. A hard divider is optional; content scrolling beneath it may fade out through a soft page-colored feather.
+- **Primary navigation (Home / Test / Settings):** a root-only floating bottom bar on mobile and compact header links from `sm` up; canonical rules in [`DESIGN_SYSTEM.md` §16.0](./DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings).
+- **`TopBar`:** Restrained Home header: `TANGO` wordmark on mobile, plus the compact primary navigation from `sm` up. It never shows a theme status or theme control; theme selection lives only in Settings. A hard divider is optional; content scrolling beneath it may fade out through a soft page-colored feather.
 - **`Button`:** Three roles. **Primary CTA** (one main action per screen): a visibly raised physical button on `--cta-*` with a solid depth lip (`--cta-depth`) that sinks onto the lip when pressed. **Neutral/Secondary** (`--bg-surface`): restrained clay with a 1px press sink. **Destructive** (`--error-surface`): restrained, never the raised primary treatment.
 - **`AnswerOption`:** Positional choice button with Amber, Sky Blue, Violet, or Rose tint.
 - **`CheckboxRow`:** Touch selection row with `IconSquare` / `IconSquareCheckFilled` and item count badge.
@@ -104,8 +106,8 @@ flowchart TD
 
     Home --> BookStudy
     Home --> LearnByType
-    Home --> MixedQuizCfg
-    Home --> Settings
+    Home -.->|primary nav| MixedQuizCfg
+    Home -.->|primary nav| Settings
 
     BookStudy --> CatInsideBook
     BookStudy --> BookQuizCfg
@@ -186,7 +188,7 @@ flowchart TD
 
 | Screen ID | Screen Name | Mobile (< 640px) | Tablet (640px–1024px) | Desktop (> 1024px) | Empty State Handling | Keyboard Shortcuts | Destructive Actions | Detailed Specification |
 |---|---|---|---|---|---|---|---|---|
-| **SCREEN 01** | Home / Study Hub | Book-first: first 2 large book cards (+ `Xem tất cả`), then 2-col Vocabulary/Kanji shortcuts and a compact Test (+) CTA | 2-col book grid, shortcut row | 2-col book grid + one shortcut row (`max-w-4xl`) | Compact recessed shelf in the book area with link to Settings | `Enter` (open), `Alt+S` (settings) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-01-home--study-hub) |
+| **SCREEN 01** | Home / Study Hub | Book-first: first 2 large book cards (+ `Xem tất cả`), then 2-col Vocabulary/Kanji shortcuts; floating Home/Test/Settings nav | 2-col book grid, shortcut row, header nav | 2-col book grid + shortcut row (`max-w-4xl`), header nav | Compact recessed shelf in the book area pointing to Settings | `Enter` (open), `Alt+S` (settings) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-01-home--study-hub) |
 | **SCREEN 02** | Book Study View | Stacked cards + sticky CTA | Centered 2-col category row (`max-w-2xl`) | Centered 2-col category row (`max-w-2xl`) | Disabled category card if 0 lessons | `Esc` (back), `Enter` (test) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-02-book-study-view) |
 | **SCREEN 03** | Category View Inside Book | Full-width lesson list | 2-col lesson grid | 2-col lesson grid (`max-w-4xl`) | Empty message if 0 lessons in category | `Esc` (back) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-03-category-view-inside-book) |
 | **SCREEN 04** | Learn by Type | Stacked groups by book | 2-col grouped cards | 2-col grouped cards (`max-w-4xl`) | Message if no lessons exist | `Esc` (back) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-04-learn-by-type-học-theo-loại) |

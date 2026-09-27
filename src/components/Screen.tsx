@@ -48,6 +48,8 @@ export interface ScreenHeaderProps {
   width?: ScreenWidth;
   /** Title language hint for Japanese book titles. */
   titleClassName?: string;
+  /** Root destinations: the back arrow only appears from `sm` up (mobile uses the bottom nav). */
+  backOnDesktopOnly?: boolean;
 }
 
 /**
@@ -63,6 +65,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   trailing,
   width = '4xl',
   titleClassName = '',
+  backOnDesktopOnly = false,
 }) => {
   const { t } = useI18n();
   return (
@@ -70,11 +73,13 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
       <div className={`${WIDTH_CLASSES[width]} mx-auto px-4 min-h-[64px] py-2 flex items-center gap-3`}>
         {leading ??
           (onBack && (
-            <IconButton
-              label={backLabel ?? t('nav.back')}
-              icon={<IconArrowLeft size={22} stroke={2} />}
-              onClick={onBack}
-            />
+            <span className={backOnDesktopOnly ? 'hidden sm:block' : 'contents'}>
+              <IconButton
+                label={backLabel ?? t('nav.back')}
+                icon={<IconArrowLeft size={22} stroke={2} />}
+                onClick={onBack}
+              />
+            </span>
           ))}
         <div className="flex-1 min-w-0">
           <h1
@@ -147,7 +152,7 @@ export interface StickyBottomBarProps {
  */
 export const StickyBottomBar: React.FC<StickyBottomBarProps> = ({ children, width = '2xl', mobileOnly = false }) => (
   <div
-    className={`tango-bottombar sticky bottom-0 z-20 bg-page sm:static sm:bg-transparent pb-[env(safe-area-inset-bottom)] ${mobileOnly ? 'sm:hidden' : ''}`}
+    className={`tango-bottombar sticky bottom-[var(--tango-bottom-nav-space,0px)] z-20 bg-page sm:static sm:bg-transparent pb-[env(safe-area-inset-bottom)] ${mobileOnly ? 'sm:hidden' : ''}`}
   >
     <div className={`${WIDTH_CLASSES[width]} mx-auto px-4 pt-3 pb-4 sm:pt-0 sm:pb-12`}>{children}</div>
   </div>

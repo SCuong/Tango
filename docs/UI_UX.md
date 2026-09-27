@@ -29,7 +29,7 @@ The Home screen is dedicated purely to reading and studying. Administrative, imp
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ TANGO                           [IconSettings]│  <- no divider line
+│ TANGO                                         │  <- wordmark only on mobile
 │ ┌───────────────────────────────────────────┐ │
 │ │ ┌─────────┐  中級へ行こう 日本語の文型と │ │  <- first 2 books only:
 │ │ │  Cover  │  表現55 第2版                │ │     large 3:4 cover, title,
@@ -48,19 +48,17 @@ MOBILE (< 640px)
 │ │ 語彙         [あ]  │ │ 漢字         [字]  │ │  <- glyph + name + illustration
 │ │ Từ vựng            │ │ Hán tự             │ │
 │ └────────────────────┘ └────────────────────┘ │
-│ ┌───────────────────────────────────────────┐ │
-│ │ Kiểm tra                              (+) │ │  <- "Tạo bài kiểm tra"
-│ └───────────────────────────────────────────┘ │
 │            (quiet theme ambience behind)      │
+│  ╭ Trang chủ · Kiểm tra · Cài đặt ╮  (floating) │
 └───────────────────────────────────────────────┘
 ```
 
-- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Test action are secondary.
-- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Test = short label `Kiểm tra` with a `+` affordance. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
-- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only, with no divider line. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
+- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts are secondary.
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
+- **Primary navigation:** Home / Test / Settings as a root-only floating bottom bar on mobile and compact header links from `sm` up (see [`DESIGN_SYSTEM.md` §16.0](./DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings)).
+- **Top Bar:** Wordmark `TANGO` (plus the header navigation from `sm` up), with no divider line. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
 - **Study Book cards:** The first 2 books as large cards (3:4 cover, title up to 3 lines with full title on hover, Study Coverage). A centered, compact dashed `Xem tất cả` / `View all` bridge reveals the rest in place when more than 2 exist. Tapping a book opens its **Book Study View**. (Never triggers edit/delete). Reordering books is not available on Home; it belongs to the future full Books list / management view.
 - **Vocabulary / Kanji shortcuts:** Equal-height `語彙 Từ vựng` and `漢字 Hán tự` tiles (glyph top-left, illustration top-right, label bottom-left, no wrapping) to browse lessons by category across all textbooks.
-- **Kiểm tra (+):** Compact CTA (accessible name "Tạo bài kiểm tra" / "Create test") that opens the global multi-lesson test builder.
 - **Ambience:** A restrained per-theme Japanese scene sits quietly behind the content (see [`docs/DESIGN_SYSTEM.md` §8.2](./DESIGN_SYSTEM.md#82-restrained-japanese-ambience-explicit-exception)).
 - **Strict Safety Rule:** Zero Add, Import, Edit, or Delete controls on Home.
 
@@ -301,7 +299,7 @@ A protected administrative screen accessed intentionally via **Settings → Qu�
 
 | Component / Screen | Mobile (< 640px) | Tablet (640px - 1024px) | Desktop (> 1024px) |
 |---|---|---|---|
-| **Home Screen** | First 2 large Study Book cards (+ `Xem tất cả`), 2-col Vocabulary/Kanji tiles, full-width Test (+) CTA | 2-column Study Book grid, shortcut row | 2-column Study Book grid (max-w-4xl), one row of Vocabulary/Kanji tiles + Test (+) CTA |
+| **Home Screen** | First 2 large Study Book cards (+ `Xem tất cả`), 2-col Vocabulary/Kanji tiles, floating Home/Test/Settings nav | 2-column Study Book grid, shortcut row, header nav | 2-column Study Book grid (max-w-4xl), one row of Vocabulary/Kanji tiles, header nav |
 | **Mixed Test Selector**| Full-screen route, stacked checkboxes, sticky Start bar | Centered 2-column route (`max-w-4xl`) | Centered 2-column route (`max-w-4xl`), sticky settings panel |
 | **Lesson List** | Single column list | 2-column grid | 2-column grid (max-w-4xl) |
 | **Quiz Container** | Full screen (100% width, 16px padding) | Centered canvas (max-w-lg) | Centered canvas (max-w-xl) |

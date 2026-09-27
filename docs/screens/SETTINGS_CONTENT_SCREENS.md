@@ -25,13 +25,13 @@ App preferences management and intentional gateway to administrative content ope
 
 #### Routes & Navigation:
 - **Route:** `/settings`
-- **Entry:** Top bar `[IconSettings]` button from Home or other main screens.
+- **Entry:** the **Cài đặt / Settings** primary destination (mobile bottom bar, Home header from `sm` up, or `Alt+S` on Home); see [`DESIGN_SYSTEM.md` §16.0](../DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings).
 - **Exit:**
-  - Mobile: `[IconArrowLeft]` Back $\rightarrow$ Previous screen.
+  - Mobile: Settings is a root destination; leave through the Home / Test tabs of the bottom navigation (no back arrow).
   - Tablet/Desktop: `[IconX]` Close or `Escape` $\rightarrow$ Closes modal.
 
 #### Canonical Responsive Presentation:
-- **Mobile (< 640px):** **Full-screen route** (`/settings`) with `[IconArrowLeft]` top back button.
+- **Mobile (< 640px):** **Full-screen root screen** (`/settings`): title only (no back arrow) and the floating primary navigation with Settings active. Opening Content Management hides the bottom navigation; its back arrow returns to Settings.
 - **Tablet / Desktop (>= 640px):** **Centered modal dialog** (`max-w-lg`) with backdrop blur and `[IconX]` top-right close button.
 
 #### Content Sections:

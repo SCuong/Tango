@@ -261,6 +261,41 @@
     background-color: var(--bg-surface-elevated);
   }
 
+  /*
+   * Mobile primary navigation (DESIGN_SYSTEM §16.0): a floating clay bar inset from the screen
+   * edges, lifted above the system navigation area. Root screens reserve its height through
+   * --tango-bottom-nav-space so content and sticky action bars never sit underneath it.
+   */
+  .tango-bottom-nav {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(env(safe-area-inset-bottom) + 10px);
+    z-index: 30;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .tango-primary-root {
+    --tango-bottom-nav-space: calc(96px + env(safe-area-inset-bottom));
+    padding-bottom: var(--tango-bottom-nav-space);
+  }
+
+  /* The floating nav already clears the system area, so sticky bars above it skip that inset */
+  .tango-primary-root .tango-bottombar {
+    padding-bottom: 0;
+  }
+
+  .tango-primary-root > .min-h-screen {
+    min-height: calc(100vh - var(--tango-bottom-nav-space));
+  }
+
+  @media (min-width: 640px) {
+    .tango-primary-root {
+      --tango-bottom-nav-space: 0px;
+    }
+  }
+
   /* Mobile sticky action bar: content scrolling under it fades out toward the bar */
   .tango-bottombar::before {
     content: "";

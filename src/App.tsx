@@ -16,11 +16,27 @@ import { ManageBookScreen } from './features/content-management/ManageBookScreen
 import { ManageLessonScreen } from './features/content-management/ManageLessonScreen';
 import { ImportScreen } from './features/content-management/ImportScreen';
 import { NotFoundScreen } from './components/NotFoundScreen';
+import { MobileBottomNav, getPrimaryDestination } from './components/PrimaryNav';
 
 /**
  * Screen router / navigation coordinator: one canonical screen per route (SCREEN_SPEC §4).
  */
 export const App: React.FC = () => {
+  const { route } = useNavigation();
+  const primaryDestination = getPrimaryDestination(route);
+
+  // Root destinations (Home, Test, Settings) get the mobile primary navigation; deeper and
+  // focused flows (study details, active quiz, results, management, import) never do.
+  // The wrapper element stays the same on every route so screens are not remounted by it.
+  return (
+    <div className={primaryDestination ? 'tango-primary-root' : undefined}>
+      <Screens />
+      {primaryDestination && <MobileBottomNav active={primaryDestination} />}
+    </div>
+  );
+};
+
+const Screens: React.FC = () => {
   const { route } = useNavigation();
 
   // Each screen starts at the top of the page

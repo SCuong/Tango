@@ -224,6 +224,72 @@ describe('quiz runtime', () => {
   });
 });
 
+describe('mobile primary navigation mounting', () => {
+  const ROOTS: Record<string, string> = { '/': 'home', '/quiz/mixed-config': 'test', '/settings': 'settings' };
+
+  it('mounts the bottom nav only on Home, Test, and Settings with the right active tab', () => {
+    for (const path of CANONICAL_PATHS) {
+      const html = render(path);
+      const navCount = (html.match(/class="tango-bottom-nav sm:hidden"/g) ?? []).length;
+      if (ROOTS[path]) {
+        expect(navCount, path).toBe(1);
+        const active = html.match(/<button[^>]*aria-current="page"[^>]*data-nav-destination="(\w+)"/g) ?? [];
+        expect(active.some((tag) => tag.includes(`data-nav-destination="${ROOTS[path]}"`)), path).toBe(true);
+      } else {
+        expect(navCount, path).toBe(0);
+        expect(html, path).not.toContain('tango-primary-root');
+      }
+    }
+  });
+
+  it('never renders global navigation during an active quiz or on results', () => {
+    const config = {
+      lessonIds: ['lesson_v1'],
+      mode: 'test' as const,
+      questionCount: 'all' as const,
+      allowedTypes: DEFAULT_QUESTION_TYPES,
+      kind: 'standard' as const,
+    };
+    const session = createQuizSession(config, generateQuizQuestions(config, { lesson_v1: vocab }), Date.now());
+    expect(render('/quiz/session', { session })).not.toContain('tango-bottom-nav');
+    const completed: CompletedQuiz = {
+      config,
+      result: {
+        sessionId: 's',
+        lessonIds: ['lesson_v1'],
+        mode: 'test',
+        totalQuestions: 1,
+        correctCount: 1,
+        incorrectCount: 0,
+        accuracy: 100,
+        bestStreak: 1,
+        timeSpentSeconds: 1,
+        missedItemIds: [],
+        completedAt: 'x',
+      },
+    };
+    expect(render('/quiz/results', { completed })).not.toContain('tango-bottom-nav');
+  });
+
+  it('treats Test and Settings as root screens on mobile (no mobile back arrow)', () => {
+    // Mixed Test: the back arrow only appears from sm up
+    expect(render('/quiz/mixed-config')).toMatch(/<span class="hidden sm:block"><button[^>]*aria-label="Quay lại"/);
+    // Settings: no mobile back arrow; the sm+ panel keeps its close button
+    const settings = render('/settings');
+    expect(settings).not.toContain('aria-label="Quay lại"');
+    expect(settings).toContain('aria-label="Đóng"');
+    // Deeper configuration screens keep a normal back arrow
+    expect(render('/book/book_1/quiz-config')).toMatch(/<span class="contents"><button[^>]*aria-label="Quay lại"/);
+  });
+
+  it('keeps the Test root functional: mixed configuration still renders its controls', () => {
+    const html = render('/quiz/mixed-config');
+    expect(html).toContain('Chọn bài kiểm tra');
+    expect(html).toContain('Loại câu hỏi');
+    expect(html).toContain('Bắt đầu kiểm tra');
+  });
+});
+
 describe('settings and content management', () => {
   it('Settings shows three real theme previews as a radio group, language, sound, and content link', () => {
     const html = render('/settings');

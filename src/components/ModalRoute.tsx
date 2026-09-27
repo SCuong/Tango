@@ -12,6 +12,8 @@ export interface ModalRouteProps {
   /** Primary actions: sticky bottom bar on mobile, panel footer from `sm` up. */
   footer?: React.ReactNode;
   size?: 'md' | 'lg';
+  /** Root destinations (Settings): no mobile back arrow; the bottom nav is the way out. */
+  hideMobileBack?: boolean;
 }
 
 /**
@@ -25,6 +27,7 @@ export const ModalRoute: React.FC<ModalRouteProps> = ({
   children,
   footer,
   size = 'md',
+  hideMobileBack = false,
 }) => {
   const { t } = useI18n();
   useEscapeKey(onClose);
@@ -38,9 +41,11 @@ export const ModalRoute: React.FC<ModalRouteProps> = ({
       >
         <header className="tango-topbar sticky top-0 z-10 bg-page sm:bg-surface pt-[env(safe-area-inset-top)] sm:pt-0">
           <div className="px-4 sm:px-6 min-h-[64px] flex items-center gap-3 sm:border-b sm:border-border-subtle">
-            <span className="sm:hidden">
-              <IconButton label={t('nav.back')} icon={<IconArrowLeft size={22} stroke={2} />} onClick={onClose} />
-            </span>
+            {!hideMobileBack && (
+              <span className="sm:hidden">
+                <IconButton label={t('nav.back')} icon={<IconArrowLeft size={22} stroke={2} />} onClick={onClose} />
+              </span>
+            )}
             <h1 id={titleId} className="flex-1 text-lg sm:text-xl font-bold text-text-primary leading-snug">
               {title}
             </h1>

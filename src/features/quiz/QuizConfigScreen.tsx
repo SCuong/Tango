@@ -269,6 +269,7 @@ export const QuizConfigScreen: React.FC<{ scope: QuizConfigScope }> = ({ scope }
           subtitle={book ? book.title : undefined}
           onBack={goParent}
           width={width}
+          backOnDesktopOnly={scope.kind === 'mixed'}
         />
       }
       bottomBar={

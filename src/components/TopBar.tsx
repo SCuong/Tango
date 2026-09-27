@@ -1,8 +1,7 @@
 import React from 'react';
-import { IconSettings } from '@tabler/icons-react';
 import { useNavigation } from '../hooks/useNavigation';
 import { useI18n } from '../hooks/useI18n';
-import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../hooks/usePressFeedback';
+import { DesktopPrimaryNav } from './PrimaryNav';
 
 export interface TopBarProps {
   className?: string;
@@ -11,8 +10,6 @@ export interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
   const { navigate } = useNavigation();
   const { t } = useI18n();
-  const { isPressed: isSettingsPressed, pressHandlers: settingsPressHandlers } =
-    usePressFeedback();
 
   return (
     <header
@@ -28,17 +25,9 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
           TANGO
         </button>
 
-        {/* Settings button (theme and language are chosen only inside Settings) */}
-        <button
-          type="button"
-          {...settingsPressHandlers}
-          onClick={() => navigate({ type: 'settings' })}
-          aria-label={t('nav.settings')}
-          title={t('nav.settings')}
-          className={`clay-interactive clay-hover-surface flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border-subtle text-text-primary ${isSettingsPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch`}
-        >
-          <IconSettings size={22} stroke={2} aria-hidden="true" />
-        </button>
+        {/* Primary navigation from sm up; on mobile the floating bottom nav takes this role.
+            No theme status or control here: theme selection lives only in Settings. */}
+        <DesktopPrimaryNav active="home" />
       </div>
     </header>
   );

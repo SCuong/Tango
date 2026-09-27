@@ -61,7 +61,7 @@ export const SettingsScreen: React.FC = () => {
   };
 
   return (
-    <ModalRoute titleId="settings-title" title={t('settings.title')} onClose={close} size="lg">
+    <ModalRoute titleId="settings-title" title={t('settings.title')} onClose={close} size="lg" hideMobileBack>
       <div className="space-y-7 pb-4">
         <section aria-labelledby="settings-appearance" className="space-y-5">
           <h2 id="settings-appearance" className="text-xs font-semibold uppercase tracking-wider text-text-muted">
