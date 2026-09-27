@@ -29,17 +29,17 @@
   --space-14: 56px;
 }
 
-/* 1. LIGHT THEME (Default): Cool Porcelain / Japanese Stationery */
+/* 1. LIGHT THEME (Default): Cool Pearl / Japanese Stationery */
 [data-theme="light"], :root {
-  --bg-page: #E9EBF7;
+  --bg-page: #ECEFF3;
   --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #DFE2F2;
-  --border-subtle: #D6DAEE;
-  --border-strong: #B7BDD9;
+  --bg-surface-elevated: #E1E5EC;
+  --border-subtle: #D8DDE6;
+  --border-strong: #B8C0CD;
 
-  --text-primary: #1A2040;
-  --text-secondary: #474F73;
-  --text-muted: #5C6488;
+  --text-primary: #1A2033;
+  --text-secondary: #475065;
+  --text-muted: #5A6479;
 
   --primary: #4F46E5;
   --primary-hover: #4338CA;
@@ -60,15 +60,15 @@
   --answer-4-bg: #FFE4E6; --answer-4-border: #FDA4AF; --answer-4-text: #881337;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #DCDFFB;
-  --category-vocabulary-border: #BFC4F2;
-  --category-vocabulary-icon: #4F46E5;
-  --category-vocabulary-text: #2B2778;
+  --category-vocabulary-surface: #E2DDFC;
+  --category-vocabulary-border: #C6BDF3;
+  --category-vocabulary-icon: #5145E0;
+  --category-vocabulary-text: #2D2677;
 
-  --category-kanji-surface: #FAE3CB;
-  --category-kanji-border: #EBC59C;
-  --category-kanji-icon: #B0500A;
-  --category-kanji-text: #6E300E;
+  --category-kanji-surface: #FCE2C6;
+  --category-kanji-border: #EEC393;
+  --category-kanji-icon: #AD4D08;
+  --category-kanji-text: #6B2F0E;
 
   /* Primary Study CTA (solid clay action) */
   --cta-surface: #4A43D6;
@@ -78,29 +78,29 @@
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Clay Shadows (cool indigo-tinted porcelain) */
-  --shadow-clay-card: 0 4px 14px -1px rgba(36, 42, 102, 0.10), 0 2px 6px -1px rgba(36, 42, 102, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  --shadow-clay-card-hover: 0 8px 20px -2px rgba(36, 42, 102, 0.13), 0 3px 8px -1px rgba(36, 42, 102, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1);
-  --shadow-clay-button: 0 4px 12px rgba(74, 67, 214, 0.24), 0 1px 3px rgba(36, 42, 102, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.40);
-  --shadow-clay-pressed: 0 1px 2px rgba(36, 42, 102, 0.10), inset 0 2px 4px rgba(36, 42, 102, 0.08);
+  /* Clay Shadows (neutral cool pearl) */
+  --shadow-clay-card: 0 4px 14px -1px rgba(30, 38, 64, 0.10), 0 2px 6px -1px rgba(30, 38, 64, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 20px -2px rgba(30, 38, 64, 0.13), 0 3px 8px -1px rgba(30, 38, 64, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(74, 67, 214, 0.26), 0 1px 3px rgba(30, 38, 64, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.40);
+  --shadow-clay-pressed: 0 1px 2px rgba(30, 38, 64, 0.10), inset 0 2px 4px rgba(30, 38, 64, 0.08);
 }
 
-/* 2. DARK THEME: Midnight Indigo */
+/* 2. DARK THEME: Midnight Ink */
 [data-theme="dark"] {
-  --bg-page: #0F1433;
-  --bg-surface: #1A2150;
-  --bg-surface-elevated: #242C61;
-  --border-subtle: #2F3873;
-  --border-strong: #434D90;
+  --bg-page: #11151E;
+  --bg-surface: #1C222F;
+  --bg-surface-elevated: #262D3C;
+  --border-subtle: #2D3444;
+  --border-strong: #404A5F;
 
-  --text-primary: #EEF0FF;
-  --text-secondary: #AEB5DE;
-  --text-muted: #8189BB;
+  --text-primary: #EEF1F7;
+  --text-secondary: #ABB4C6;
+  --text-muted: #8993A8;
 
-  --primary: #7C82F8;
-  --primary-hover: #9CA1FA;
-  --primary-surface: #282F6B;
-  --primary-border-subtle: #434B9E;
+  --primary: #8B8CF9;
+  --primary-hover: #A9AAFB;
+  --primary-surface: #2A2A58;
+  --primary-border-subtle: #44438E;
 
   --success: #10B981;
   --success-surface: #064E3B;
@@ -116,29 +116,29 @@
   --answer-4-bg: #33141F; --answer-4-border: #7A223B; --answer-4-text: #FECDD3;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #29316E;
-  --category-vocabulary-border: #3D4796;
-  --category-vocabulary-icon: #A9AFFF;
-  --category-vocabulary-text: #E6E8FF;
+  --category-vocabulary-surface: #2F2A5E;
+  --category-vocabulary-border: #4A418F;
+  --category-vocabulary-icon: #B8AEFF;
+  --category-vocabulary-text: #ECE8FF;
 
-  --category-kanji-surface: #3A2B35;
-  --category-kanji-border: #5E4252;
+  --category-kanji-surface: #3A2A1C;
+  --category-kanji-border: #5F4530;
   --category-kanji-icon: #F6AE3D;
   --category-kanji-text: #FDEBCB;
 
   /* Primary Study CTA (solid clay action) */
-  --cta-surface: #4A4EC4;
-  --cta-border: #6468E0;
+  --cta-surface: #5A52EC;
+  --cta-border: #7A73F3;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #E6E8FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
   --cta-puck-border: rgba(255, 255, 255, 0.24);
 
-  /* Clay Shadows (midnight elevation) */
-  --shadow-clay-card: 0 4px 16px rgba(4, 6, 24, 0.45), 0 1px 3px rgba(4, 6, 24, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  --shadow-clay-card-hover: 0 8px 24px rgba(4, 6, 24, 0.55), 0 2px 6px rgba(4, 6, 24, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.10);
-  --shadow-clay-button: 0 4px 14px rgba(4, 6, 24, 0.50), 0 1px 3px rgba(124, 130, 248, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  --shadow-clay-pressed: 0 1px 2px rgba(4, 6, 24, 0.55), inset 0 2px 4px rgba(4, 6, 24, 0.40);
+  /* Clay Shadows (neutral night elevation) */
+  --shadow-clay-card: 0 4px 16px rgba(0, 2, 10, 0.45), 0 1px 3px rgba(0, 2, 10, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-clay-card-hover: 0 8px 24px rgba(0, 2, 10, 0.55), 0 2px 6px rgba(0, 2, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --shadow-clay-button: 0 4px 14px rgba(0, 2, 10, 0.50), 0 1px 3px rgba(90, 82, 236, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --shadow-clay-pressed: 0 1px 2px rgba(0, 2, 10, 0.55), inset 0 2px 4px rgba(0, 2, 10, 0.40);
 }
 
 /* 3. SAKURA THEME: Warm Blossom Paper */
