@@ -54,6 +54,27 @@ export const VI_DICTIONARY = {
   'state.empty': 'Không có dữ liệu',
   'state.notFound': 'Không tìm thấy trang',
   'state.notImplemented': 'Tính năng đang được phát triển',
+
+  // Home Screen (SCREEN 01)
+  'home.greeting': 'Bạn muốn học gì hôm nay?',
+  'home.studyBooks': 'Giáo trình',
+  'home.learnByType': 'Học theo loại',
+  'home.mixedTest': 'Kiểm tra tổng hợp',
+  'home.mixedTestSubtitle': 'Tùy chọn nhiều bài học trên tất cả giáo trình để kiểm tra',
+  'home.emptyBooks.title': 'Chưa có giáo trình nào.',
+  'home.emptyBooks.description': 'Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung.',
+
+  // Metrics & Counters
+  'metrics.lessonCount': '{count} bài',
+  'metrics.itemCount': '{count} mục',
+  'metrics.coverage': '{percent}%',
+
+  // Accessibility / ARIA
+  'aria.currentTheme': 'Giao diện hiện tại: {theme}',
+  'aria.openBook': 'Mở giáo trình {title}',
+  'aria.bookCover': 'Bìa giáo trình {title}',
+  'aria.learnCategory': 'Học theo loại: {category}',
+  'aria.progressCoverage': 'Độ bao phủ: {percent}%',
 } as const;
 
 /**
@@ -107,6 +128,27 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'state.empty': 'No data available',
   'state.notFound': 'Page not found',
   'state.notImplemented': 'Feature in development',
+
+  // Home Screen (SCREEN 01)
+  'home.greeting': 'What would you like to learn today?',
+  'home.studyBooks': 'Study Books',
+  'home.learnByType': 'Learn by Type',
+  'home.mixedTest': 'Mixed Test',
+  'home.mixedTestSubtitle': 'Select multiple lessons across all study books to test',
+  'home.emptyBooks.title': 'No study books yet.',
+  'home.emptyBooks.description': 'You can add study books from: Settings → Content Management.',
+
+  // Metrics & Counters
+  'metrics.lessonCount': '{count} lessons',
+  'metrics.itemCount': '{count} items',
+  'metrics.coverage': '{percent}%',
+
+  // Accessibility / ARIA
+  'aria.currentTheme': 'Current theme: {theme}',
+  'aria.openBook': 'Open study book: {title}',
+  'aria.bookCover': 'Book cover: {title}',
+  'aria.learnCategory': 'Learn by type: {category}',
+  'aria.progressCoverage': 'Study coverage: {percent}%',
 };
 
 /**
