@@ -139,6 +139,7 @@ Tango is designed to be installed on mobile phones and tablets:
   - **App shell:** `/`, the manifest, and the icon are cached on install.
   - **Navigations:** Network first; offline, the cached app shell is served for every route (client-side routing takes over).
   - **Static Assets & Fonts:** Same-origin assets and Google Fonts are served from cache and refreshed in the background (stale-while-revalidate).
+  - **First visit:** resources loaded before the worker took control (built JS/CSS, fonts, the manifest, and bundled images such as the `.webp` brand wordmark; see `src/lib/offlineAssets.ts`) are posted to the worker and cached right away.
   - **Seed lessons** are bundled into the JavaScript and copied to `tango_v1_lessons` once; cache updates never overwrite `tango_v1_lessons` or resurrect deleted lessons.
   - After the first online visit the app is fully functional offline. Study data lives in `localStorage` / IndexedDB and is never handled by the service worker.
 

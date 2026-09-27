@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { bootstrapAppState, applyDocumentPreferences } from './lib/appState';
+import { isFirstVisitAsset } from './lib/offlineAssets';
 import { AppStateProvider } from './hooks/useAppState';
 import { NavigationProvider } from './hooks/useNavigation';
 import { QuizSessionProvider } from './features/quiz/QuizSessionContext';
@@ -26,7 +27,7 @@ if (import.meta.env.PROD && typeof navigator !== 'undefined' && 'serviceWorker' 
           ...performance
             .getEntriesByType('resource')
             .map((entry) => entry.name)
-            .filter((name) => /\.(js|css|woff2?|svg|webmanifest)(\?|$)|fonts\.googleapis\.com/.test(name)),
+            .filter(isFirstVisitAsset),
         ];
         registration.active?.postMessage({ type: 'tango-cache-urls', urls });
       })
