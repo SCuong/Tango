@@ -115,7 +115,7 @@ describe("Meo's World styles stay scoped", () => {
 
   it('makes the cat motion static under reduced motion and keeps motion rare', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.ambience-animated\s*\{\s*animation:\s*none !important;/);
-    // Only the tail sways and the sleeping cat breathes, both very slowly
+    // Only the stage butterfly and one heart move, both very slowly; the cat artworks never move
     const animated = Array.from(css.matchAll(/\.meo-[a-z-]+\s*\{[^}]*animation:\s*meo-[a-z-]+ (\d+)s/g), (m) => Number(m[1]));
     expect(animated.length).toBe(2);
     for (const seconds of animated) expect(seconds).toBeGreaterThanOrEqual(8);

@@ -7,7 +7,7 @@ import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeed
 import { TranslationKey } from '../../lib/i18n';
 import { StudyCategory } from '../../types';
 import { TopBar } from '../../components/TopBar';
-import { ThemeAmbience } from '../../components/ThemeAmbience';
+import { MeoHomeStage, ThemeAmbience } from '../../components/ThemeAmbience';
 import { EmptyState } from '../../components/EmptyState';
 import { VocabularyIllustration } from '../../components/illustrations/VocabularyIllustration';
 import { KanjiIllustration } from '../../components/illustrations/KanjiIllustration';
@@ -257,6 +257,9 @@ export const HomeStudyHub: React.FC = () => {
             />
           </div>
         </section>
+
+        {/* Meo's World only: the mascot scene in the open canvas below the categories */}
+        <MeoHomeStage />
       </main>
     </div>
   );
