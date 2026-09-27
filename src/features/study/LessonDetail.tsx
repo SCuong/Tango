@@ -111,7 +111,6 @@ export const LessonDetail: React.FC<{ lessonId: string }> = ({ lessonId }) => {
 
   return (
     <Screen
-      ambience
       width="2xl"
       onEscape={goParent}
       header={

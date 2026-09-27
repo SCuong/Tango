@@ -367,6 +367,11 @@
     pointer-events: none;
   }
 
+  /* Secondary study screens: same scene, quieter, so headings on the canvas stay undisturbed */
+  .tango-ambience-subtle {
+    opacity: 0.5;
+  }
+
   .ambience-scene {
     display: none;
     position: absolute;

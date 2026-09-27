@@ -9,8 +9,8 @@ import React from 'react';
  * animated elements only translate or fade very slowly, and `prefers-reduced-motion` makes the
  * layer fully static. The layer is decorative: hidden from assistive technology and inert.
  */
-export const ThemeAmbience: React.FC = () => (
-  <div aria-hidden="true" className="tango-ambience">
+export const ThemeAmbience: React.FC<{ subtle?: boolean }> = ({ subtle = false }) => (
+  <div aria-hidden="true" className={`tango-ambience${subtle ? ' tango-ambience-subtle' : ''}`}>
     {/* Light: Japanese daytime — daylight through a shoji window, seigaiha waves, one mist band */}
     <div className="ambience-scene ambience-light">
       <ShojiWindow className="ambience-shoji-window" paperOpacity={0.5} lineOpacity={0.07} />

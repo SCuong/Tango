@@ -98,7 +98,10 @@ export interface ScreenProps {
   header: React.ReactNode;
   children: React.ReactNode;
   width?: ScreenWidth;
-  /** Restrained theme ambience behind content (study browsing and quiz setup screens only). */
+  /**
+   * Restrained theme ambience behind content (study browsing and quiz setup screens only).
+   * Secondary screens use the subtle variant so motifs never compete with text on the canvas.
+   */
   ambience?: boolean;
   /** Mobile sticky action bar; dissolves into document flow from `sm` up. */
   bottomBar?: React.ReactNode;
@@ -119,7 +122,7 @@ export const Screen: React.FC<ScreenProps> = ({
   useEscapeKey(onEscape);
   return (
     <div className="min-h-screen bg-page text-text-primary flex flex-col">
-      {ambience && <ThemeAmbience />}
+      {ambience && <ThemeAmbience subtle />}
       {header}
       <main
         className={`relative flex-1 w-full ${WIDTH_CLASSES[width]} mx-auto px-4 pt-3 sm:pt-5 ${bottomBar ? 'pb-4' : 'pb-10 sm:pb-14'} ${mainClassName}`}
