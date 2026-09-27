@@ -73,6 +73,7 @@
   /* Primary Study CTA (solid clay action) */
   --cta-surface: #4A43D6;
   --cta-border: #3F38BD;
+  --cta-depth: #332CA6;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #E0E7FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
@@ -134,6 +135,7 @@
   /* Primary Study CTA (solid clay action) */
   --cta-surface: #5A52EC;
   --cta-border: #7A73F3;
+  --cta-depth: #3A34B4;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #E6E8FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
@@ -195,6 +197,7 @@
   /* Primary Study CTA (solid clay action) */
   --cta-surface: #A8385C;
   --cta-border: #912E4F;
+  --cta-depth: #7D2743;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #FDE7EE;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
@@ -225,6 +228,33 @@
       background-color var(--transition-fast);
   }
 
+  /*
+   * Raised primary CTA (e.g. Home "Kiểm tra"): a solid depth lip under the button makes it
+   * look raised at rest; while pressed (data-pressed, held for MIN_PRESS_FEEDBACK_MS) it sinks
+   * onto the lip. Transform only, so reduced motion keeps the state change without animating.
+   */
+  .cta-raised {
+    box-shadow: 0 5px 0 0 var(--cta-depth), var(--shadow-clay-button);
+    transition: transform 70ms ease-out, box-shadow 70ms ease-out;
+  }
+
+  .cta-raised[data-pressed="true"] {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 0 var(--cta-depth), var(--shadow-clay-pressed);
+  }
+
+  /* Home TopBar: content scrolling under it fades out instead of being cut by a hard edge */
+  .tango-topbar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 14px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, var(--bg-page), transparent);
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .clay-interactive:hover:not([data-pressed="true"]) {
       transform: translateY(-1px);
@@ -237,6 +267,11 @@
 
     .clay-interactive:hover:not([data-pressed="true"]) .clay-hover-nudge {
       transform: translateX(2px);
+    }
+
+    .clay-interactive.cta-raised:hover:not([data-pressed="true"]) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 0 0 var(--cta-depth), var(--shadow-clay-button);
     }
   }
 }
@@ -282,6 +317,33 @@
   .ambience-firefly {
     position: absolute;
     display: block;
+  }
+
+  /*
+   * Feathered edges: every motif that is cut by the viewport fades out toward the cut edge
+   * instead of ending in a hard line. Masks only change alpha; nothing is blurred.
+   */
+  .ambience-shoji-window,
+  .ambience-moon,
+  .ambience-mist,
+  .ambience-kasumi {
+    -webkit-mask-image: linear-gradient(to right, #000 45%, transparent 96%);
+    mask-image: linear-gradient(to right, #000 45%, transparent 96%);
+  }
+
+  .ambience-seigaiha {
+    -webkit-mask-image: radial-gradient(circle at 0% 100%, #000 40%, transparent 72%);
+    mask-image: radial-gradient(circle at 0% 100%, #000 40%, transparent 72%);
+  }
+
+  .ambience-night-window {
+    -webkit-mask-image: radial-gradient(circle at 0% 0%, #000 22%, transparent 78%);
+    mask-image: radial-gradient(circle at 0% 0%, #000 22%, transparent 78%);
+  }
+
+  .ambience-branch {
+    -webkit-mask-image: linear-gradient(to left, #000 72%, transparent 100%);
+    mask-image: linear-gradient(to left, #000 72%, transparent 100%);
   }
 
   /* Light: daylight shoji window, seigaiha fan, one drifting mist band */

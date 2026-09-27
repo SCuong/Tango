@@ -11,6 +11,8 @@ import { UserStudyState, StudyBook, Lesson } from '../../../types';
 import {
   CLAY_PRESSED_CLASSES,
   isPointInsideRect,
+  MIN_PRESS_FEEDBACK_MS,
+  remainingPressFeedbackMs,
   shouldStartPress,
 } from '../../../hooks/usePressFeedback';
 
@@ -344,7 +346,8 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('border-cta-border');
     expect(html).toContain('text-cta-text');
     expect(html).not.toContain('border-primary/20');
-    expect(html).toContain('shadow-clay-button');
+    // Raised primary CTA treatment (depth lip + pressed state in CSS)
+    expect(html).toMatch(/<button[^>]*id="home-mixed-test-heading"[^>]*class="[^"]*cta-raised/);
 
     // Canonical clay interaction is carried by the shared `.clay-interactive` rule
     expect(html).toContain('clay-interactive');
@@ -654,6 +657,24 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       expect(html.indexOf('tango-ambience')).toBeLessThan(html.indexOf('<main'));
     });
 
+    it('feathers every motif cut by the viewport and fades content under the TopBar', () => {
+      const css = readFileSync(resolve(__dirname, '../../../index.css'), 'utf-8');
+      for (const selector of [
+        'ambience-shoji-window',
+        'ambience-seigaiha',
+        'ambience-mist',
+        'ambience-moon',
+        'ambience-night-window',
+        'ambience-branch',
+        'ambience-kasumi',
+      ]) {
+        expect(css).toMatch(new RegExp(`\\.${selector}[^{]*\\{[^}]*mask-image:`));
+      }
+      expect(css).toMatch(/\.tango-topbar::after\s*\{[^}]*linear-gradient\(to bottom, var\(--bg-page\), transparent\)/);
+      const header = renderHome(populatedState).match(/<header[^>]*>/);
+      expect(header![0]).toContain('tango-topbar');
+    });
+
     it('keeps ambience fixed, non-interactive, theme-scoped, and static under reduced motion', () => {
       const css = readFileSync(resolve(__dirname, '../../../index.css'), 'utf-8');
       expect(css).toMatch(/\.tango-ambience\s*\{[^}]*position:\s*fixed;[^}]*pointer-events:\s*none;/);
@@ -744,6 +765,26 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       expect(shouldStartPress('mouse', 2)).toBe(false);
       expect(shouldStartPress('touch', 0)).toBe(true);
       expect(shouldStartPress('pen', 0)).toBe(true);
+    });
+
+    it('keeps a quick press visible for the minimum feedback time, never delaying longer presses', () => {
+      expect(MIN_PRESS_FEEDBACK_MS).toBeGreaterThanOrEqual(90);
+      expect(MIN_PRESS_FEEDBACK_MS).toBeLessThanOrEqual(110);
+      // Quick tap released after 30ms waits the rest of the minimum
+      expect(remainingPressFeedbackMs(1000, 1030, MIN_PRESS_FEEDBACK_MS)).toBe(MIN_PRESS_FEEDBACK_MS - 30);
+      // A press that already lasted long enough runs immediately
+      expect(remainingPressFeedbackMs(1000, 1250, MIN_PRESS_FEEDBACK_MS)).toBe(0);
+      // No press (e.g. keyboard Enter) or no minimum requested: immediate
+      expect(remainingPressFeedbackMs(null, 1030, MIN_PRESS_FEEDBACK_MS)).toBe(0);
+      expect(remainingPressFeedbackMs(1000, 1030, 0)).toBe(0);
+    });
+
+    it('styles the raised CTA from explicit press state with a per-theme depth lip', () => {
+      const css = readFileSync(resolve(__dirname, '../../../index.css'), 'utf-8');
+      expect(css.match(/--cta-depth:\s*#[0-9A-Fa-f]{6};/g)).toHaveLength(3);
+      expect(css).toMatch(/\.cta-raised\s*\{[^}]*box-shadow:\s*0 5px 0 0 var\(--cta-depth\)/);
+      expect(css).toMatch(/\.cta-raised\[data-pressed="true"\]\s*\{[^}]*transform:\s*translateY\(4px\);/);
+      expect(css).not.toMatch(/\.cta-raised[^{]*:active/);
     });
 
     it('detects a pointer dragged outside the control bounds', () => {

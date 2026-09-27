@@ -91,6 +91,10 @@ All primary interactive clay surfaces (Study Book cards, Learn by Type cards, pr
   - The press starts on pointer down (primary mouse button, touch, or pen) or `Space`, and clears on pointer up, pointer cancel, pointer leave, pointer moving outside the control bounds, blur, and any pointer/key release in the window.
   - Pointer capture is not used, so native click cancellation on drag-out is unchanged.
   - While pressed, the control swaps its resting shadow for `CLAY_PRESSED_CLASSES` (`translate-y-px shadow-clay-pressed`) and exposes `data-pressed="true"`.
+- **Raised primary CTA (e.g. Home `Kiểm tra`):**
+  - At rest it is clearly raised: a solid depth lip `0 5px 0 0 var(--cta-depth)` under the button plus `--shadow-clay-button` (`.cta-raised`).
+  - Pressed (`data-pressed="true"`): it sinks onto the lip (`translateY(4px)`, lip reduced to 1px, `--shadow-clay-pressed`), with a 70ms transition. Hover on fine pointers lifts it 1px with a 6px lip.
+  - Minimum visible press: the control uses `usePressFeedback({ minPressMs: MIN_PRESS_FEEDBACK_MS })` (100ms). A quick tap stays pressed until 100ms after pointer down, and the action runs through `runAfterPress`, so navigation happens at that same moment. A press that already lasted 100ms navigates immediately on release. Keyboard `Enter` (no press) acts immediately. Drag-out, pointer cancel, blur, and releases outside the control still cancel the press and never navigate.
 - **Focus-Visible:**
   - High-contrast primary focus ring with clear 2px offset (`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page`)
   - Never relies on shadow alone for keyboard focus
@@ -234,6 +238,7 @@ Rules:
 - **Motion:** only a few very slow elements per theme (Light: 1 mist band drifting 28px over 56s; Dark: 4 fireflies floating 10–14px and fading over 16–24s; Sakura: 5 petals falling over 64–88s). Motion is translate or fade only; petals keep one fixed tilt and are never flipped, spun, or turned upside-down.
 - **Reduced motion:** under `prefers-reduced-motion: reduce` every ambience animation is removed (`animation: none`) and the scene is fully static.
 - **Theme scoping:** all three scenes are in the DOM; CSS shows only the one matching the active `data-theme`.
+- **Feathered cut edges:** any motif that is cut by the viewport edge fades out toward that edge with a `mask-image` gradient (linear toward the cut side, or radial from the motif's visible corner) instead of ending in a hard line. Masks only change alpha; content and cards are never blurred.
 
 ### Semantic Token Strategy
 Components **never** reference raw hex colors. All components consume semantic CSS variables that adapt automatically to the active theme:
@@ -298,6 +303,7 @@ Components **never** reference raw hex colors. All components consume semantic C
   --cta-text-secondary: ...;
   --cta-puck-surface: ...;
   --cta-puck-border: ...;
+  --cta-depth: ...;          /* solid depth lip under raised primary CTAs */
 
   /* Restrained Japanese ambience (§8.2), always at very low opacity */
   --ambience-line: ...;
@@ -343,6 +349,7 @@ A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards bef
 | `--category-kanji-text` | `#6B2F0E` | Deep amber-plum label text |
 | `--cta-surface` | `#4A43D6` | Strong ink-indigo action color (7.0:1 white text) |
 | `--cta-border` | `#3F38BD` | Deep indigo CTA edge |
+| `--cta-depth` | `#332CA6` | Depth lip under the raised indigo CTA |
 | `--cta-text` | `#FFFFFF` | CTA title |
 | `--cta-text-secondary` | `#E0E7FF` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte puck on CTA |
@@ -382,6 +389,7 @@ A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and s
 | `--category-kanji-text` | `#FDEBCB` | Pale amber label text |
 | `--cta-surface` | `#5A52EC` | Vivid primary indigo action color (5.5:1 white text) |
 | `--cta-border` | `#7A73F3` | Luminous indigo CTA edge |
+| `--cta-depth` | `#3A34B4` | Depth lip under the raised indigo CTA |
 | `--cta-text` | `#FFFFFF` | CTA title |
 | `--cta-text-secondary` | `#E6E8FF` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.14)` | Matte puck on CTA |
@@ -421,6 +429,7 @@ A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted rai
 | `--category-kanji-text` | `#5A2430` | Deep plum label text |
 | `--cta-surface` | `#A8385C` | Solid plum-rose CTA (6.2:1 white text) |
 | `--cta-border` | `#912E4F` | Deep plum CTA edge |
+| `--cta-depth` | `#7D2743` | Depth lip under the raised plum-rose CTA |
 | `--cta-text` | `#FFFFFF` | CTA title |
 | `--cta-text-secondary` | `#FDE7EE` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte puck on CTA |
@@ -587,7 +596,7 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 ### 16.1 Home Screen (Safe Study Hub)
 Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts and the Test action are secondary.
 
-- **Top Bar:** Opaque theme canvas (`bg-page`) with **no divider line**, so it belongs to each theme instead of reading as a separate panel; zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
+- **Top Bar:** Opaque theme canvas (`bg-page`) with **no divider line**, so it belongs to each theme instead of reading as a separate panel. Content scrolling under it fades out through a 14px `--bg-page` feather (`.tango-topbar::after`) instead of a hard cut; zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
 - **No visible greeting, no visible section labels:** Home renders no greeting line and no visible "Giáo trình" / "Học theo loại" headings. Semantic structure is kept with visually hidden headings (`sr-only` `h1` for the page and `h2` per section).
 - **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Test = short action label with a `+` affordance. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. Theme controls remain Settings-only.
 - **Composition order:** Study Books → Vocabulary / Kanji shortcuts → Test.
@@ -600,7 +609,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Fallback cover: theme-aware primary-tinted placeholder with a spine band and `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
 - **Vocabulary / Kanji shortcuts (secondary):** A 2-column row of equal-height, symmetrical semantic clay tiles (`min-h-[112px]`, `sm:min-h-[128px]`) below the books, smaller than the book cards. Fixed corners: the Japanese category name (`語彙` / `漢字`, `font-japanese`, `lang="ja"`, `aria-hidden`, `--category-*-icon`) pinned top-left, the study-card illustration (`VocabularyIllustration` / `KanjiIllustration`, `currentColor`) pinned top-right, and the localized name (`Từ vựng` / `Hán tự`) pinned bottom-left. Glyph and label use `whitespace-nowrap`; on narrow phones (< 380px) the glyph and illustration shrink instead of wrapping, so the 2-column layout stays clean at 360px. Surfaces keep `--category-vocabulary-*` and `--category-kanji-*`. No counts; the button's `aria-label` carries the localized name.
-- **Test (compact CTA):** Solid `--cta-*` surface with `shadow-clay-button`, the short label `Kiểm tra` / `Test`, and a round `IconPlus` puck (`--cta-puck-*`) that signals "create / configure a test". The accessible name is explicit: `aria-label="Tạo bài kiểm tra"` / `"Create test"`. Route: `mixed_quiz_config`. Full width under the shortcuts on mobile/tablet; the narrower track of the shortcut row on desktop (`lg:grid-cols-[3fr_2fr]`). It never outweighs the books.
+- **Test (compact CTA):** Raised primary CTA (§3.1: solid `--cta-*` surface, `--cta-depth` lip, visibly pressed for at least 100ms before navigating), the short label `Kiểm tra` / `Test`, and a round `IconPlus` puck (`--cta-puck-*`) that signals "create / configure a test". The accessible name is explicit: `aria-label="Tạo bài kiểm tra"` / `"Create test"`. Route: `mixed_quiz_config`. Full width under the shortcuts on mobile/tablet; the narrower track of the shortcut row on desktop (`lg:grid-cols-[3fr_2fr]`). It never outweighs the books.
 - **Ambience:** The restrained per-theme Japanese ambience layer (§8.2) sits behind all Home content.
 - **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: visible books, Vocabulary, Kanji, Test.
 - **Zero-Book Empty State:** The same primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, *"Chưa có giáo trình nào."*, the Settings → Content Management hint, and a tactile `[IconSettings] Cài đặt` button. Never a large floating card. Never places an "+ Add Book" button directly on Home.
@@ -744,6 +753,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   /* Primary Study CTA (solid clay action) */
   --cta-surface: #4A43D6;
   --cta-border: #3F38BD;
+  --cta-depth: #332CA6;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #E0E7FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
@@ -805,6 +815,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   /* Primary Study CTA (solid clay action) */
   --cta-surface: #5A52EC;
   --cta-border: #7A73F3;
+  --cta-depth: #3A34B4;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #E6E8FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
@@ -866,6 +877,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   /* Primary Study CTA (solid clay action) */
   --cta-surface: #A8385C;
   --cta-border: #912E4F;
+  --cta-depth: #7D2743;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #FDE7EE;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);

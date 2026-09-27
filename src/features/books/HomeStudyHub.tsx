@@ -9,7 +9,11 @@ import {
 import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
-import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeedback';
+import {
+  CLAY_PRESSED_CLASSES,
+  MIN_PRESS_FEEDBACK_MS,
+  usePressFeedback,
+} from '../../hooks/usePressFeedback';
 import { TranslationKey } from '../../lib/i18n';
 import { StudyCategory } from '../../types';
 import { TopBar } from '../../components/TopBar';
@@ -102,8 +106,10 @@ export const HomeStudyHub: React.FC = () => {
   const { state } = useAppState();
   const { navigate } = useNavigation();
   const { t } = useI18n();
-  const { isPressed: isMixedTestPressed, pressHandlers: mixedTestPressHandlers } =
-    usePressFeedback();
+  // Primary CTA keeps its pressed state visible for a minimum time before navigating
+  const { pressHandlers: testPressHandlers, runAfterPress: runAfterTestPress } = usePressFeedback({
+    minPressMs: MIN_PRESS_FEEDBACK_MS,
+  });
   const [showAllBooks, setShowAllBooks] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -271,16 +277,17 @@ export const HomeStudyHub: React.FC = () => {
             </div>
           </section>
 
-          {/* Test CTA: short label plus a "+" affordance (creates/configures a test) */}
+          {/* Test CTA: raised primary action (solid depth lip, visibly pressed before navigating),
+              short label plus a "+" affordance (creates/configures a test) */}
           <section aria-labelledby="home-mixed-test-heading">
             <button
               type="button"
               id="home-mixed-test-heading"
               data-study-card="true"
-              {...mixedTestPressHandlers}
-              onClick={() => navigate({ type: 'mixed_quiz_config' })}
+              {...testPressHandlers}
+              onClick={() => runAfterTestPress(() => navigate({ type: 'mixed_quiz_config' }))}
               aria-label={t('aria.createTest')}
-              className={`clay-interactive w-full h-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 min-h-[72px] flex items-center justify-between gap-3 ${isMixedTestPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-button'} ${FOCUS_RING}`}
+              className={`clay-interactive cta-raised w-full h-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 min-h-[72px] flex items-center justify-between gap-3 ${FOCUS_RING}`}
             >
               <h3 className="font-bold text-base sm:text-lg leading-snug text-cta-text">
                 {t('home.test')}
