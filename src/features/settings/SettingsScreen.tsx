@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   IconAlertTriangle,
-  IconChevronLeft,
+  IconChevronDown,
   IconChevronRight,
+  IconChevronUp,
   IconCards,
   IconFolders,
   IconHome,
@@ -43,7 +44,7 @@ const THEMES: { value: AppTheme; nameKey: TranslationKey; descKey: TranslationKe
   { value: 'light', nameKey: 'preferences.theme.light', descKey: 'settings.themeDesc.light' },
   { value: 'dark', nameKey: 'preferences.theme.dark', descKey: 'settings.themeDesc.dark' },
   { value: 'sakura', nameKey: 'preferences.theme.sakura', descKey: 'settings.themeDesc.sakura' },
-  // Special easter-egg theme: revealed by the carousel arrow, never in the initial three
+  // Special easter-egg theme: revealed in the third slot by the header action, never shown first
   { value: 'meo', nameKey: 'preferences.theme.meo', descKey: 'settings.themeDesc.meo' },
 ];
 
@@ -97,12 +98,7 @@ export const SettingsScreen: React.FC = () => {
             />
           </div>
 
-          <div>
-            <p id="settings-theme" className="text-sm font-semibold text-text-primary mb-2">
-              {t('settings.theme')}
-            </p>
-            <ThemePicker value={preferences.theme} onChange={(theme) => safeUpdate({ theme })} />
-          </div>
+          <ThemePicker value={preferences.theme} onChange={(theme) => safeUpdate({ theme })} />
 
           <div>
             <p id="settings-sound" className="text-sm font-semibold text-text-primary">
@@ -154,133 +150,129 @@ const ContentManagementRow: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
 };
 
 /**
- * Theme carousel positions: 0 shows the three standard themes (Light, Dark, Sakura); 1 shifts the
- * track one card to the left, hiding Light and revealing Meo's World (the easter-egg theme).
+ * The picker always shows three card slots: Light and Dark stay fixed, and the third slot holds
+ * either Sakura (default) or the Meo's World easter egg.
  */
-export type ThemeCarouselPosition = 0 | 1;
-
-/** Number of theme cards visible at once. */
-export const VISIBLE_THEME_CARDS = 3;
-
-/** Themes visible at a carousel position, in picker order. */
-export function visibleThemes(position: ThemeCarouselPosition): AppTheme[] {
-  return THEMES.slice(position, position + VISIBLE_THEME_CARDS).map((theme) => theme.value);
+export function slotThemes(meoRevealed: boolean): AppTheme[] {
+  return ['light', 'dark', meoRevealed ? 'meo' : 'sakura'];
 }
 
-/**
- * Position that keeps `theme` visible: the current one when it already shows the theme, otherwise
- * the one position that does (Light only at 0, Meo's World only at 1). A persisted Meo's World
- * therefore opens Settings on the second position.
- */
-export function carouselPositionFor(theme: AppTheme, current: ThemeCarouselPosition = 0): ThemeCarouselPosition {
-  if (visibleThemes(current).includes(theme)) return current;
-  return theme === THEMES[0].value ? 0 : 1;
+/** A persisted Meo's World opens Settings with it already revealed in the third slot. */
+export function initialMeoRevealed(theme: AppTheme): boolean {
+  return theme === 'meo';
 }
+
+const THEME_BY_VALUE = Object.fromEntries(THEMES.map((theme) => [theme.value, theme])) as Record<
+  AppTheme,
+  (typeof THEMES)[number]
+>;
 
 /**
  * Theme previews: each miniature sets its own `data-theme`, so it renders with that theme's real
- * tokens (canvas, surface card, category identities, CTA, ambience motif). Three cards are visible;
- * a subtle arrow beside the group slides the track by one card to reveal Meo's World and back.
+ * tokens. The header action (`Xem thêm` / `More`, then `Quay lại` / `Back`) swaps only the third
+ * slot between Sakura and Meo's World with a vertical reel transition; it never selects a theme.
  */
-const ThemePicker: React.FC<{ value: AppTheme; onChange: (theme: AppTheme) => void }> = ({ value, onChange }) => {
+export const ThemePicker: React.FC<{
+  value: AppTheme;
+  onChange: (theme: AppTheme) => void;
+  /** Reveal state for this Settings visit; defaults to revealed only for a persisted Meo's World. */
+  initialRevealed?: boolean;
+}> = ({ value, onChange, initialRevealed }) => {
   const { t } = useI18n();
-  const refs = useRef<Array<HTMLButtonElement | null>>([]);
-  const arrowRef = useRef<HTMLButtonElement | null>(null);
-  const moveFocusToArrow = useRef(false);
-  const [position, setPosition] = useState<ThemeCarouselPosition>(() => carouselPositionFor(value));
-  const visible = visibleThemes(position);
+  const refs = useRef<Partial<Record<AppTheme, HTMLButtonElement | null>>>({});
+  const [meoRevealed, setMeoRevealed] = useState(() => initialRevealed ?? initialMeoRevealed(value));
+  const visible = slotThemes(meoRevealed);
   const tabbable = visible.includes(value) ? value : visible[0];
 
-  // The arrow swaps sides after a shift; keep keyboard focus on the arrow that replaced it
-  useEffect(() => {
-    if (moveFocusToArrow.current) {
-      moveFocusToArrow.current = false;
-      arrowRef.current?.focus();
-    }
-  }, [position]);
-
-  const shift = (next: ThemeCarouselPosition) => {
-    moveFocusToArrow.current = typeof document !== 'undefined' && document.activeElement === arrowRef.current;
-    setPosition(next);
-  };
-
-  const onKeyDown = (e: React.KeyboardEvent, index: number) => {
+  // Roving radio focus among the three visible cards; revealing is only done with the header action
+  const onKeyDown = (e: React.KeyboardEvent, theme: AppTheme) => {
+    const index = visible.indexOf(theme);
     let next = -1;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % THEMES.length;
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + THEMES.length) % THEMES.length;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % visible.length;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + visible.length) % visible.length;
     if (next >= 0) {
       e.preventDefault();
-      onChange(THEMES[next].value);
-      setPosition((current) => carouselPositionFor(THEMES[next].value, current));
-      refs.current[next]?.focus();
+      onChange(visible[next]);
+      refs.current[visible[next]]?.focus();
     }
   };
 
+  const card = (theme: AppTheme, hidden = false) => (
+    <ThemeCard
+      ref={(el) => {
+        refs.current[theme] = el;
+      }}
+      theme={THEME_BY_VALUE[theme]}
+      selected={value === theme}
+      offscreen={hidden}
+      tabbable={tabbable === theme}
+      onSelect={() => onChange(theme)}
+      onKeyDown={(e) => onKeyDown(e, theme)}
+    />
+  );
+
   return (
-    <div className="theme-picker relative -mx-3" data-position={position}>
-      <div className="theme-carousel-viewport">
-        <div
-          id="settings-theme-track"
-          role="radiogroup"
-          aria-labelledby="settings-theme"
-          data-position={position}
-          className="theme-carousel-track flex"
-        >
-          {THEMES.map((theme, index) => (
-            <ThemeCard
-              key={theme.value}
-              ref={(el) => {
-                refs.current[index] = el;
-              }}
-              theme={theme}
-              selected={value === theme.value}
-              offscreen={!visible.includes(theme.value)}
-              tabbable={tabbable === theme.value}
-              onSelect={() => onChange(theme.value)}
-              onKeyDown={(e) => onKeyDown(e, index)}
-            />
-          ))}
-        </div>
+    <div>
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <p id="settings-theme" className="text-sm font-semibold text-text-primary">
+          {t('settings.theme')}
+        </p>
+        <RevealAction revealed={meoRevealed} onToggle={() => setMeoRevealed((revealed) => !revealed)} />
       </div>
-      {position === 0 ? (
-        <CarouselArrow ref={arrowRef} side="right" label={t('settings.themeMore')} onPress={() => shift(1)} />
-      ) : (
-        <CarouselArrow ref={arrowRef} side="left" label={t('settings.themeBack')} onPress={() => shift(0)} />
-      )}
+      <div role="radiogroup" aria-labelledby="settings-theme" className="grid grid-cols-3 gap-2.5 sm:gap-3">
+        {card('light')}
+        {card('dark')}
+        <ThemeSlot id="settings-theme-slot" showSecond={meoRevealed}>
+          {card('sakura', meoRevealed)}
+          {card('meo', !meoRevealed)}
+        </ThemeSlot>
+      </div>
     </div>
   );
 };
 
-/** Small clay arrow in the picker's reserved gutter, beside the card row: a 44px touch target around a 32px puck. */
-const CarouselArrow = React.forwardRef<
-  HTMLButtonElement,
-  { side: 'left' | 'right'; label: string; onPress: () => void }
->(function CarouselArrow({ side, label, onPress }, ref) {
-  const { isPressed, pressHandlers } = usePressFeedback();
-  const Icon = side === 'right' ? IconChevronRight : IconChevronLeft;
+/**
+ * One reel slot that swaps between two cards vertically. Both cards share the slot's grid cell, so
+ * its size never changes; the first card rests below when hidden and the second rests above, so
+ * revealing the second moves the first down and out while the second drops in from above, and
+ * going back reverses it. The slot clips the travel to its own bounds (plus room for the card
+ * ring and shadow); nothing around it moves.
+ */
+const ThemeSlot: React.FC<{ id: string; showSecond: boolean; children: [React.ReactNode, React.ReactNode] }> = ({
+  id,
+  showSecond,
+  children,
+}) => (
+  <div id={id} className="theme-slot" data-show={showSecond ? 'second' : 'first'}>
+    <div className="theme-slot-item" data-slot={showSecond ? 'below' : 'shown'}>
+      {children[0]}
+    </div>
+    <div className="theme-slot-item" data-slot={showSecond ? 'shown' : 'above'}>
+      {children[1]}
+    </div>
+  </div>
+);
+
+/** Quiet header action that reveals (or hides) Meo's World in the third slot; it never selects. */
+const RevealAction: React.FC<{ revealed: boolean; onToggle: () => void }> = ({ revealed, onToggle }) => {
+  const { t } = useI18n();
+  const { pressHandlers } = usePressFeedback();
+  const Icon = revealed ? IconChevronUp : IconChevronDown;
   return (
     <button
-      ref={ref}
       type="button"
       {...pressHandlers}
-      onClick={onPress}
-      aria-label={label}
-      title={label}
-      aria-controls="settings-theme-track"
-      data-carousel-arrow={side}
-      className={`theme-carousel-arrow absolute top-1/2 -translate-y-1/2 ${side === 'right' ? 'right-0' : 'left-0'} z-10 w-11 h-11 flex items-center justify-center rounded-full ${FOCUS_RING}`}
+      onClick={onToggle}
+      aria-label={t(revealed ? 'settings.themeBack' : 'settings.themeMore')}
+      aria-controls="settings-theme-slot"
+      data-theme-reveal={revealed ? 'back' : 'more'}
+      className={`flat-interactive shrink-0 inline-flex items-center gap-1 min-h-touch -my-3 -mr-2 px-2.5 rounded-xl text-sm font-semibold text-primary ${FOCUS_RING}`}
     >
-      <span
-        aria-hidden="true"
-        className={`tango-icon-puck flex items-center justify-center w-8 h-8 rounded-full bg-surface border border-border-subtle text-text-secondary transition-[transform,box-shadow] duration-100 ease-out ${
-          isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'
-        }`}
-      >
-        <Icon size={18} stroke={2.4} />
-      </span>
+      {t(revealed ? 'settings.themeBackShort' : 'settings.themeMoreShort')}
+      <Icon size={16} stroke={2.4} aria-hidden="true" />
     </button>
   );
-});
+};
 
 const ThemeCard = React.forwardRef<
   HTMLButtonElement,
@@ -314,7 +306,7 @@ const ThemeCard = React.forwardRef<
         onKeyDown(e);
       }}
       onClick={onSelect}
-      className={`theme-carousel-card clay-interactive relative text-left rounded-xl border bg-surface p-1.5 sm:p-2 ${
+      className={`clay-interactive relative w-full h-full text-left rounded-xl border bg-surface p-1.5 sm:p-2 ${
         selected ? 'border-primary ring-2 ring-primary' : 'border-border-subtle'
       } ${isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'} ${FOCUS_RING}`}
     >

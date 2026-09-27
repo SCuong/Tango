@@ -13,7 +13,7 @@ export interface ItemProgress {
 
 /**
  * Light / Dark / Sakura are the standard themes; 'meo' (Mèo mập 😺 / Meo's World) is the special
- * easter-egg theme revealed from the Settings theme carousel.
+ * easter-egg theme revealed in the third Settings theme slot.
  */
 export type AppTheme = 'light' | 'dark' | 'sakura' | 'meo';
 
