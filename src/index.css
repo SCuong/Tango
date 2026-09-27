@@ -29,22 +29,22 @@
   --space-14: 56px;
 }
 
-/* 1. LIGHT THEME (Default) */
+/* 1. LIGHT THEME (Default): Cool Porcelain / Japanese Stationery */
 [data-theme="light"], :root {
-  --bg-page: #FBFBF9;
+  --bg-page: #E9EBF7;
   --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F4F4F0;
-  --border-subtle: #E8E8E2;
-  --border-strong: #CBD5E1;
+  --bg-surface-elevated: #DFE2F2;
+  --border-subtle: #D6DAEE;
+  --border-strong: #B7BDD9;
 
-  --text-primary: #1E293B;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
+  --text-primary: #1A2040;
+  --text-secondary: #474F73;
+  --text-muted: #5C6488;
 
   --primary: #4F46E5;
   --primary-hover: #4338CA;
-  --primary-surface: #EEF2FF;
-  --primary-border-subtle: #C7D2FE;
+  --primary-surface: #E3E4FD;
+  --primary-border-subtle: #C0C3F4;
 
   --success: #059669;
   --success-surface: #ECFDF5;
@@ -60,47 +60,47 @@
   --answer-4-bg: #FFE4E6; --answer-4-border: #FDA4AF; --answer-4-text: #881337;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #E6EAFB;
-  --category-vocabulary-border: #C9D1F4;
+  --category-vocabulary-surface: #DCDFFB;
+  --category-vocabulary-border: #BFC4F2;
   --category-vocabulary-icon: #4F46E5;
-  --category-vocabulary-text: #312E81;
+  --category-vocabulary-text: #2B2778;
 
-  --category-kanji-surface: #FBEAD6;
-  --category-kanji-border: #EFCFA8;
-  --category-kanji-icon: #B45309;
-  --category-kanji-text: #78350F;
+  --category-kanji-surface: #FAE3CB;
+  --category-kanji-border: #EBC59C;
+  --category-kanji-icon: #B0500A;
+  --category-kanji-text: #6E300E;
 
   /* Primary Study CTA (solid clay action) */
-  --cta-surface: #4F46E5;
-  --cta-border: #4338CA;
+  --cta-surface: #4A43D6;
+  --cta-border: #3F38BD;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #E0E7FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Clay Shadows */
-  --shadow-clay-card: 0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  --shadow-clay-card-hover: 0 8px 20px -2px rgba(0, 0, 0, 0.09), 0 3px 8px -1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
-  --shadow-clay-button: 0 4px 12px rgba(79, 70, 229, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  /* Clay Shadows (cool indigo-tinted porcelain) */
+  --shadow-clay-card: 0 4px 14px -1px rgba(36, 42, 102, 0.10), 0 2px 6px -1px rgba(36, 42, 102, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 20px -2px rgba(36, 42, 102, 0.13), 0 3px 8px -1px rgba(36, 42, 102, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(74, 67, 214, 0.24), 0 1px 3px rgba(36, 42, 102, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.40);
+  --shadow-clay-pressed: 0 1px 2px rgba(36, 42, 102, 0.10), inset 0 2px 4px rgba(36, 42, 102, 0.08);
 }
 
-/* 2. DARK THEME */
+/* 2. DARK THEME: Midnight Indigo */
 [data-theme="dark"] {
-  --bg-page: #0B0F19;
-  --bg-surface: #151D2E;
-  --bg-surface-elevated: #1E293B;
-  --border-subtle: #26334B;
-  --border-strong: #334155;
+  --bg-page: #0F1433;
+  --bg-surface: #1A2150;
+  --bg-surface-elevated: #242C61;
+  --border-subtle: #2F3873;
+  --border-strong: #434D90;
 
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
+  --text-primary: #EEF0FF;
+  --text-secondary: #AEB5DE;
+  --text-muted: #8189BB;
 
-  --primary: #6366F1;
-  --primary-hover: #818CF8;
-  --primary-surface: #1E1B4B;
-  --primary-border-subtle: #3730A3;
+  --primary: #7C82F8;
+  --primary-hover: #9CA1FA;
+  --primary-surface: #282F6B;
+  --primary-border-subtle: #434B9E;
 
   --success: #10B981;
   --success-surface: #064E3B;
@@ -116,47 +116,47 @@
   --answer-4-bg: #33141F; --answer-4-border: #7A223B; --answer-4-text: #FECDD3;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #1D2850;
-  --category-vocabulary-border: #33437A;
-  --category-vocabulary-icon: #818CF8;
-  --category-vocabulary-text: #E0E7FF;
+  --category-vocabulary-surface: #29316E;
+  --category-vocabulary-border: #3D4796;
+  --category-vocabulary-icon: #A9AFFF;
+  --category-vocabulary-text: #E6E8FF;
 
-  --category-kanji-surface: #3A2618;
-  --category-kanji-border: #5E3F28;
-  --category-kanji-icon: #F59E0B;
-  --category-kanji-text: #FEF3C7;
+  --category-kanji-surface: #3A2B35;
+  --category-kanji-border: #5E4252;
+  --category-kanji-icon: #F6AE3D;
+  --category-kanji-text: #FDEBCB;
 
   /* Primary Study CTA (solid clay action) */
-  --cta-surface: #4F46E5;
-  --cta-border: #6366F1;
+  --cta-surface: #4A4EC4;
+  --cta-border: #6468E0;
   --cta-text: #FFFFFF;
-  --cta-text-secondary: #E0E7FF;
+  --cta-text-secondary: #E6E8FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
   --cta-puck-border: rgba(255, 255, 255, 0.24);
 
-  /* Clay Shadows (Dark structural emphasis) */
-  --shadow-clay-card: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --shadow-clay-card-hover: 0 8px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --shadow-clay-button: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  /* Clay Shadows (midnight elevation) */
+  --shadow-clay-card: 0 4px 16px rgba(4, 6, 24, 0.45), 0 1px 3px rgba(4, 6, 24, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --shadow-clay-card-hover: 0 8px 24px rgba(4, 6, 24, 0.55), 0 2px 6px rgba(4, 6, 24, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  --shadow-clay-button: 0 4px 14px rgba(4, 6, 24, 0.50), 0 1px 3px rgba(124, 130, 248, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --shadow-clay-pressed: 0 1px 2px rgba(4, 6, 24, 0.55), inset 0 2px 4px rgba(4, 6, 24, 0.40);
 }
 
-/* 3. SAKURA THEME */
+/* 3. SAKURA THEME: Warm Blossom Paper */
 [data-theme="sakura"] {
-  --bg-page: #FAF5F5;
-  --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F3E8E8;
-  --border-subtle: #EAD7D7;
-  --border-strong: #D5BDBD;
+  --bg-page: #F5E3E1;
+  --bg-surface: #FFFAF8;
+  --bg-surface-elevated: #F0D8D6;
+  --border-subtle: #EACDCA;
+  --border-strong: #D8AEAA;
 
-  --text-primary: #2D1F24;
-  --text-secondary: #5C454D;
-  --text-muted: #8F757D;
+  --text-primary: #34181F;
+  --text-secondary: #66434C;
+  --text-muted: #7C5861;
 
-  --primary: #D95379;
-  --primary-hover: #C23E64;
-  --primary-surface: #FDF0F3;
-  --primary-border-subtle: #F3C1D0;
+  --primary: #C2416A;
+  --primary-hover: #A63458;
+  --primary-surface: #FADFE7;
+  --primary-border-subtle: #EBB3C4;
 
   --success: #059669;
   --success-surface: #ECFDF5;
@@ -172,29 +172,29 @@
   --answer-4-bg: #FCEEF1; --answer-4-border: #EBB3C0; --answer-4-text: #641E2F;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #E4E8F5;
-  --category-vocabulary-border: #C8CFE6;
-  --category-vocabulary-icon: #4F46E5;
-  --category-vocabulary-text: #232C42;
+  --category-vocabulary-surface: #E5E0F3;
+  --category-vocabulary-border: #CBC3E5;
+  --category-vocabulary-icon: #5A4FCF;
+  --category-vocabulary-text: #2C2654;
 
-  --category-kanji-surface: #F8E3D6;
-  --category-kanji-border: #E9C6B0;
-  --category-kanji-icon: #C05621;
-  --category-kanji-text: #4A232E;
+  --category-kanji-surface: #F8D9C7;
+  --category-kanji-border: #E9BBA0;
+  --category-kanji-icon: #B04A28;
+  --category-kanji-text: #5A2430;
 
   /* Primary Study CTA (solid clay action) */
-  --cta-surface: #B83A60;
-  --cta-border: #A32F52;
+  --cta-surface: #A8385C;
+  --cta-border: #912E4F;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #FDE7EE;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Clay Shadows (Warm pink-slate lift) */
-  --shadow-clay-card: 0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  --shadow-clay-card-hover: 0 8px 22px rgba(180, 120, 135, 0.18), 0 2px 6px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1);
-  --shadow-clay-button: 0 4px 12px rgba(217, 83, 121, 0.22), 0 1px 3px rgba(180, 120, 135, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  --shadow-clay-pressed: 0 1px 2px rgba(180, 120, 135, 0.18), inset 0 2px 4px rgba(180, 120, 135, 0.1);
+  /* Clay Shadows (warm blossom lift) */
+  --shadow-clay-card: 0 4px 14px rgba(150, 80, 95, 0.13), 0 1px 4px rgba(150, 80, 95, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 22px rgba(150, 80, 95, 0.18), 0 2px 6px rgba(150, 80, 95, 0.09), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(168, 56, 92, 0.26), 0 1px 3px rgba(150, 80, 95, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.40);
+  --shadow-clay-pressed: 0 1px 2px rgba(150, 80, 95, 0.18), inset 0 2px 4px rgba(150, 80, 95, 0.12);
 }
 
 /*

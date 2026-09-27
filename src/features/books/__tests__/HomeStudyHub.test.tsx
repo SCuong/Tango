@@ -307,14 +307,16 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('bg-primary');
   });
 
-  it('renders TopBar with solid matte surface and rounded-full clay controls', () => {
+  it('renders TopBar as an opaque part of the theme canvas with rounded-full clay controls', () => {
     const html = renderHome(populatedState);
 
-    // TopBar has solid bg-surface and crisp border, strictly NO backdrop-blur
-    expect(html).toContain('bg-surface');
-    expect(html).toContain('border-b border-border-subtle');
+    // TopBar shares the opaque theme canvas with a hairline border, strictly NO backdrop-blur
+    const header = html.match(/<header[^>]*>/);
+    expect(header).not.toBeNull();
+    expect(header![0]).toContain('bg-page');
+    expect(header![0]).toContain('border-b border-border-subtle');
     expect(html).not.toContain('backdrop-blur');
-    expect(html).not.toContain('bg-surface/80');
+    expect(html).not.toMatch(/bg-(?:page|surface)\/\d+/);
 
     // Controls use rounded-full
     expect(html).toContain('rounded-full');

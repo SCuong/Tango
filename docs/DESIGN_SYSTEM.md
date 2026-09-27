@@ -204,9 +204,19 @@ Tango's user interface is fully localized in:
 ## 8. Multi-Theme Token Architecture
 
 Tango features three distinct, meticulously tuned appearance themes:
-1. **Light (Sáng):** Warm, soft, glare-free daytime study environment.
-2. **Dark (Tối):** Deep slate/navy night mode optimized for low eye strain.
-3. **Sakura (Sakura):** A poetic, calm Japanese aesthetic inspired by cherry blossoms, blush tones, and warm plum accents.
+1. **Light (Sáng) — Cool Porcelain / Japanese Stationery:** A cool lavender-porcelain canvas with porcelain-white cards, lavender-gray raised surfaces, and Tango indigo. Bright and comfortable for long daytime sessions.
+2. **Dark (Tối) — Midnight Indigo:** A deep midnight-indigo canvas with navy-indigo surfaces and slightly lighter raised cards. Lavender (Vocabulary) and amber (Kanji) sit naturally inside the palette. Never a generic black dark mode.
+3. **Sakura (Sakura) — Warm Blossom Paper:** A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted raised surfaces, and a rose-plum accent. It reads as "Sakura" without any flower decoration.
+
+### 8.1 Calm Does Not Mean Colorless
+Tango stays mature and restrained, but it never falls back to near-white or near-black palettes that make every theme feel generic.
+
+- **Recognizable at first glance:** Each theme must have its own atmosphere even if category cards and CTA buttons are ignored.
+- **Identity lives in the material, not only the accents:** Theme identity must be visible from the page canvas, surfaces, borders, and elevation. Cards must separate from the canvas by color before any shadow is considered.
+- **Personality comes only from:** palette, material contrast, typography, the existing study illustrations, and hierarchy.
+- **Never:** gradients, decorative blobs, Sakura petals, Japanese patterns, neon, glow, glassmorphism, or wallpaper illustrations.
+- **Restraint:** Shadows stay soft and are tinted to each theme's material; never make them heavier to fake personality.
+- **Settings previews:** The palettes in §9 are exactly what the Settings theme preview cards display (§16.5).
 
 ### Semantic Token Strategy
 Components **never** reference raw hex colors. All components consume semantic CSS variables that adapt automatically to the active theme:
@@ -284,113 +294,113 @@ Components **never** reference raw hex colors. All components consume semantic C
 
 ## 9. Theme Palette Specifications
 
-### 9.1 Light Theme (Sáng)
-A warm, soft off-white canvas with gentle ceramic elevation and crisp slate typography. Avoids harsh, sterile 100% white glare.
+### 9.1 Light Theme (Sáng) — Cool Porcelain / Japanese Stationery
+A cool lavender-porcelain canvas that clearly separates porcelain-white cards before shadows are considered. Lavender-gray raised surfaces, deep indigo-ink typography, and Tango indigo as the primary identity. Bright, never sterile white.
 
-| Token | Hex Value | Visual Role |
+| Token | Value | Visual Role |
 |---|---|---|
-| `--bg-page` | `#FBFBF9` | Warm off-white canvas |
-| `--bg-surface` | `#FFFFFF` | Crisp white card surface |
-| `--bg-surface-elevated` | `#F4F4F0` | Elevated sub-panels and active containers |
-| `--border-subtle` | `#E8E8E2` | Thin structural boundary (1px) |
-| `--border-strong` | `#CBD5E1` | Solid secondary boundary (1px) |
-| `--text-primary` | `#1E293B` | Slate 800 high-contrast primary text |
-| `--text-secondary` | `#475569` | Slate 600 secondary definitions |
-| `--text-muted` | `#94A3B8` | Slate 400 captions and readings |
-| `--primary` | `#4F46E5` | Deep Indigo brand accent |
-| `--primary-hover` | `#4338CA` | Indigo 700 active tap state |
-| `--primary-surface` | `#EEF2FF` | Faint indigo wash for selected items |
-| `--primary-border-subtle` | `#C7D2FE` | Subtle indigo primary boundary |
-| `--category-vocabulary-surface` | `#E6EAFB` | Visible cool-indigo clay tile surface |
-| `--category-vocabulary-border` | `#C9D1F4` | Soft indigo tile border |
-| `--category-vocabulary-icon` | `#4F46E5` | Primary indigo vocabulary icon |
-| `--category-vocabulary-text` | `#312E81` | Deep indigo header text |
-| `--category-kanji-surface` | `#FBEAD6` | Visible warm amber-peach clay tile surface |
-| `--category-kanji-border` | `#EFCFA8` | Soft warm amber tile border |
-| `--category-kanji-icon` | `#B45309` | Warm amber Kanji icon |
-| `--category-kanji-text` | `#78350F` | Deep amber-plum Kanji header text |
-| `--cta-surface` | `#4F46E5` | Solid indigo primary study CTA |
-| `--cta-border` | `#4338CA` | Deep indigo CTA edge |
-| `--cta-text` | `#FFFFFF` | CTA title (6.3:1 on surface) |
-| `--cta-text-secondary` | `#E0E7FF` | CTA subtitle (5.1:1 on surface) |
-| `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte icon puck on CTA |
-| `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
-| `--shadow-clay-card` | `0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Subtle clay lift |
-| `--shadow-clay-card-hover` | `0 8px 20px -2px rgba(0, 0, 0, 0.09), 0 3px 8px -1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)` | Tactile hover lift |
-| `--shadow-clay-button`| `0 4px 12px rgba(79, 70, 229, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.45)` | Tactile button depth |
-| `--shadow-clay-pressed`| `0 1px 2px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.06)` | Tactile pressed state |
-
-### 9.2 Dark Theme (Tối)
-Deep slate and midnight navy tones rather than pitch black. Emphasizes clean border delineation and subtle matte highlights over heavy drop shadows.
-
-| Token | Hex Value | Visual Role |
-|---|---|---|
-| `--bg-page` | `#0B0F19` | Deep midnight canvas |
-| `--bg-surface` | `#151D2E` | Elevated dark slate card |
-| `--bg-surface-elevated` | `#1E293B` | Layered sub-panels and options |
-| `--border-subtle` | `#26334B` | Crisp dark border for structural definition |
-| `--border-strong` | `#334155` | Defined dark structural boundary |
-| `--text-primary` | `#F8FAFC` | Crisp off-white text (never blinding pure white) |
-| `--text-secondary` | `#94A3B8` | Slate 400 secondary text |
-| `--text-muted` | `#64748B` | Slate 500 metadata |
-| `--primary` | `#6366F1` | Luminous Indigo brand accent |
-| `--primary-hover` | `#818CF8` | Indigo 400 hover state |
-| `--primary-surface` | `#1E1B4B` | Deep indigo surface wash |
-| `--primary-border-subtle` | `#3730A3` | Subtle indigo primary boundary |
-| `--category-vocabulary-surface` | `#1D2850` | Deep indigo clay tile surface |
-| `--category-vocabulary-border` | `#33437A` | Crisp dark indigo border |
-| `--category-vocabulary-icon` | `#818CF8` | Luminous indigo vocabulary icon |
-| `--category-vocabulary-text` | `#E0E7FF` | Crisp off-white vocabulary header text |
-| `--category-kanji-surface` | `#3A2618` | Deep warm amber-umber clay tile surface |
-| `--category-kanji-border` | `#5E3F28` | Dark warm amber border |
-| `--category-kanji-icon` | `#F59E0B` | Luminous warm amber Kanji icon |
-| `--category-kanji-text` | `#FEF3C7` | Warm amber-plum Kanji header text |
-| `--cta-surface` | `#4F46E5` | Solid indigo CTA (keeps 6.3:1 white text; `--primary` is 4.5:1) |
-| `--cta-border` | `#6366F1` | Luminous indigo CTA edge |
+| `--bg-page` | `#E9EBF7` | Cool lavender-porcelain canvas; white cards separate from it before any shadow |
+| `--bg-surface` | `#FFFFFF` | Porcelain-white card surface |
+| `--bg-surface-elevated` | `#DFE2F2` | Cool lavender-gray raised/recessed panels and progress tracks |
+| `--border-subtle` | `#D6DAEE` | Cool lavender hairline boundary (1px) |
+| `--border-strong` | `#B7BDD9` | Defined cool boundary (1px) |
+| `--text-primary` | `#1A2040` | Deep indigo-ink primary text |
+| `--text-secondary` | `#474F73` | Indigo-slate secondary text |
+| `--text-muted` | `#5C6488` | Cool muted captions (AA on white and canvas) |
+| `--primary` | `#4F46E5` | Tango indigo brand accent |
+| `--primary-hover` | `#4338CA` | Deep indigo hover/active |
+| `--primary-surface` | `#E3E4FD` | Indigo wash for selected items and cover placeholders |
+| `--primary-border-subtle` | `#C0C3F4` | Indigo hairline boundary |
+| `--category-vocabulary-surface` | `#DCDFFB` | Periwinkle clay tile surface |
+| `--category-vocabulary-border` | `#BFC4F2` | Soft indigo tile border |
+| `--category-vocabulary-icon` | `#4F46E5` | Indigo glyph and illustration color |
+| `--category-vocabulary-text` | `#2B2778` | Deep indigo label text |
+| `--category-kanji-surface` | `#FAE3CB` | Apricot clay tile surface |
+| `--category-kanji-border` | `#EBC59C` | Warm amber tile border |
+| `--category-kanji-icon` | `#B0500A` | Amber glyph and illustration color |
+| `--category-kanji-text` | `#6E300E` | Deep amber-plum label text |
+| `--cta-surface` | `#4A43D6` | Solid ink-indigo primary study CTA (7.0:1 white text) |
+| `--cta-border` | `#3F38BD` | Deep indigo CTA edge |
 | `--cta-text` | `#FFFFFF` | CTA title |
-| `--cta-text-secondary` | `#E0E7FF` | CTA subtitle |
-| `--cta-puck-surface` | `rgba(255, 255, 255, 0.14)` | Matte icon puck on CTA |
+| `--cta-text-secondary` | `#E0E7FF` | CTA secondary text |
+| `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte puck on CTA |
+| `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
+| `--shadow-clay-card` | `0 4px 14px -1px rgba(36, 42, 102, 0.10), 0 2px 6px -1px rgba(36, 42, 102, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Cool indigo-tinted clay lift |
+| `--shadow-clay-card-hover` | `0 8px 20px -2px rgba(36, 42, 102, 0.13), 0 3px 8px -1px rgba(36, 42, 102, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1)` | Tactile hover lift |
+| `--shadow-clay-button` | `0 4px 12px rgba(74, 67, 214, 0.24), 0 1px 3px rgba(36, 42, 102, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.40)` | Indigo CTA depth |
+| `--shadow-clay-pressed` | `0 1px 2px rgba(36, 42, 102, 0.10), inset 0 2px 4px rgba(36, 42, 102, 0.08)` | Tactile pressed state |
+
+### 9.2 Dark Theme (Tối) — Midnight Indigo
+A deep midnight-indigo canvas with navy-indigo surfaces and slightly lighter raised cards. Moonlit off-white text, a luminous periwinkle accent, lavender Vocabulary, and warm amber Kanji embedded in the palette. Never neutral or pure black.
+
+| Token | Value | Visual Role |
+|---|---|---|
+| `--bg-page` | `#0F1433` | Deep midnight-indigo canvas (never neutral black) |
+| `--bg-surface` | `#1A2150` | Navy-indigo card surface |
+| `--bg-surface-elevated` | `#242C61` | Lighter indigo raised/recessed panels and progress tracks |
+| `--border-subtle` | `#2F3873` | Indigo hairline boundary |
+| `--border-strong` | `#434D90` | Defined indigo boundary |
+| `--text-primary` | `#EEF0FF` | Moonlit off-white text |
+| `--text-secondary` | `#AEB5DE` | Soft lavender-gray secondary text |
+| `--text-muted` | `#8189BB` | Muted lavender metadata |
+| `--primary` | `#7C82F8` | Luminous periwinkle brand accent |
+| `--primary-hover` | `#9CA1FA` | Lighter periwinkle hover |
+| `--primary-surface` | `#282F6B` | Indigo wash for selected items and cover placeholders |
+| `--primary-border-subtle` | `#434B9E` | Indigo accent boundary |
+| `--category-vocabulary-surface` | `#29316E` | Lavender-indigo clay tile surface |
+| `--category-vocabulary-border` | `#3D4796` | Lavender tile border |
+| `--category-vocabulary-icon` | `#A9AFFF` | Lavender glyph and illustration color |
+| `--category-vocabulary-text` | `#E6E8FF` | Pale lavender label text |
+| `--category-kanji-surface` | `#3A2B35` | Plum-umber clay tile surface embedded in midnight |
+| `--category-kanji-border` | `#5E4252` | Warm plum tile border |
+| `--category-kanji-icon` | `#F6AE3D` | Warm amber glyph and illustration color |
+| `--category-kanji-text` | `#FDEBCB` | Pale amber label text |
+| `--cta-surface` | `#4A4EC4` | Solid deep-indigo CTA that sits inside the midnight palette (6.9:1 white text) |
+| `--cta-border` | `#6468E0` | Soft periwinkle CTA edge |
+| `--cta-text` | `#FFFFFF` | CTA title |
+| `--cta-text-secondary` | `#E6E8FF` | CTA secondary text |
+| `--cta-puck-surface` | `rgba(255, 255, 255, 0.14)` | Matte puck on CTA |
 | `--cta-puck-border` | `rgba(255, 255, 255, 0.24)` | CTA puck rim highlight |
-| `--shadow-clay-card` | `0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)` | Restrained dark elevation |
-| `--shadow-clay-card-hover` | `0 8px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12)` | Dark tactile hover lift |
-| `--shadow-clay-button`| `0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)` | Dark tactile button depth |
-| `--shadow-clay-pressed`| `0 1px 2px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4)` | Dark tactile pressed state |
+| `--shadow-clay-card` | `0 4px 16px rgba(4, 6, 24, 0.45), 0 1px 3px rgba(4, 6, 24, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.07)` | Midnight elevation |
+| `--shadow-clay-card-hover` | `0 8px 24px rgba(4, 6, 24, 0.55), 0 2px 6px rgba(4, 6, 24, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.10)` | Midnight hover lift |
+| `--shadow-clay-button` | `0 4px 14px rgba(4, 6, 24, 0.50), 0 1px 3px rgba(124, 130, 248, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14)` | Indigo CTA depth |
+| `--shadow-clay-pressed` | `0 1px 2px rgba(4, 6, 24, 0.55), inset 0 2px 4px rgba(4, 6, 24, 0.40)` | Midnight pressed state |
 
-### 9.3 Sakura Theme (Sakura)
-A serene, poetic theme inspired by Japanese cherry blossoms. Uses soft cream, peach blush, warm rose accents, and dark plum text. **Never neon, candy, or overwhelming pink.**
+### 9.3 Sakura Theme (Sakura) — Warm Blossom Paper
+A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted raised surfaces, deep plum-ink text, and a rose-plum primary. Vocabulary stays a compatible wisteria lavender; Kanji stays warm peach/plum. **No petals, patterns, neon, or candy pink.**
 
-| Token | Hex Value | Visual Role |
+| Token | Value | Visual Role |
 |---|---|---|
-| `--bg-page` | `#FAF5F5` | Delicate warm blossom canvas |
-| `--bg-surface` | `#FFFFFF` | Pure white elevated surface |
-| `--bg-surface-elevated` | `#F3E8E8` | Soft blush tint for sub-panels |
-| `--border-subtle` | `#EAD7D7` | Soft dusty rose structural border |
-| `--border-strong` | `#D5BDBD` | Defined dusty rose boundary |
-| `--text-primary` | `#2D1F24` | Deep plum-charcoal text (exceptional contrast) |
-| `--text-secondary` | `#5C454D` | Warm muted plum secondary |
-| `--text-muted` | `#8F757D` | Soft dusty lavender metadata |
-| `--primary` | `#D95379` | Refined Sakura Rose primary accent |
-| `--primary-hover` | `#C23E64` | Deep rose hover state |
-| `--primary-surface` | `#FDF0F3` | Faint petal blush surface |
-| `--primary-border-subtle` | `#F3C1D0` | Subtle petal rose primary boundary |
-| `--category-vocabulary-surface` | `#E4E8F5` | Visible cool-slate clay tile surface |
-| `--category-vocabulary-border` | `#C8CFE6` | Soft slate-lavender border |
-| `--category-vocabulary-icon` | `#4F46E5` | Indigo vocabulary icon |
-| `--category-vocabulary-text` | `#232C42` | Deep slate-plum vocabulary header text |
-| `--category-kanji-surface` | `#F8E3D6` | Visible plum-amber clay tile surface |
-| `--category-kanji-border` | `#E9C6B0` | Warm rose-linen border |
-| `--category-kanji-icon` | `#C05621` | Warm amber-plum Kanji icon |
-| `--category-kanji-text` | `#4A232E` | Deep plum Kanji header text |
-| `--cta-surface` | `#B83A60` | Deep rose CTA (5.5:1 white text; `--primary` is too light for body text) |
-| `--cta-border` | `#A32F52` | Deep rose CTA edge |
+| `--bg-page` | `#F5E3E1` | Warm blush Japanese-paper canvas |
+| `--bg-surface` | `#FFFAF8` | Warm porcelain card surface |
+| `--bg-surface-elevated` | `#F0D8D6` | Blossom-tinted raised/recessed panels and progress tracks |
+| `--border-subtle` | `#EACDCA` | Blush hairline boundary |
+| `--border-strong` | `#D8AEAA` | Defined dusty-rose boundary |
+| `--text-primary` | `#34181F` | Deep plum-ink text |
+| `--text-secondary` | `#66434C` | Warm plum secondary text |
+| `--text-muted` | `#7C5861` | Dusty plum metadata (AA on porcelain) |
+| `--primary` | `#C2416A` | Blossom rose-plum brand accent |
+| `--primary-hover` | `#A63458` | Deep rose hover/active |
+| `--primary-surface` | `#FADFE7` | Petal wash for selected items and cover placeholders |
+| `--primary-border-subtle` | `#EBB3C4` | Petal-rose boundary |
+| `--category-vocabulary-surface` | `#E5E0F3` | Wisteria lavender clay tile surface |
+| `--category-vocabulary-border` | `#CBC3E5` | Soft wisteria tile border |
+| `--category-vocabulary-icon` | `#5A4FCF` | Wisteria-indigo glyph and illustration color |
+| `--category-vocabulary-text` | `#2C2654` | Deep wisteria label text |
+| `--category-kanji-surface` | `#F8D9C7` | Peach clay tile surface |
+| `--category-kanji-border` | `#E9BBA0` | Warm peach tile border |
+| `--category-kanji-icon` | `#B04A28` | Terracotta-plum glyph and illustration color |
+| `--category-kanji-text` | `#5A2430` | Deep plum label text |
+| `--cta-surface` | `#A8385C` | Solid plum-rose CTA (6.2:1 white text) |
+| `--cta-border` | `#912E4F` | Deep plum CTA edge |
 | `--cta-text` | `#FFFFFF` | CTA title |
-| `--cta-text-secondary` | `#FDE7EE` | CTA subtitle |
-| `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte icon puck on CTA |
+| `--cta-text-secondary` | `#FDE7EE` | CTA secondary text |
+| `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte puck on CTA |
 | `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
-| `--shadow-clay-card` | `0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Gentle warm blossom lift |
-| `--shadow-clay-card-hover` | `0 8px 22px rgba(180, 120, 135, 0.18), 0 2px 6px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1)` | Warm blossom hover lift |
-| `--shadow-clay-button`| `0 4px 12px rgba(217, 83, 121, 0.22), 0 1px 3px rgba(180, 120, 135, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.55)` | Soft tactile rose depth |
-| `--shadow-clay-pressed`| `0 1px 2px rgba(180, 120, 135, 0.18), inset 0 2px 4px rgba(180, 120, 135, 0.1)` | Warm blossom pressed state |
+| `--shadow-clay-card` | `0 4px 14px rgba(150, 80, 95, 0.13), 0 1px 4px rgba(150, 80, 95, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Warm blossom lift |
+| `--shadow-clay-card-hover` | `0 8px 22px rgba(150, 80, 95, 0.18), 0 2px 6px rgba(150, 80, 95, 0.09), inset 0 1px 0 rgba(255, 255, 255, 1)` | Warm blossom hover lift |
+| `--shadow-clay-button` | `0 4px 12px rgba(168, 56, 92, 0.26), 0 1px 3px rgba(150, 80, 95, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.40)` | Plum-rose CTA depth |
+| `--shadow-clay-pressed` | `0 1px 2px rgba(150, 80, 95, 0.18), inset 0 2px 4px rgba(150, 80, 95, 0.12)` | Warm blossom pressed state |
 
 ---
 
@@ -546,7 +556,7 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 ### 16.1 Home Screen (Safe Study Hub)
 Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts and the Mixed Test are secondary.
 
-- **Top Bar:** Solid surface (`bg-surface`, `border-b border-subtle`), matte clay finish with zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
+- **Top Bar:** Opaque theme canvas (`bg-page`) with a hairline `border-b border-subtle`, so it belongs to each theme instead of reading as a separate white panel; zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
 - **No visible greeting, no visible section labels:** Home renders no greeting line and no visible "Giáo trình" / "Học theo loại" headings. Semantic structure is kept with visually hidden headings (`sr-only` `h1` for the page and `h2` per section).
 - **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Mixed Test = concise action label. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. No visible section labels or greeting. Theme controls remain Settings-only.
 - **Composition order:** Study Books → Vocabulary / Kanji shortcuts → Mixed Test.
@@ -596,6 +606,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
 - **Language Section:** Segmented clay toggle: `[ Tiếng Việt ]` | `[ English ]`.
 - **Theme Section (Chủ đề màu sắc):**
   - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
+  - The previews display the §9 palettes (Cool Porcelain, Midnight Indigo, Warm Blossom Paper).
   - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
   - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
   - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
@@ -655,22 +666,22 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --transition-normal: 220ms ease-out;
 }
 
-/* 1. LIGHT THEME (Default) */
+/* 1. LIGHT THEME (Default): Cool Porcelain / Japanese Stationery */
 [data-theme="light"], :root {
-  --bg-page: #FBFBF9;
+  --bg-page: #E9EBF7;
   --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F4F4F0;
-  --border-subtle: #E8E8E2;
-  --border-strong: #CBD5E1;
+  --bg-surface-elevated: #DFE2F2;
+  --border-subtle: #D6DAEE;
+  --border-strong: #B7BDD9;
 
-  --text-primary: #1E293B;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
+  --text-primary: #1A2040;
+  --text-secondary: #474F73;
+  --text-muted: #5C6488;
 
   --primary: #4F46E5;
   --primary-hover: #4338CA;
-  --primary-surface: #EEF2FF;
-  --primary-border-subtle: #C7D2FE;
+  --primary-surface: #E3E4FD;
+  --primary-border-subtle: #C0C3F4;
 
   --success: #059669;
   --success-surface: #ECFDF5;
@@ -686,47 +697,47 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-4-bg: #FFE4E6; --answer-4-border: #FDA4AF; --answer-4-text: #881337;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #E6EAFB;
-  --category-vocabulary-border: #C9D1F4;
+  --category-vocabulary-surface: #DCDFFB;
+  --category-vocabulary-border: #BFC4F2;
   --category-vocabulary-icon: #4F46E5;
-  --category-vocabulary-text: #312E81;
+  --category-vocabulary-text: #2B2778;
 
-  --category-kanji-surface: #FBEAD6;
-  --category-kanji-border: #EFCFA8;
-  --category-kanji-icon: #B45309;
-  --category-kanji-text: #78350F;
+  --category-kanji-surface: #FAE3CB;
+  --category-kanji-border: #EBC59C;
+  --category-kanji-icon: #B0500A;
+  --category-kanji-text: #6E300E;
 
   /* Primary Study CTA (solid clay action) */
-  --cta-surface: #4F46E5;
-  --cta-border: #4338CA;
+  --cta-surface: #4A43D6;
+  --cta-border: #3F38BD;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #E0E7FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Clay Shadows */
-  --shadow-clay-card: 0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  --shadow-clay-card-hover: 0 8px 20px -2px rgba(0, 0, 0, 0.09), 0 3px 8px -1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
-  --shadow-clay-button: 0 4px 12px rgba(79, 70, 229, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  /* Clay Shadows (cool indigo-tinted porcelain) */
+  --shadow-clay-card: 0 4px 14px -1px rgba(36, 42, 102, 0.10), 0 2px 6px -1px rgba(36, 42, 102, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 20px -2px rgba(36, 42, 102, 0.13), 0 3px 8px -1px rgba(36, 42, 102, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(74, 67, 214, 0.24), 0 1px 3px rgba(36, 42, 102, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.40);
+  --shadow-clay-pressed: 0 1px 2px rgba(36, 42, 102, 0.10), inset 0 2px 4px rgba(36, 42, 102, 0.08);
 }
 
-/* 2. DARK THEME */
+/* 2. DARK THEME: Midnight Indigo */
 [data-theme="dark"] {
-  --bg-page: #0B0F19;
-  --bg-surface: #151D2E;
-  --bg-surface-elevated: #1E293B;
-  --border-subtle: #26334B;
-  --border-strong: #334155;
+  --bg-page: #0F1433;
+  --bg-surface: #1A2150;
+  --bg-surface-elevated: #242C61;
+  --border-subtle: #2F3873;
+  --border-strong: #434D90;
 
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
+  --text-primary: #EEF0FF;
+  --text-secondary: #AEB5DE;
+  --text-muted: #8189BB;
 
-  --primary: #6366F1;
-  --primary-hover: #818CF8;
-  --primary-surface: #1E1B4B;
-  --primary-border-subtle: #3730A3;
+  --primary: #7C82F8;
+  --primary-hover: #9CA1FA;
+  --primary-surface: #282F6B;
+  --primary-border-subtle: #434B9E;
 
   --success: #10B981;
   --success-surface: #064E3B;
@@ -742,47 +753,47 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-4-bg: #33141F; --answer-4-border: #7A223B; --answer-4-text: #FECDD3;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #1D2850;
-  --category-vocabulary-border: #33437A;
-  --category-vocabulary-icon: #818CF8;
-  --category-vocabulary-text: #E0E7FF;
+  --category-vocabulary-surface: #29316E;
+  --category-vocabulary-border: #3D4796;
+  --category-vocabulary-icon: #A9AFFF;
+  --category-vocabulary-text: #E6E8FF;
 
-  --category-kanji-surface: #3A2618;
-  --category-kanji-border: #5E3F28;
-  --category-kanji-icon: #F59E0B;
-  --category-kanji-text: #FEF3C7;
+  --category-kanji-surface: #3A2B35;
+  --category-kanji-border: #5E4252;
+  --category-kanji-icon: #F6AE3D;
+  --category-kanji-text: #FDEBCB;
 
   /* Primary Study CTA (solid clay action) */
-  --cta-surface: #4F46E5;
-  --cta-border: #6366F1;
+  --cta-surface: #4A4EC4;
+  --cta-border: #6468E0;
   --cta-text: #FFFFFF;
-  --cta-text-secondary: #E0E7FF;
+  --cta-text-secondary: #E6E8FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
   --cta-puck-border: rgba(255, 255, 255, 0.24);
 
-  /* Clay Shadows (Dark structural emphasis) */
-  --shadow-clay-card: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --shadow-clay-card-hover: 0 8px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --shadow-clay-button: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  --shadow-clay-pressed: 0 1px 2px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  /* Clay Shadows (midnight elevation) */
+  --shadow-clay-card: 0 4px 16px rgba(4, 6, 24, 0.45), 0 1px 3px rgba(4, 6, 24, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --shadow-clay-card-hover: 0 8px 24px rgba(4, 6, 24, 0.55), 0 2px 6px rgba(4, 6, 24, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  --shadow-clay-button: 0 4px 14px rgba(4, 6, 24, 0.50), 0 1px 3px rgba(124, 130, 248, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --shadow-clay-pressed: 0 1px 2px rgba(4, 6, 24, 0.55), inset 0 2px 4px rgba(4, 6, 24, 0.40);
 }
 
-/* 3. SAKURA THEME */
+/* 3. SAKURA THEME: Warm Blossom Paper */
 [data-theme="sakura"] {
-  --bg-page: #FAF5F5;
-  --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F3E8E8;
-  --border-subtle: #EAD7D7;
-  --border-strong: #D5BDBD;
+  --bg-page: #F5E3E1;
+  --bg-surface: #FFFAF8;
+  --bg-surface-elevated: #F0D8D6;
+  --border-subtle: #EACDCA;
+  --border-strong: #D8AEAA;
 
-  --text-primary: #2D1F24;
-  --text-secondary: #5C454D;
-  --text-muted: #8F757D;
+  --text-primary: #34181F;
+  --text-secondary: #66434C;
+  --text-muted: #7C5861;
 
-  --primary: #D95379;
-  --primary-hover: #C23E64;
-  --primary-surface: #FDF0F3;
-  --primary-border-subtle: #F3C1D0;
+  --primary: #C2416A;
+  --primary-hover: #A63458;
+  --primary-surface: #FADFE7;
+  --primary-border-subtle: #EBB3C4;
 
   --success: #059669;
   --success-surface: #ECFDF5;
@@ -798,29 +809,29 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-4-bg: #FCEEF1; --answer-4-border: #EBB3C0; --answer-4-text: #641E2F;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #E4E8F5;
-  --category-vocabulary-border: #C8CFE6;
-  --category-vocabulary-icon: #4F46E5;
-  --category-vocabulary-text: #232C42;
+  --category-vocabulary-surface: #E5E0F3;
+  --category-vocabulary-border: #CBC3E5;
+  --category-vocabulary-icon: #5A4FCF;
+  --category-vocabulary-text: #2C2654;
 
-  --category-kanji-surface: #F8E3D6;
-  --category-kanji-border: #E9C6B0;
-  --category-kanji-icon: #C05621;
-  --category-kanji-text: #4A232E;
+  --category-kanji-surface: #F8D9C7;
+  --category-kanji-border: #E9BBA0;
+  --category-kanji-icon: #B04A28;
+  --category-kanji-text: #5A2430;
 
   /* Primary Study CTA (solid clay action) */
-  --cta-surface: #B83A60;
-  --cta-border: #A32F52;
+  --cta-surface: #A8385C;
+  --cta-border: #912E4F;
   --cta-text: #FFFFFF;
   --cta-text-secondary: #FDE7EE;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
-  /* Clay Shadows (Warm pink-slate lift) */
-  --shadow-clay-card: 0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  --shadow-clay-card-hover: 0 8px 22px rgba(180, 120, 135, 0.18), 0 2px 6px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1);
-  --shadow-clay-button: 0 4px 12px rgba(217, 83, 121, 0.22), 0 1px 3px rgba(180, 120, 135, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  --shadow-clay-pressed: 0 1px 2px rgba(180, 120, 135, 0.18), inset 0 2px 4px rgba(180, 120, 135, 0.1);
+  /* Clay Shadows (warm blossom lift) */
+  --shadow-clay-card: 0 4px 14px rgba(150, 80, 95, 0.13), 0 1px 4px rgba(150, 80, 95, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 8px 22px rgba(150, 80, 95, 0.18), 0 2px 6px rgba(150, 80, 95, 0.09), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(168, 56, 92, 0.26), 0 1px 3px rgba(150, 80, 95, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.40);
+  --shadow-clay-pressed: 0 1px 2px rgba(150, 80, 95, 0.18), inset 0 2px 4px rgba(150, 80, 95, 0.12);
 }
 ```
 

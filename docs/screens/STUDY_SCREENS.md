@@ -39,7 +39,7 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
 
 #### Responsive Layout Strategy:
 - **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Mixed Test are secondary.
-- **Top Bar:** Solid matte clay surface (`bg-surface`, `border-b border-subtle`, zero blur) with the `TANGO` wordmark and a tactile `rounded-full` Settings button only. No theme status or theme control on Home.
+- **Top Bar:** Opaque theme canvas (`bg-page`) with a hairline `border-b border-subtle` (zero blur), with the `TANGO` wordmark and a tactile `rounded-full` Settings button only. No theme status or theme control on Home.
 - **No greeting, no visible section labels:** Semantic structure uses visually hidden headings (`sr-only` page `h1`, `sr-only` `h2` for "Giáo trình" and "Học theo loại").
 - **Composition order (all breakpoints):** Study Books → Vocabulary / Kanji shortcuts → Mixed Test.
 - **Mobile (< 640px):** Study Books as stacked horizontal cards where the large 3:4 cover (`w-20`), full title (up to 3 lines), and Study Coverage bar fill the card. Below them, a compact 2-column Vocabulary / Kanji shortcut row, then a compact full-width Mixed Test CTA.
