@@ -73,7 +73,6 @@ SETTINGS PANEL
 │ NỘI DUNG HỌC                                  │
 │ ┌───────────────────────────────────────────┐ │
 │ │ Quản lý giáo trình và bài học   [IconChevronRight] │
-│ │ Thêm, sửa, nhập và phân loại nội dung     │ │
 │ └───────────────────────────────────────────┘ │
 └───────────────────────────────────────────────┘
 ```
@@ -90,9 +89,9 @@ The single protected administrative hub for adding, editing, and managing textbo
 - **Entry:** Settings row "Quản lý giáo trình và bài học".
 - **Exit:** `[IconArrowLeft]` Back $\rightarrow$ [SCREEN 16: Settings](#screen-16-settings-cài-đặt).
 - **Actions:**
-  - `[IconPlus] Thêm giáo trình mới` $\rightarrow$ [SCREEN 18: Add Study Book](#screen-18-add-study-book-thêm-giáo-trình).
+  - `Thêm giáo trình (+)` $\rightarrow$ [SCREEN 18: Add Study Book](#screen-18-add-study-book-thêm-giáo-trình).
   - `[ Quản lý ]` beside a book $\rightarrow$ [SCREEN 19: Manage Study Book](#screen-19-manage-study-book-quản-lý-giáo-trình).
-  - `[IconFileImport] Thêm / Nhập bài học mới` $\rightarrow$ [SCREEN 21: Import Input](./IMPORT_SCREENS.md#screen-21-add--import-lesson-input-stage-bước-1).
+  - `[IconFileImport] Thêm bài học mới` $\rightarrow$ [SCREEN 21: Import Input](./IMPORT_SCREENS.md#screen-21-add--import-lesson-input-stage-bước-1).
   - `[ Quản lý ]` beside an unassigned lesson $\rightarrow$ [SCREEN 20: Manage Lesson](#screen-20-manage-lesson-quản-lý-bài-học).
 
 #### Management Paths & Unassigned Lessons Rules:
@@ -114,8 +113,8 @@ The single protected administrative hub for adding, editing, and managing textbo
 #### Responsive Layout:
 - **Mobile (< 640px):** Full-screen stacked list. Study Books roster listed first, followed by Unassigned Lessons (if any exist), followed by lesson creation CTA.
 - **Tablet / Desktop (>= 640px):** **Structured 2-column management dashboard** (`max-w-4xl`):
-  - Left Column (60%): Study Books list with `[ Quản lý ]` actions and `+ Thêm giáo trình mới` CTA.
-  - Right Column (40%): Lessons & Import quick tools (`[IconFileImport] Thêm / Nhập bài học mới`), plus the Unassigned Lessons roster (if any exist) with `[ Quản lý ]` buttons.
+  - Left Column (60%): Study Books list with `[ Quản lý ]` actions and `Thêm giáo trình (+)` action.
+  - Right Column (40%): Lessons & Import quick tools (`[IconFileImport] Thêm bài học mới`), plus the Unassigned Lessons roster (if any exist) with `[ Quản lý ]` buttons.
 
 #### Wireframes:
 ```text
@@ -132,7 +131,7 @@ MOBILE (< 640px)
 │ │         5 bài · 110 mục                   │ │
 │ └───────────────────────────────────────────┘ │
 │                                               │
-│ [ [IconPlus] Thêm giáo trình mới ]            │
+│ [ Thêm giáo trình (+) ]                       │
 │                                               │
 │ KHÔNG THUỘC GIÁO TRÌNH (khi có bài lẻ)        │
 │ ┌───────────────────────────────────────────┐ │
@@ -144,8 +143,7 @@ MOBILE (< 640px)
 │ THAO TÁC BÀI HỌC (LESSONS)                    │
 │ ┌───────────────────────────────────────────┐ │
 │ │ [IconFileImport]                          │ │
-│ │ Thêm / Nhập bài học mới                   │ │
-│ │ Tạo thủ công hoặc nhập từ tệp/văn bản     │ │
+│ │ Thêm bài học mới                          │ │
 │ └───────────────────────────────────────────┘ │
 └───────────────────────────────────────────────┘
 
@@ -156,13 +154,13 @@ DESKTOP (> 1024px - max-w-4xl Centered)
 │ GIÁO TRÌNH (STUDY BOOKS)               BÀI HỌC & NHẬP LIỆU             │
 │ ┌────────────────────────────────────┐ ┌─────────────────────────────┐ │
 │ │ [Thumb] 中級へ行こう    [ Quản lý ]│ │ [IconFileImport]            │ │
-│ │         8 bài · 164 mục            │ │ Thêm / Nhập bài học mới     │ │
-│ ├────────────────────────────────────┤ │ Tạo bài học mới bằng cách   │ │
-│ │ [Thumb] Mimikara        [ Quản lý ]│ │ dán văn bản hoặc tải file.  │ │
-│ │         5 bài · 110 mục            │ └─────────────────────────────┘ │
+│ │         8 bài · 164 mục            │ │ Thêm bài học mới            │ │
+│ ├────────────────────────────────────┤ └─────────────────────────────┘ │
+│ │ [Thumb] Mimikara        [ Quản lý ]│                                 │
+│ │         5 bài · 110 mục            │                                 │
 │ └────────────────────────────────────┘                                 │
 │                                        KHÔNG THUỘC GIÁO TRÌNH          │
-│ [ [IconPlus] Thêm giáo trình mới ]     ┌─────────────────────────────┐ │
+│ [ Thêm giáo trình (+) ]                ┌─────────────────────────────┐ │
 │                                        │ • 20 từ N3      [ Quản lý ] │ │
 │                                        │ • Chữ Hán N4    [ Quản lý ] │ │
 │                                        └─────────────────────────────┘ │

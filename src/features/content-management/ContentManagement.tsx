@@ -67,7 +67,16 @@ export const ContentManagement: React.FC = () => {
               })}
             </ul>
           )}
-          <Button icon={<IconPlus size={18} stroke={2} />} onClick={() => navigate({ type: 'add_book' })}>
+          {/* Label first, then a round "+" puck (same affordance as the Home Test CTA) */}
+          <Button
+            onClick={() => navigate({ type: 'add_book' })}
+            className="pr-2.5"
+            trailingIcon={
+              <span className="w-8 h-8 rounded-full bg-primary-surface border border-primary-border text-primary flex items-center justify-center">
+                <IconPlus size={18} stroke={2.25} />
+              </span>
+            }
+          >
             {t('content.addBook')}
           </Button>
         </section>
@@ -113,7 +122,6 @@ const ImportCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-[15px] font-semibold text-text-primary leading-snug">{t('content.import')}</span>
-        <span className="block text-sm text-text-secondary leading-snug mt-0.5">{t('content.importDesc')}</span>
       </span>
       <IconChevronRight size={20} stroke={2} aria-hidden="true" className="shrink-0 text-text-muted clay-hover-nudge transition-transform" />
     </button>

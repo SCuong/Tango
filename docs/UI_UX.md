@@ -260,7 +260,7 @@ A clean, minimalist preferences modal/sheet:
 A protected administrative screen accessed intentionally via **Settings → Quản lý giáo trình và bài học**:
 - **Giáo trình (Study Books):** List of textbooks with `[ Quản lý ]` inspector and `[IconPlus] Thêm giáo trình`.
 - **Bài học (Lessons):** Lesson rows inside book management provide `[ Quản lý ]`, opening a dedicated **Quản lý bài học (Lesson Management)** view. There are **strictly no inline adjacent delete buttons** on lesson rows.
-- **Thêm bài mới:** `[IconFileImport] Thêm / Nhập bài học mới` (launches lesson importer with target book selector).
+- **Thêm bài mới:** `[IconFileImport] Thêm bài học mới` (launches lesson importer with target book selector).
 - **Danger Zone (Vùng nguy hiểm):** Located deep inside individual book and lesson management views.
 - **Hard Delete Only:** Deleting a book or lesson permanently removes records and related data via an ordered, idempotent cascade. No soft delete, no recycle bin, no trash folder.
 - **Accidental Tap Safeguards:** Requires explicit modal confirmation clearly stating book/lesson name and total items; delete button is visually separated with semantic error styling and never default focused.

@@ -553,7 +553,7 @@ GIÁO TRÌNH (STUDY BOOKS)
 
 BÀI HỌC (LESSONS)
 ──────────────────────────────────────────────────────────
-[ [IconFileImport] Thêm / Nhập bài học mới ]
+[ [IconFileImport] Thêm bài học mới ]
 
 KHÔNG THUỘC GIÁO TRÌNH (Chỉ hiển thị khi có bài lẻ)
 ──────────────────────────────────────────────────────────

@@ -246,7 +246,7 @@ describe('settings and content management', () => {
 
   it('Content Management lists books and the unassigned section with Manage actions only', () => {
     const html = render('/settings/content-management');
-    expect(html).toContain('Thêm giáo trình mới');
+    expect(html).toContain('Thêm giáo trình');
     expect(html).toContain('Không thuộc giáo trình');
     expect(html).toContain('Quản lý 20 từ Kanji JLPT N3');
     expect(html).not.toMatch(/Xóa/);

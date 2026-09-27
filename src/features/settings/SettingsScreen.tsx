@@ -141,7 +141,6 @@ const ContentManagementRow: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-[15px] font-semibold text-text-primary leading-snug">{t('settings.manageContent')}</span>
-        <span className="block text-sm text-text-secondary leading-snug mt-0.5">{t('settings.manageContentDesc')}</span>
       </span>
       <IconChevronRight size={20} stroke={2} aria-hidden="true" className="shrink-0 text-text-muted" />
     </button>

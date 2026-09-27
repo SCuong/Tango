@@ -204,20 +204,18 @@ export const VI_DICTIONARY = {
   'settings.themeDesc.dark': 'Mực đêm · trăng, đèn lồng',
   'settings.themeDesc.sakura': 'Giấy hoa anh đào ấm',
   'settings.sound': 'Âm thanh hiệu ứng',
-  'settings.soundDesc': 'Âm chạm nhẹ khi trả lời câu hỏi. Mặc định tắt.',
+  'settings.soundDesc': 'Âm chạm nhẹ khi trả lời câu hỏi.',
   'settings.studyContent': 'Nội dung học',
   'settings.manageContent': 'Quản lý giáo trình và bài học',
-  'settings.manageContentDesc': 'Thêm, sửa, nhập và phân loại nội dung',
 
   // Content Management (SCREEN 17)
   'content.books': 'Giáo trình',
-  'content.addBook': 'Thêm giáo trình mới',
+  'content.addBook': 'Thêm giáo trình',
   'content.manage': 'Quản lý',
   'content.manageAria': 'Quản lý {title}',
   'content.noBooks': 'Chưa có giáo trình nào. Hãy thêm giáo trình đầu tiên.',
   'content.lessonTools': 'Bài học & nhập liệu',
-  'content.import': 'Thêm / Nhập bài học mới',
-  'content.importDesc': 'Tạo bài học bằng cách dán văn bản hoặc tải tệp lên.',
+  'content.import': 'Thêm bài học mới',
 
   // Book form (SCREEN 18, 19)
   'addBook.title': 'Thêm giáo trình',
@@ -556,10 +554,9 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'settings.themeDesc.dark': 'Midnight ink · moonlit night',
   'settings.themeDesc.sakura': 'Warm blossom paper',
   'settings.sound': 'Sound effects',
-  'settings.soundDesc': 'A soft tap when you answer. Off by default.',
+  'settings.soundDesc': 'A soft tap when you answer.',
   'settings.studyContent': 'Study Content',
   'settings.manageContent': 'Manage books and lessons',
-  'settings.manageContentDesc': 'Add, edit, import, and organize content',
 
   // Content Management (SCREEN 17)
   'content.books': 'Study Books',
@@ -568,8 +565,7 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'content.manageAria': 'Manage {title}',
   'content.noBooks': 'No study books yet. Add your first one.',
   'content.lessonTools': 'Lessons & Import',
-  'content.import': 'Add / Import lesson',
-  'content.importDesc': 'Create a lesson by pasting text or uploading a file.',
+  'content.import': 'Add new lesson',
 
   // Book form (SCREEN 18, 19)
   'addBook.title': 'Add Study Book',
