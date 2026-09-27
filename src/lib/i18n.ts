@@ -53,7 +53,6 @@ export const VI_DICTIONARY = {
   'state.loading': 'Đang tải...',
   'state.empty': 'Không có dữ liệu',
   'state.notFound': 'Không tìm thấy trang',
-  'state.notImplemented': 'Tính năng đang được phát triển',
 
   // Home Screen (SCREEN 01)
   'home.studyBooks': 'Giáo trình',
@@ -407,7 +406,6 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'state.loading': 'Loading...',
   'state.empty': 'No data available',
   'state.notFound': 'Page not found',
-  'state.notImplemented': 'Feature in development',
 
   // Home Screen (SCREEN 01)
   'home.studyBooks': 'Study Books',
