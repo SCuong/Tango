@@ -29,35 +29,37 @@ The Home screen is dedicated purely to reading and studying. Administrative, imp
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ TANGO                           [IconSettings]│
-├───────────────────────────────────────────────┤
+│ TANGO                           [IconSettings]│  <- no divider line
 │ ┌───────────────────────────────────────────┐ │
-│ │ ┌───────┐  中級へ行こう 日本語の文型と   │ │  <- primary: large 3:4 cover,
-│ │ │ Cover │  表現55 第2版                  │ │     full title (up to 3 lines),
-│ │ │  3:4  │                                │ │     Study Coverage only
-│ │ └───────┘  [━━━━━━░░░░░░░]          45%  │ │
+│ │ ┌─────────┐  中級へ行こう 日本語の文型と │ │  <- first 2 books only:
+│ │ │  Cover  │  表現55 第2版                │ │     large 3:4 cover, title,
+│ │ │   3:4   │                              │ │     Study Coverage
+│ │ └─────────┘  [━━━━━━░░░░░░░]        45%  │ │
 │ └───────────────────────────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
-│ │ ┌───────┐  耳から覚える 日本語能力試験   │ │
-│ │ │ Cover │  文法トレーニング N3           │ │
-│ │ └───────┘  [━━━░░░░░░░░░░]          30%  │ │
+│ │ ┌─────────┐  耳から覚える 日本語能力試験 │ │
+│ │ │  Cover  │  文法トレーニング N3         │ │
+│ │ └─────────┘  [━━━░░░░░░░░░░]        30%  │ │
 │ └───────────────────────────────────────────┘ │
+│                              Xem tất cả ⌄     │  <- only when > 2 books
 │ ┌────────────────────┐ ┌────────────────────┐ │
-│ │ 語彙               │ │ 漢字               │ │  <- secondary: glyph + name
+│ │ 語彙         [あ]  │ │ 漢字         [字]  │ │  <- glyph + name + illustration
 │ │ Từ vựng            │ │ Hán tự             │ │
 │ └────────────────────┘ └────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
-│ │ Kiểm tra tổng hợp                      →  │ │  <- concise action
+│ │ Kiểm tra                              (+) │ │  <- "Tạo bài kiểm tra"
 │ └───────────────────────────────────────────┘ │
+│            (quiet theme ambience behind)      │
 └───────────────────────────────────────────────┘
 ```
 
-- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Mixed Test are secondary.
-- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Mixed Test = concise action label. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. No visible section labels or greeting. Theme controls remain Settings-only.
-- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
-- **Study Book cards:** Large 3:4 cover, title (up to 3 lines, full title on hover), and Study Coverage. Tapping a book opens its **Book Study View**. (Never triggers edit/delete).
-- **Vocabulary / Kanji shortcuts:** `語彙 Từ vựng` and `漢字 Hán tự` tiles to browse lessons by category across all textbooks.
-- **Kiểm tra tổng hợp →:** Concise CTA to the global multi-lesson quiz builder across books.
+- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Test action are secondary.
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Test = short label `Kiểm tra` with a `+` affordance. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
+- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only, with no divider line. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
+- **Study Book cards:** The first 2 books as large cards (3:4 cover, title up to 3 lines with full title on hover, Study Coverage). `Xem tất cả` / `View all` reveals the rest in place when more than 2 exist. Tapping a book opens its **Book Study View**. (Never triggers edit/delete). Reordering books is not available on Home; it belongs to the future full Books list / management view.
+- **Vocabulary / Kanji shortcuts:** `語彙 Từ vựng` and `漢字 Hán tự` tiles with their study-card illustrations, to browse lessons by category across all textbooks.
+- **Kiểm tra (+):** Compact CTA (accessible name "Tạo bài kiểm tra" / "Create test") that opens the global multi-lesson test builder.
+- **Ambience:** A restrained per-theme Japanese scene sits quietly behind the content (see [`docs/DESIGN_SYSTEM.md` §8.2](./DESIGN_SYSTEM.md#82-restrained-japanese-ambience-explicit-exception)).
 - **Strict Safety Rule:** Zero Add, Import, Edit, or Delete controls on Home.
 
 ---
@@ -297,7 +299,7 @@ A protected administrative screen accessed intentionally via **Settings → Qu�
 
 | Component / Screen | Mobile (< 640px) | Tablet (640px - 1024px) | Desktop (> 1024px) |
 |---|---|---|---|
-| **Home Screen** | Stacked Study Book cards, Learn by Type buttons, Mixed Test CTA | 2-column Study Book grid with compact sidebar / action bar | 3 to 4-column Study Book card grid (max-w-4xl), Learn by Type quick links, Mixed Test banner |
+| **Home Screen** | First 2 large Study Book cards (+ `Xem tất cả`), 2-col Vocabulary/Kanji tiles, full-width Test (+) CTA | 2-column Study Book grid, shortcut row | 2-column Study Book grid (max-w-4xl), one row of Vocabulary/Kanji tiles + Test (+) CTA |
 | **Mixed Test Selector**| Full-screen modal, stacked checkboxes | Centered modal (max-w-lg) | Centered modal (max-w-xl) |
 | **Lesson List** | Single column list | 2-column grid | 2-column grid (max-w-4xl) |
 | **Quiz Container** | Full screen (100% width, 16px padding) | Centered canvas (max-w-lg) | Centered canvas (max-w-xl) |

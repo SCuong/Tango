@@ -141,7 +141,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('Hán tự');
 
     // 5. Mixed Test action without its explanatory subtitle
-    expect(html).toContain('Kiểm tra tổng hợp');
+    expect(html).toContain('>Kiểm tra</h3>');
     expect(html).not.toContain('Tùy chọn nhiều bài học trên tất cả giáo trình để kiểm tra');
 
     // 6. No lesson/item counts anywhere on Home
@@ -176,7 +176,8 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     // Screen-reader section headings and localized labels
     expect(html).toContain('Study Books');
     expect(html).toContain('Learn by Type');
-    expect(html).toContain('Mixed Test');
+    expect(html).toContain('>Test</h3>');
+    expect(html).toContain('aria-label="Create test"');
     expect(html).toContain('Vocabulary');
     expect(html).toContain('Kanji');
     expect(html).toContain('aria-label="Learn by type: Vocabulary"');
@@ -215,7 +216,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     // 4. Category shortcuts and Mixed Test remain available, still without counts
     expect(html).toContain('Từ vựng');
     expect(html).toContain('Hán tự');
-    expect(html).toContain('Kiểm tra tổng hợp');
+    expect(html).toContain('>Kiểm tra</h3>');
     expect(html).not.toMatch(COUNT_PATTERN);
   });
 
@@ -314,7 +315,8 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     const header = html.match(/<header[^>]*>/);
     expect(header).not.toBeNull();
     expect(header![0]).toContain('bg-page');
-    expect(header![0]).toContain('border-b border-border-subtle');
+    // No divider line under the TopBar
+    expect(header![0]).not.toMatch(/border-b\b/);
     expect(html).not.toContain('backdrop-blur');
     expect(html).not.toMatch(/bg-(?:page|surface)\/\d+/);
 
@@ -532,16 +534,104 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(cardOrder).toEqual(['book', 'vocabulary', 'kanji', 'mixed']);
   });
 
-  it('renders Mixed Test as a concise action: title plus a single trailing arrow', () => {
+  it('renders the Test CTA as a short label with a "+" affordance and an explicit accessible name', () => {
     const html = renderHome(populatedState);
+    const tag = html.match(/<button[^>]*id="home-mixed-test-heading"[^>]*>/);
+    expect(tag).not.toBeNull();
+    expect(tag![0]).toContain('aria-label="Tạo bài kiểm tra"');
+    expect(tag![0]).toContain('data-study-card="true"');
+
     const start = html.indexOf('id="home-mixed-test-heading"');
     const markup = html.slice(start, html.indexOf('</button>', start));
-
-    expect(markup).toContain('Kiểm tra tổng hợp');
+    expect(markup).toContain('>Kiểm tra</h3>');
+    expect(markup).not.toContain('Kiểm tra tổng hợp');
     expect(markup).not.toMatch(/<p[\s>]/);
     expect(markup.match(/<svg/g)).toHaveLength(1);
-    expect(markup).toContain('tabler-icon-arrow-right');
-    expect(markup).not.toContain('tabler-icon-bolt');
+    expect(markup).toContain('tabler-icon-plus');
+    expect(markup).not.toContain('tabler-icon-arrow-right');
+  });
+
+  describe('book preview limit and "View all"', () => {
+    const makeBooks = (count: number) =>
+      Object.fromEntries(
+        Array.from({ length: count }, (_, i) => [
+          `book-${i + 1}`,
+          {
+            id: `book-${i + 1}`,
+            title: `Book ${i + 1}`,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
+        ])
+      );
+    const bookCardCount = (html: string) => (html.match(/aria-label="Mở giáo trình /g) ?? []).length;
+
+    it('shows only the first 2 books and a collapsed "Xem tất cả" toggle when more exist', () => {
+      const html = renderHome({ ...populatedState, books: makeBooks(4) });
+
+      expect(bookCardCount(html)).toBe(2);
+      expect(html).toContain('Book 1');
+      expect(html).toContain('Book 2');
+      expect(html).not.toContain('Book 3');
+
+      const toggle = html.match(/<button[^>]*aria-controls="home-more-books"[^>]*>/);
+      expect(toggle).not.toBeNull();
+      expect(toggle![0]).toContain('aria-expanded="false"');
+      expect(toggle![0]).toContain('min-h-touch');
+      expect(html).toContain('Xem tất cả');
+      // The toggle is not a study card and never reorders books
+      expect(toggle![0]).not.toContain('data-study-card');
+      expect(html).not.toContain('draggable="true"');
+    });
+
+    it('renders no "View all" toggle when 2 or fewer books exist', () => {
+      for (const count of [1, 2]) {
+        const html = renderHome({ ...populatedState, books: makeBooks(count) });
+        expect(bookCardCount(html)).toBe(count);
+        expect(html).not.toContain('home-more-books');
+        expect(html).not.toContain('Xem tất cả');
+      }
+    });
+
+    it('localizes the toggle label', () => {
+      const html = renderHome({
+        ...populatedState,
+        books: makeBooks(3),
+        preferences: { ...populatedState.preferences, language: 'en' },
+      });
+      expect(html).toContain('View all');
+    });
+  });
+
+  describe('theme ambience layer', () => {
+    it('renders one decorative, non-interactive layer with a scene per theme', () => {
+      const html = renderHome(populatedState);
+      const layer = html.match(/<div[^>]*class="tango-ambience"[^>]*>/);
+      expect(layer).not.toBeNull();
+      expect(layer![0]).toContain('aria-hidden="true"');
+      for (const scene of ['ambience-light', 'ambience-dark', 'ambience-sakura']) {
+        expect(html).toContain(`ambience-scene ${scene}`);
+      }
+      // Ambience sits before (behind) the TopBar and main content
+      expect(html.indexOf('tango-ambience')).toBeLessThan(html.indexOf('<header'));
+      expect(html.indexOf('tango-ambience')).toBeLessThan(html.indexOf('<main'));
+    });
+
+    it('keeps ambience fixed, non-interactive, theme-scoped, and static under reduced motion', () => {
+      const css = readFileSync(resolve(__dirname, '../../../index.css'), 'utf-8');
+      expect(css).toMatch(/\.tango-ambience\s*\{[^}]*position:\s*fixed;[^}]*pointer-events:\s*none;/);
+      expect(css).toContain('[data-theme="dark"] .ambience-dark');
+      expect(css).toContain('[data-theme="sakura"] .ambience-sakura');
+      expect(css).toMatch(
+        /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.ambience-animated\s*\{\s*animation:\s*none !important;/
+      );
+      // Petals keep a fixed tilt; they are never flipped or spun
+      const fall = css.match(/@keyframes ambience-fall\s*\{[\s\S]*?\n\}/);
+      expect(fall).not.toBeNull();
+      const angles = Array.from(fall![0].matchAll(/rotate\((-?\d+)deg\)/g), (m) => Number(m[1]));
+      expect(new Set(angles).size).toBe(1);
+      expect(Math.abs(angles[0])).toBeLessThan(45);
+    });
   });
 
   it('renders book cards with title and coverage but no lesson/item counts', () => {

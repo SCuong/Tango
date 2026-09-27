@@ -34,70 +34,74 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
 - **Exit:**
   - Tapping a Study Book card $\rightarrow$ [SCREEN 02: Book Study View](#screen-02-book-study-view) (`/book/:bookId`).
   - Tapping the `語彙 Từ vựng` or `漢字 Hán tự` shortcut $\rightarrow$ [SCREEN 04: Learn by Type](#screen-04-learn-by-type-học-theo-loại) (`/learn/:category`).
-  - Tapping `Kiểm tra tổng hợp →` $\rightarrow$ [SCREEN 09: Global Mixed Test](./QUIZ_CONFIG_SCREENS.md#screen-09-global-mixed-test) (`/quiz/mixed-config`).
+  - Tapping `Kiểm tra (+)` ("Tạo bài kiểm tra") $\rightarrow$ [SCREEN 09: Global Mixed Test](./QUIZ_CONFIG_SCREENS.md#screen-09-global-mixed-test) (`/quiz/mixed-config`).
   - Tapping `[IconSettings]` $\rightarrow$ [SCREEN 16: Settings](./SETTINGS_CONTENT_SCREENS.md#screen-16-settings) (`/settings`).
 
 #### Responsive Layout Strategy:
-- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Mixed Test are secondary.
-- **Top Bar:** Opaque theme canvas (`bg-page`) with a hairline `border-b border-subtle` (zero blur), with the `TANGO` wordmark and a tactile `rounded-full` Settings button only. No theme status or theme control on Home.
+- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Test action are secondary.
+- **Top Bar:** Opaque theme canvas (`bg-page`) with no divider line (zero blur), with the `TANGO` wordmark and a tactile `rounded-full` Settings button only. No theme status or theme control on Home.
 - **No greeting, no visible section labels:** Semantic structure uses visually hidden headings (`sr-only` page `h1`, `sr-only` `h2` for "Giáo trình" and "Học theo loại").
-- **Composition order (all breakpoints):** Study Books → Vocabulary / Kanji shortcuts → Mixed Test.
-- **Mobile (< 640px):** Study Books as stacked horizontal cards where the large 3:4 cover (`w-20`), full title (up to 3 lines), and Study Coverage bar fill the card. Below them, a compact 2-column Vocabulary / Kanji shortcut row, then a compact full-width Mixed Test CTA.
-- **Tablet (640px – 1024px):** Study Books in a 2-column grid (cover `w-24`); shortcuts as above.
-- **Desktop (> 1024px):** Centered container (`max-w-4xl`). Study Books in a 2-column primary grid (cover `w-28`). One compact shortcut row below: Vocabulary and Kanji in the wider track, Mixed Test in the narrower track (`lg:grid-cols-[3fr_2fr]`).
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Test = short label `Kiểm tra` with a `+` affordance. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
+- **Composition order (all breakpoints):** Study Books → Vocabulary / Kanji shortcuts → Test.
+- **Study Books:** Only the first 2 books render as large cards. When more exist, a quiet `Xem tất cả ⌄` / `View all ⌄` toggle (`aria-expanded`, `aria-controls="home-more-books"`) reveals the rest in place and then reads `Thu gọn` / `Show less`. Home never offers drag-reordering; ordering belongs to the future full Books list / management view.
+- **Mobile (< 640px):** Stacked horizontal book cards where the large 3:4 cover (`w-24`), full title (up to 3 lines), and Study Coverage bar fill the card. Below them, a 2-column Vocabulary / Kanji shortcut row, then a full-width Test CTA.
+- **Tablet (640px – 1024px):** Book cards in a 2-column grid (cover `w-28`); shortcuts as above.
+- **Desktop (> 1024px):** Centered container (`max-w-4xl`). Book cards in a 2-column primary grid (cover `w-32`). One shortcut row below: Vocabulary and Kanji in the wider track, Test in the narrower track (`lg:grid-cols-[3fr_2fr]`).
 - **Book titles:** `.font-study-title` (UI font for Latin/Vietnamese, Japanese stack for Kana/Kanji), `line-clamp-3`, full title in the native `title` attribute for hover.
-- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Mixed Test = concise action label. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. No visible section labels or greeting. Theme controls remain Settings-only.
-- **Visual hierarchy:** Large neutral book cards (cover + title + Study Coverage) > typography-led tinted category shortcuts (`語彙` / `漢字` glyph in `--category-*-icon` over the localized name) ≈ concise solid Mixed Test CTA (`--cta-*`, `shadow-clay-button`, title + trailing arrow).
-- **Tactile Clay Recipe:** Every interactive Home card and button uses `.clay-interactive` (hover lift only under `@media (hover: hover) and (pointer: fine)`) plus `usePressFeedback` (explicit `data-pressed` state that swaps in `translate-y-px shadow-clay-pressed`). Never Tailwind `hover:*` / `active:*` elevation utilities, which stick on touch screens. Focus ring: `focus-visible:ring-2 ring-primary ring-offset-2 ring-offset-page`. See [`docs/DESIGN_SYSTEM.md` §3.1](../DESIGN_SYSTEM.md#31-canonical-clay-interaction-recipe).
+- **Category shortcuts:** Spacious tinted clay tiles (`min-h-[96px]`, `sm:min-h-[112px]`) with the `語彙` / `漢字` glyph, localized name, and the category study-card illustration; still smaller than the book cards.
+- **Test CTA:** Short label `Kiểm tra` / `Test` plus a round `IconPlus` puck; accessible name `Tạo bài kiểm tra` / `Create test`; route `mixed_quiz_config`.
+- **Ambience:** Restrained per-theme Japanese scene behind all content (Light daytime shoji / mist / washi sun, Dark moon / stars / lantern, Sakura branch / few falling petals), fixed, `aria-hidden`, very low opacity, static under reduced motion (see [`docs/DESIGN_SYSTEM.md` §8.2](../DESIGN_SYSTEM.md#82-restrained-japanese-ambience-explicit-exception)).
+- **Tactile Clay Recipe:** Every interactive Home card and button uses `.clay-interactive` (hover lift only under `@media (hover: hover) and (pointer: fine)`) plus `usePressFeedback` (explicit `data-pressed` state that swaps in `translate-y-px shadow-clay-pressed`). The `View all` toggle is a quiet text button, not a clay card. Focus ring: `focus-visible:ring-2 ring-primary ring-offset-2 ring-offset-page`. See [`docs/DESIGN_SYSTEM.md` §3.1](../DESIGN_SYSTEM.md#31-canonical-clay-interaction-recipe).
 
 #### Wireframes:
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ TANGO                           [IconSettings]│
-├───────────────────────────────────────────────┤
+│ TANGO                           [IconSettings]│  <- no divider line
 │ ┌───────────────────────────────────────────┐ │
-│ │ ┌───────┐  中級へ行こう 日本語の文型と   │ │  <- primary: large 3:4 cover,
-│ │ │ Cover │  表現55 第2版                  │ │     full title (up to 3 lines),
-│ │ │  3:4  │                                │ │     Study Coverage only
-│ │ └───────┘  [━━━━━━░░░░░░░]          45%  │ │
+│ │ ┌─────────┐  中級へ行こう 日本語の文型と │ │  <- first 2 books only:
+│ │ │  Cover  │  表現55 第2版                │ │     large 3:4 cover, title,
+│ │ │   3:4   │                              │ │     Study Coverage
+│ │ └─────────┘  [━━━━━━░░░░░░░]        45%  │ │
 │ └───────────────────────────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
-│ │ ┌───────┐  耳から覚える 日本語能力試験   │ │
-│ │ │ Cover │  文法トレーニング N3           │ │
-│ │ └───────┘  [━━━░░░░░░░░░░]          30%  │ │
+│ │ ┌─────────┐  耳から覚える 日本語能力試験 │ │
+│ │ │  Cover  │  文法トレーニング N3         │ │
+│ │ └─────────┘  [━━━░░░░░░░░░░]        30%  │ │
 │ └───────────────────────────────────────────┘ │
+│                              Xem tất cả ⌄     │  <- only when > 2 books
 │ ┌────────────────────┐ ┌────────────────────┐ │
-│ │ 語彙               │ │ 漢字               │ │  <- secondary: glyph + name
+│ │ 語彙         [あ]  │ │ 漢字         [字]  │ │  <- glyph + name + illustration
 │ │ Từ vựng            │ │ Hán tự             │ │
 │ └────────────────────┘ └────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
-│ │ Kiểm tra tổng hợp                      →  │ │  <- concise action
+│ │ Kiểm tra                              (+) │ │  <- "Tạo bài kiểm tra"
 │ └───────────────────────────────────────────┘ │
+│            (quiet theme ambience behind)      │
 └───────────────────────────────────────────────┘
 
 DESKTOP (> 1024px - max-w-4xl Centered)
 ┌────────────────────────────────────────────────────────────────────────┐
 │ TANGO                                                    [IconSettings]│
-├────────────────────────────────────────────────────────────────────────┤
 │ ┌──────────────────────────────────┐ ┌───────────────────────────────┐ │
 │ │ ┌────────┐ 中級へ行こう 日本語の │ │ ┌────────┐ 耳から覚える      │ │
 │ │ │ Cover  │ 文型と表現55 第2版    │ │ │ Cover  │ 日本語能力試験    │ │
 │ │ │  3:4   │                       │ │ │  3:4   │ 文法トレーニング  │ │
 │ │ └────────┘ [━━━━━░░░░░]     45%  │ │ └────────┘ [━━░░░░░░]   30%  │ │
 │ └──────────────────────────────────┘ └───────────────────────────────┘ │
+│                                                        Xem tất cả ⌄    │
 │ ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────────────┐ │
-│ │ 語彙             │ │ 漢字             │ │ Kiểm tra tổng hợp     →  │ │
+│ │ 語彙       [あ]  │ │ 漢字       [字]  │ │ Kiểm tra             (+) │ │
 │ │ Từ vựng          │ │ Hán tự           │ │                          │ │
 │ └──────────────────┘ └──────────────────┘ └──────────────────────────┘ │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
 #### Keyboard Navigation (Desktop):
-- Arrow keys move through Home study cards in order: Study Books, Vocabulary, Kanji, Mixed Test. `Enter` / `Space` open the focused card; `Alt+S` opens Settings.
+- Arrow keys move through Home study cards in order: visible Study Books, Vocabulary, Kanji, Test. `Enter` / `Space` open the focused card; `Tab` reaches the `View all` toggle; `Alt+S` opens Settings.
 
 #### Empty State:
-- If 0 books exist, the primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`) instead of a large floating card: icon puck, *"Chưa có giáo trình nào."*, *"Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung."*, and a tactile `[IconSettings] Cài đặt` button (right-aligned on desktop, under the text on mobile). The category shortcuts and Mixed Test follow directly below. Never places an "+ Add Book" button directly on Home.
+- If 0 books exist, the primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`) instead of a large floating card: icon puck, *"Chưa có giáo trình nào."*, *"Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung."*, and a tactile `[IconSettings] Cài đặt` button (right-aligned on desktop, under the text on mobile). The category shortcuts and the Test CTA follow directly below. Never places an "+ Add Book" button directly on Home.
 
 ```text
 EMPTY (0 Study Books) - same primary book area

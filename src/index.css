@@ -78,6 +78,11 @@
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
+  /* Ambient background (Japanese daytime: ink lines, washi sun, sky mist); always used at very low opacity */
+  --ambience-line: #1A2033;
+  --ambience-glow: #FFFFFF;
+  --ambience-accent: #8FA3C8;
+
   /* Clay Shadows (neutral cool pearl) */
   --shadow-clay-card: 0 4px 14px -1px rgba(30, 38, 64, 0.10), 0 2px 6px -1px rgba(30, 38, 64, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
   --shadow-clay-card-hover: 0 8px 20px -2px rgba(30, 38, 64, 0.13), 0 3px 8px -1px rgba(30, 38, 64, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1);
@@ -133,6 +138,11 @@
   --cta-text-secondary: #E6E8FF;
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
   --cta-puck-border: rgba(255, 255, 255, 0.24);
+
+  /* Ambient background (Japanese night: moonlit lines, moonlight, lantern amber); always used at very low opacity */
+  --ambience-line: #C9D2E6;
+  --ambience-glow: #F3E7C4;
+  --ambience-accent: #F6AE3D;
 
   /* Clay Shadows (neutral night elevation) */
   --shadow-clay-card: 0 4px 16px rgba(0, 2, 10, 0.45), 0 1px 3px rgba(0, 2, 10, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -190,6 +200,11 @@
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
+  /* Ambient background (Blossom paper: plum branch, paper glow, petal pink); always used at very low opacity */
+  --ambience-line: #7C5861;
+  --ambience-glow: #FFFAF8;
+  --ambience-accent: #E595AC;
+
   /* Clay Shadows (warm blossom lift) */
   --shadow-clay-card: 0 4px 14px rgba(150, 80, 95, 0.13), 0 1px 4px rgba(150, 80, 95, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.95);
   --shadow-clay-card-hover: 0 8px 22px rgba(150, 80, 95, 0.18), 0 2px 6px rgba(150, 80, 95, 0.09), inset 0 1px 0 rgba(255, 255, 255, 1);
@@ -234,6 +249,88 @@
 @layer utilities {
   .font-study-title {
     font-family: "Be Vietnam Pro", var(--font-japanese);
+  }
+}
+
+/*
+ * Restrained Japanese ambience (DESIGN_SYSTEM §8.2). Fixed decorative layer behind all Home
+ * content: deterministic positions, very low opacity, only a few slow translate/fade motions,
+ * and fully static under prefers-reduced-motion.
+ */
+@layer components {
+  .tango-ambience {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .ambience-scene {
+    display: none;
+    position: absolute;
+    inset: 0;
+  }
+
+  html:not([data-theme="dark"]):not([data-theme="sakura"]) .ambience-light,
+  [data-theme="dark"] .ambience-dark,
+  [data-theme="sakura"] .ambience-sakura {
+    display: block;
+  }
+
+  .ambience-scene svg,
+  .ambience-star {
+    position: absolute;
+    display: block;
+  }
+
+  /* Light: daytime sun, mist bands, shoji lattice */
+  .ambience-sun { top: 9%; right: -80px; width: 220px; height: 220px; }
+  .ambience-mist { width: 280px; height: 36px; }
+  .ambience-mist-1 { bottom: 13%; left: -72px; animation: ambience-drift 48s ease-in-out infinite alternate; }
+  .ambience-mist-2 { bottom: 5%; right: -64px; animation: ambience-drift 60s ease-in-out -20s infinite alternate-reverse; }
+  .ambience-shoji { bottom: -48px; right: -40px; width: 176px; height: 220px; opacity: 0.7; }
+
+  /* Dark: moon, stars, paper lantern */
+  .ambience-moon { top: 9%; right: -64px; width: 220px; height: 220px; }
+  .ambience-star { width: 3px; height: 3px; border-radius: 9999px; background: var(--ambience-glow); opacity: 0.35; }
+  .ambience-star-1 { top: 22%; left: 7%; animation: ambience-twinkle 9s ease-in-out infinite; }
+  .ambience-star-2 { top: 58%; left: 16%; }
+  .ambience-star-3 { top: 46%; right: 9%; animation: ambience-twinkle 12s ease-in-out -4s infinite; }
+  .ambience-star-4 { top: 78%; right: 24%; }
+  .ambience-star-5 { top: 90%; left: 42%; }
+  .ambience-lantern { bottom: 7%; left: 4%; width: 64px; height: 96px; }
+
+  /* Sakura: branch and falling petals (translate only, fixed tilt, never flipped) */
+  .ambience-branch { top: 72px; left: -36px; width: 300px; height: 206px; }
+  .ambience-petal { width: 14px; height: 14px; }
+  .ambience-petal-1 { top: 12%; left: 86%; animation: ambience-fall 64s linear -33s infinite; }
+  .ambience-petal-2 { top: 80%; left: 12%; animation: ambience-fall 76s linear -38s infinite; }
+  .ambience-petal-3 { top: 90%; left: 70%; animation: ambience-fall 70s linear -34s infinite; }
+  .ambience-petal-4 { top: 55%; left: 94%; animation: ambience-fall 82s linear -45s infinite; }
+}
+
+@keyframes ambience-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(28px); }
+}
+
+@keyframes ambience-twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.12; }
+}
+
+@keyframes ambience-fall {
+  from { transform: translate(0, -110vh) rotate(18deg); }
+  to { transform: translate(6vw, 110vh) rotate(18deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambience-animated {
+    animation: none !important;
+  }
+
+  .ambience-petal {
+    transform: rotate(18deg);
   }
 }
 

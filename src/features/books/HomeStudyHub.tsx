@@ -1,5 +1,11 @@
-import React, { useRef, useEffect } from 'react';
-import { IconArrowRight, IconBooks, IconSettings } from '@tabler/icons-react';
+import React, { useRef, useEffect, useState } from 'react';
+import {
+  IconBooks,
+  IconChevronDown,
+  IconChevronUp,
+  IconPlus,
+  IconSettings,
+} from '@tabler/icons-react';
 import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
@@ -7,11 +13,16 @@ import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeed
 import { TranslationKey } from '../../lib/i18n';
 import { StudyCategory } from '../../types';
 import { TopBar } from '../../components/TopBar';
+import { ThemeAmbience } from '../../components/ThemeAmbience';
 import { EmptyState } from '../../components/EmptyState';
 import { VocabularyIllustration } from '../../components/illustrations/VocabularyIllustration';
 import { KanjiIllustration } from '../../components/illustrations/KanjiIllustration';
 import { IllustrationProps } from '../../components/illustrations/StudyCardIllustration';
 import { BookCard } from './BookCard';
+
+// Home previews only the first books; the rest are revealed in place by "View all".
+// Reordering belongs to the future full Books list / management view, never to Home.
+const HOME_BOOK_PREVIEW_COUNT = 2;
 
 // Focus ring shared by Home study actions. Hover lift comes from `.clay-interactive`
 // (pointer-capability gated) and pressed depth from usePressFeedback (explicit state).
@@ -71,19 +82,19 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, onClick }) => {
       {...pressHandlers}
       onClick={onClick}
       aria-label={t('aria.learnCategory', { category: label })}
-      className={`clay-interactive w-full h-full text-left border rounded-2xl pl-4 pr-2 py-3 sm:pl-5 sm:pr-3 min-h-[72px] flex items-center justify-between gap-2 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
+      className={`clay-interactive w-full h-full text-left border rounded-2xl pl-4 pr-3 py-4 sm:pl-6 sm:pr-4 sm:py-5 min-h-[96px] sm:min-h-[112px] flex items-center justify-between gap-3 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
     >
-      <div className="min-w-0 flex flex-col gap-1.5">
+      <div className="min-w-0 flex flex-col gap-2">
         <span
           lang="ja"
           aria-hidden="true"
-          className={`font-japanese font-bold leading-none text-2xl sm:text-3xl tracking-wide select-none ${tile.glyphColor}`}
+          className={`font-japanese font-bold leading-none text-[1.75rem] sm:text-4xl tracking-wide select-none ${tile.glyphColor}`}
         >
           {tile.glyph}
         </span>
         <h3 className={`font-semibold text-sm sm:text-base leading-snug ${tile.title}`}>{label}</h3>
       </div>
-      <tile.Illustration className={`w-14 h-14 sm:w-[4.5rem] sm:h-[4.5rem] shrink-0 ${tile.glyphColor}`} />
+      <tile.Illustration className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 ${tile.glyphColor}`} />
     </button>
   );
 };
@@ -94,6 +105,7 @@ export const HomeStudyHub: React.FC = () => {
   const { t } = useI18n();
   const { isPressed: isMixedTestPressed, pressHandlers: mixedTestPressHandlers } =
     usePressFeedback();
+  const [showAllBooks, setShowAllBooks] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -150,17 +162,32 @@ export const HomeStudyHub: React.FC = () => {
   };
 
   const bookList = Object.values(state.books);
+  const previewBooks = bookList.slice(0, HOME_BOOK_PREVIEW_COUNT);
+  const moreBooks = bookList.slice(HOME_BOOK_PREVIEW_COUNT);
+
+  const renderBookCard = (book: (typeof bookList)[number]) => (
+    <BookCard
+      key={book.id}
+      book={book}
+      lessons={state.lessons}
+      progressByItem={state.progressByItem}
+      onClick={() => navigate({ type: 'book_study', bookId: book.id })}
+    />
+  );
 
   return (
     <div className="min-h-screen bg-page text-text-primary flex flex-col">
-      {/* Top Bar with TANGO wordmark, active theme indicator, and Settings button */}
+      {/* Restrained per-theme Japanese ambience, behind all content */}
+      <ThemeAmbience />
+
+      {/* Top Bar: TANGO wordmark and Settings only */}
       <TopBar />
 
       {/* Main Home study canvas: Study Books first, then category shortcuts, then Mixed Test */}
       <main
         ref={containerRef}
         onKeyDown={handleKeyDown}
-        className="flex-1 w-full max-w-4xl mx-auto px-4 pt-5 pb-10 sm:pt-8 sm:pb-14 space-y-6 sm:space-y-8"
+        className="relative flex-1 w-full max-w-4xl mx-auto px-4 pt-4 pb-10 sm:pt-6 sm:pb-14 space-y-6 sm:space-y-8"
       >
         <h1 className="sr-only">{t('nav.home')}</h1>
 
@@ -182,17 +209,37 @@ export const HomeStudyHub: React.FC = () => {
               }}
             />
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-              {bookList.map((book) => (
-                <BookCard
-                  key={book.id}
-                  book={book}
-                  lessons={state.lessons}
-                  progressByItem={state.progressByItem}
-                  onClick={() => navigate({ type: 'book_study', bookId: book.id })}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+                {previewBooks.map(renderBookCard)}
+              </div>
+
+              {moreBooks.length > 0 && (
+                <>
+                  {showAllBooks && (
+                    <div id="home-more-books" className="grid gap-3 sm:grid-cols-2 sm:gap-4 mt-3 sm:mt-4">
+                      {moreBooks.map(renderBookCard)}
+                    </div>
+                  )}
+                  <div className="flex justify-end mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAllBooks((value) => !value)}
+                      aria-expanded={showAllBooks}
+                      aria-controls="home-more-books"
+                      className={`inline-flex items-center gap-1.5 min-h-touch px-3 rounded-xl text-sm font-semibold text-text-secondary ${FOCUS_RING}`}
+                    >
+                      {t(showAllBooks ? 'home.showFewerBooks' : 'home.viewAllBooks')}
+                      {showAllBooks ? (
+                        <IconChevronUp size={18} stroke={2} aria-hidden="true" />
+                      ) : (
+                        <IconChevronDown size={18} stroke={2} aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
+            </>
           )}
         </section>
 
@@ -225,7 +272,7 @@ export const HomeStudyHub: React.FC = () => {
             </div>
           </section>
 
-          {/* Mixed Test: concise solid CTA (title + trailing arrow), below the books in hierarchy */}
+          {/* Test CTA: short label plus a "+" affordance (creates/configures a test) */}
           <section aria-labelledby="home-mixed-test-heading">
             <button
               type="button"
@@ -233,17 +280,18 @@ export const HomeStudyHub: React.FC = () => {
               data-study-card="true"
               {...mixedTestPressHandlers}
               onClick={() => navigate({ type: 'mixed_quiz_config' })}
+              aria-label={t('aria.createTest')}
               className={`clay-interactive w-full h-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 min-h-[72px] flex items-center justify-between gap-3 ${isMixedTestPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-button'} ${FOCUS_RING}`}
             >
               <h3 className="font-bold text-base sm:text-lg leading-snug text-cta-text">
-                {t('home.mixedTest')}
+                {t('home.test')}
               </h3>
-              <IconArrowRight
-                size={22}
-                stroke={2}
+              <span
+                className="w-10 h-10 rounded-full bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0"
                 aria-hidden="true"
-                className="shrink-0 clay-hover-nudge transition-transform duration-150"
-              />
+              >
+                <IconPlus size={22} stroke={2.25} />
+              </span>
             </button>
           </section>
         </div>

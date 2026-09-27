@@ -26,7 +26,7 @@ Tango strictly rejects visual clichés commonly associated with low-effort or te
 ### Anti-Patterns Strictly Prohibited:
 - **No generic template or SaaS dashboard layouts:** No sidebar menus stuffed with fake productivity stats, "Welcome back, User!" hero banners, or pointless telemetry widgets.
 - **No exaggerated neon gradients or glowing borders:** No rainbow halos, iridescent chromatic aberrations, or radioactive accent buttons.
-- **No floating gradient blobs or decorative geometric shapes:** Every element on screen must serve a clear study or navigation function.
+- **No floating gradient blobs or decorative geometric shapes:** Every element on screen must serve a clear study or navigation function. The only exception is the restrained, fixed ambience layer defined in §8.2.
 - **No glassmorphism everywhere:** No blurry frosted-glass panels stacked over complex backgrounds that degrade text readability.
 - **No nested cards inside cards inside cards:** Flat, intentional grouping with clean negative space.
 - **No random emoji as primary UI icons:** Emojis are reserved exclusively for natural Japanese/Vietnamese study content. System navigation and status indicators use Tabler stroke iconography only (e.g. streak indicator `[IconFlame] 4`).
@@ -215,9 +215,25 @@ Tango stays mature and restrained, but it never falls back to near-white or near
 - **Identity lives in the material, not only the accents:** Theme identity must be visible from the page canvas, surfaces, borders, and elevation. Cards must separate from the canvas by color before any shadow is considered.
 - **Separate the three color roles:** Canvas creates atmosphere; category surfaces create identity; CTA creates action emphasis. These three roles must not collapse into the same hue family. In practice: keep the canvas and neutral card surfaces low-saturation, give each category surface its own clearly different hue, and reserve the most saturated color on screen for the CTA. Sakura is the reference: blush canvas, lavender/peach categories, plum-rose action.
 - **Personality comes only from:** palette, material contrast, typography, the existing study illustrations, and hierarchy.
-- **Never:** gradients, decorative blobs, Sakura petals, Japanese patterns, neon, glow, glassmorphism, or wallpaper illustrations.
+- **Never:** gradients, decorative blobs, neon, glow, glassmorphism, or wallpaper illustrations. Sakura petals and Japanese motifs (shoji, moon, lantern, mist) are allowed **only** inside the restrained ambience layer of §8.2.
 - **Restraint:** Shadows stay soft and are tinted to each theme's material; never make them heavier to fake personality.
 - **Settings previews:** The palettes in §9 are exactly what the Settings theme preview cards display (§16.5).
+
+### 8.2 Restrained Japanese Ambience (Explicit Exception)
+Each theme may show a quiet ambient scene behind all content. This is the **only** exception to the "no decorative shapes / no petals / no Japanese patterns" rules in §2 and §8.1, and it applies only to this fixed background layer (`ThemeAmbience`, used on Home).
+
+- **Light — Japanese daytime:** a pale washi sun, soft sky mist bands (kasumi), and a faint shoji lattice.
+- **Dark — Japanese night:** a dim moon with a soft halo, a few 3px stars, and one small paper lantern.
+- **Sakura — warm blossom paper:** one quiet branch with a few small blossoms and a few slowly falling petals.
+
+Rules:
+- **Behind everything:** a `position: fixed`, `pointer-events: none`, `aria-hidden` layer rendered before the TopBar and main content. Cards and controls are opaque, so the scene only shows in the gaps and empty space.
+- **Very low contrast:** colors come from the per-theme `--ambience-line`, `--ambience-glow`, and `--ambience-accent` tokens (§9) at very low opacity. The scene must never reduce text readability or compete with book covers.
+- **Lightweight:** inline CSS/SVG shapes only; no raster images, no gradients, no loud blobs, no neon, glow, or cyberpunk look.
+- **Deterministic:** every element has a fixed position in CSS; nothing is randomized per render.
+- **Motion:** at most a few very slow elements per theme (Light: 2 mist bands drifting 28px over 48–60s; Dark: 2 stars fading over 9–12s; Sakura: 4 petals falling over 64–82s). Motion is translate or fade only; petals keep one fixed tilt and are never flipped, spun, or turned upside-down.
+- **Reduced motion:** under `prefers-reduced-motion: reduce` every ambience animation is removed (`animation: none`) and the scene is fully static.
+- **Theme scoping:** all three scenes are in the DOM; CSS shows only the one matching the active `data-theme`.
 
 ### Semantic Token Strategy
 Components **never** reference raw hex colors. All components consume semantic CSS variables that adapt automatically to the active theme:
@@ -275,13 +291,18 @@ Components **never** reference raw hex colors. All components consume semantic C
   --category-kanji-icon: ...;
   --category-kanji-text: ...;
 
-  /* Primary Study CTA (solid clay action, e.g. Home Mixed Test) */
+  /* Primary Study CTA (solid clay action, e.g. the Home Test CTA) */
   --cta-surface: ...;
   --cta-border: ...;
   --cta-text: ...;
   --cta-text-secondary: ...;
   --cta-puck-surface: ...;
   --cta-puck-border: ...;
+
+  /* Restrained Japanese ambience (§8.2), always at very low opacity */
+  --ambience-line: ...;
+  --ambience-glow: ...;
+  --ambience-accent: ...;
 
   /* Clay Elevation Shadows & Highlights */
   --shadow-clay-card: ...;
@@ -296,7 +317,7 @@ Components **never** reference raw hex colors. All components consume semantic C
 ## 9. Theme Palette Specifications
 
 ### 9.1 Light Theme (Sáng) — Cool Pearl / Japanese Stationery
-A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards before shadows are considered, with pearl-gray raised surfaces and navy-ink typography. Vocabulary is a clearly lavender-violet surface, Kanji a warm apricot-peach surface, and Mixed Test a strong indigo action. Canvas, Vocabulary, and CTA never share the same blue-purple family.
+A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards before shadows are considered, with pearl-gray raised surfaces and navy-ink typography. Vocabulary is a clearly lavender-violet surface, Kanji a warm apricot-peach surface, and the Test CTA a strong indigo action. Canvas, Vocabulary, and CTA never share the same blue-purple family.
 
 | Token | Value | Visual Role |
 |---|---|---|
@@ -326,13 +347,16 @@ A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards bef
 | `--cta-text-secondary` | `#E0E7FF` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte puck on CTA |
 | `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
+| `--ambience-line` | `#1A2033` | Ambience ink lines (shoji lattice), used at ≤6% opacity |
+| `--ambience-glow` | `#FFFFFF` | Ambience washi sun, used at ≤55% opacity on the pearl canvas |
+| `--ambience-accent` | `#8FA3C8` | Ambience sky mist bands, used at ≤14% opacity |
 | `--shadow-clay-card` | `0 4px 14px -1px rgba(30, 38, 64, 0.10), 0 2px 6px -1px rgba(30, 38, 64, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Neutral cool clay lift |
 | `--shadow-clay-card-hover` | `0 8px 20px -2px rgba(30, 38, 64, 0.13), 0 3px 8px -1px rgba(30, 38, 64, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1)` | Tactile hover lift |
 | `--shadow-clay-button` | `0 4px 12px rgba(74, 67, 214, 0.26), 0 1px 3px rgba(30, 38, 64, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.40)` | Indigo CTA depth |
 | `--shadow-clay-pressed` | `0 1px 2px rgba(30, 38, 64, 0.10), inset 0 2px 4px rgba(30, 38, 64, 0.08)` | Tactile pressed state |
 
 ### 9.2 Dark Theme (Tối) — Midnight Ink
-A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and soft off-white text. Vocabulary is a violet-indigo clay, Kanji a warm amber-brown clay, and Mixed Test a vivid indigo action, so layers differ by identity and not only by brightness. Never neutral black and never monochrome navy.
+A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and soft off-white text. Vocabulary is a violet-indigo clay, Kanji a warm amber-brown clay, and the Test CTA a vivid indigo action, so layers differ by identity and not only by brightness. Never neutral black and never monochrome navy.
 
 | Token | Value | Visual Role |
 |---|---|---|
@@ -362,6 +386,9 @@ A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and s
 | `--cta-text-secondary` | `#E6E8FF` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.14)` | Matte puck on CTA |
 | `--cta-puck-border` | `rgba(255, 255, 255, 0.24)` | CTA puck rim highlight |
+| `--ambience-line` | `#C9D2E6` | Ambience moonlit lines (lantern cap/cord), used at ≤18% opacity |
+| `--ambience-glow` | `#F3E7C4` | Ambience moonlight and stars, used at ≤10% (moon) / ≤35% (3px stars) |
+| `--ambience-accent` | `#F6AE3D` | Ambience paper-lantern amber, used at ≤22% opacity |
 | `--shadow-clay-card` | `0 4px 16px rgba(0, 2, 10, 0.45), 0 1px 3px rgba(0, 2, 10, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06)` | Neutral night elevation |
 | `--shadow-clay-card-hover` | `0 8px 24px rgba(0, 2, 10, 0.55), 0 2px 6px rgba(0, 2, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.09)` | Night hover lift |
 | `--shadow-clay-button` | `0 4px 14px rgba(0, 2, 10, 0.50), 0 1px 3px rgba(90, 82, 236, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.16)` | Vivid indigo CTA depth |
@@ -398,6 +425,9 @@ A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted rai
 | `--cta-text-secondary` | `#FDE7EE` | CTA secondary text |
 | `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte puck on CTA |
 | `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
+| `--ambience-line` | `#7C5861` | Ambience plum branch, used at ≤10% opacity |
+| `--ambience-glow` | `#FFFAF8` | Ambience paper glow |
+| `--ambience-accent` | `#E595AC` | Ambience blossoms and petals, used at ≤40% opacity |
 | `--shadow-clay-card` | `0 4px 14px rgba(150, 80, 95, 0.13), 0 1px 4px rgba(150, 80, 95, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Warm blossom lift |
 | `--shadow-clay-card-hover` | `0 8px 22px rgba(150, 80, 95, 0.18), 0 2px 6px rgba(150, 80, 95, 0.09), inset 0 1px 0 rgba(255, 255, 255, 1)` | Warm blossom hover lift |
 | `--shadow-clay-button` | `0 4px 12px rgba(168, 56, 92, 0.26), 0 1px 3px rgba(150, 80, 95, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.40)` | Plum-rose CTA depth |
@@ -555,21 +585,24 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 ## 16. Screen Design Specifications
 
 ### 16.1 Home Screen (Safe Study Hub)
-Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts and the Mixed Test are secondary.
+Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts and the Test action are secondary.
 
-- **Top Bar:** Opaque theme canvas (`bg-page`) with a hairline `border-b border-subtle`, so it belongs to each theme instead of reading as a separate white panel; zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
+- **Top Bar:** Opaque theme canvas (`bg-page`) with **no divider line**, so it belongs to each theme instead of reading as a separate panel; zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
 - **No visible greeting, no visible section labels:** Home renders no greeting line and no visible "Giáo trình" / "Học theo loại" headings. Semantic structure is kept with visually hidden headings (`sr-only` `h1` for the page and `h2` per section).
-- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Mixed Test = concise action label. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. No visible section labels or greeting. Theme controls remain Settings-only.
-- **Composition order:** Study Books → Vocabulary / Kanji shortcuts → Mixed Test.
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Test = short action label with a `+` affordance. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. Theme controls remain Settings-only.
+- **Composition order:** Study Books → Vocabulary / Kanji shortcuts → Test.
 - **Study Books (primary, visually dominant):**
-  - Neutral clay cards (`bg-surface`, `shadow-clay-card`) with a large 3:4 cover (`w-20` mobile, `w-24` tablet, `w-28` desktop), the book title, and one Study Coverage bar with its percentage. No lesson/item counts on Home.
-  - Mobile: stacked horizontal cards. Tablet/desktop: a 2-column primary book grid inside `max-w-4xl` (never squeezed into a 3-4 column secondary grid).
+  - Home previews only the **first 2 books** as large neutral clay cards (`bg-surface`, `shadow-clay-card`): a large 3:4 cover (`w-24` mobile, `w-28` tablet, `w-32` desktop), the title (`text-lg`/`sm:text-xl`), and one Study Coverage bar with its percentage. No lesson/item counts on Home.
+  - When more than 2 books exist, a quiet text toggle `Xem tất cả ⌄` / `View all ⌄` (`text-text-secondary`, 48px touch target, `aria-expanded`, `aria-controls`) sits under the cards and reveals the remaining books in place; it then reads `Thu gọn` / `Show less`. With 2 or fewer books the toggle is not rendered.
+  - **No reordering on Home.** Drag-reordering and manual ordering belong to the future full Books list / management view, never to Home.
+  - Mobile: stacked horizontal cards. Tablet/desktop: a 2-column primary book grid inside `max-w-4xl`.
   - Titles use `.font-study-title` (§6.3), wrap up to 3 lines (`line-clamp-3`), and expose the full title on hover via the native `title` attribute.
   - Fallback cover: theme-aware primary-tinted placeholder with a spine band and `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
-- **Vocabulary / Kanji shortcuts (secondary):** A compact 2-column row of typography-led semantic clay tiles (`min-h-[72px]`) below the books. The Japanese category name is the visual identity (`語彙` / `漢字`, `font-japanese`, `lang="ja"`, `aria-hidden`, in `--category-*-icon`), with the localized name (`Từ vựng` / `Hán tự`) under it in `--category-*-text`. Surfaces keep `--category-vocabulary-*` (cool indigo / slate) and `--category-kanji-*` (warm amber / plum). No Tabler icon puck and no counts; the button's `aria-label` carries the localized name.
-- **Mixed Test (concise CTA):** Solid `--cta-*` surface with `shadow-clay-button`, showing only the title `Kiểm tra tổng hợp` and one trailing `IconArrowRight` (no subtitle, no icon pucks). Same compact height as the category shortcuts. Full width under the shortcuts on mobile/tablet; the third column of the shortcut row on desktop (`lg:grid-cols-[3fr_2fr]`). It stays recognizable as an action but never outweighs the books.
-- **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: books, Vocabulary, Kanji, Mixed Test.
+- **Vocabulary / Kanji shortcuts (secondary):** A 2-column row of spacious semantic clay tiles (`min-h-[96px]`, `sm:min-h-[112px]`) below the books, smaller than the book cards. Each shows the Japanese category name as its identity (`語彙` / `漢字`, `font-japanese`, `lang="ja"`, `aria-hidden`, `--category-*-icon`), the localized name (`Từ vựng` / `Hán tự`) under it, and its study-card illustration (`VocabularyIllustration` / `KanjiIllustration`, `currentColor`). Surfaces keep `--category-vocabulary-*` and `--category-kanji-*`. No counts; the button's `aria-label` carries the localized name.
+- **Test (compact CTA):** Solid `--cta-*` surface with `shadow-clay-button`, the short label `Kiểm tra` / `Test`, and a round `IconPlus` puck (`--cta-puck-*`) that signals "create / configure a test". The accessible name is explicit: `aria-label="Tạo bài kiểm tra"` / `"Create test"`. Route: `mixed_quiz_config`. Full width under the shortcuts on mobile/tablet; the narrower track of the shortcut row on desktop (`lg:grid-cols-[3fr_2fr]`). It never outweighs the books.
+- **Ambience:** The restrained per-theme Japanese ambience layer (§8.2) sits behind all Home content.
+- **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: visible books, Vocabulary, Kanji, Test.
 - **Zero-Book Empty State:** The same primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, *"Chưa có giáo trình nào."*, the Settings → Content Management hint, and a tactile `[IconSettings] Cài đặt` button. Never a large floating card. Never places an "+ Add Book" button directly on Home.
 - **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
@@ -716,6 +749,11 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
 
+  /* Ambient background (Japanese daytime: ink lines, washi sun, sky mist); always used at very low opacity */
+  --ambience-line: #1A2033;
+  --ambience-glow: #FFFFFF;
+  --ambience-accent: #8FA3C8;
+
   /* Clay Shadows (neutral cool pearl) */
   --shadow-clay-card: 0 4px 14px -1px rgba(30, 38, 64, 0.10), 0 2px 6px -1px rgba(30, 38, 64, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
   --shadow-clay-card-hover: 0 8px 20px -2px rgba(30, 38, 64, 0.13), 0 3px 8px -1px rgba(30, 38, 64, 0.07), inset 0 1px 0 rgba(255, 255, 255, 1);
@@ -772,6 +810,11 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --cta-puck-surface: rgba(255, 255, 255, 0.14);
   --cta-puck-border: rgba(255, 255, 255, 0.24);
 
+  /* Ambient background (Japanese night: moonlit lines, moonlight, lantern amber); always used at very low opacity */
+  --ambience-line: #C9D2E6;
+  --ambience-glow: #F3E7C4;
+  --ambience-accent: #F6AE3D;
+
   /* Clay Shadows (neutral night elevation) */
   --shadow-clay-card: 0 4px 16px rgba(0, 2, 10, 0.45), 0 1px 3px rgba(0, 2, 10, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --shadow-clay-card-hover: 0 8px 24px rgba(0, 2, 10, 0.55), 0 2px 6px rgba(0, 2, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.09);
@@ -827,6 +870,11 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --cta-text-secondary: #FDE7EE;
   --cta-puck-surface: rgba(255, 255, 255, 0.16);
   --cta-puck-border: rgba(255, 255, 255, 0.28);
+
+  /* Ambient background (Blossom paper: plum branch, paper glow, petal pink); always used at very low opacity */
+  --ambience-line: #7C5861;
+  --ambience-glow: #FFFAF8;
+  --ambience-accent: #E595AC;
 
   /* Clay Shadows (warm blossom lift) */
   --shadow-clay-card: 0 4px 14px rgba(150, 80, 95, 0.13), 0 1px 4px rgba(150, 80, 95, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.95);

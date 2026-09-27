@@ -58,7 +58,9 @@ export const VI_DICTIONARY = {
   // Home Screen (SCREEN 01)
   'home.studyBooks': 'Giáo trình',
   'home.learnByType': 'Học theo loại',
-  'home.mixedTest': 'Kiểm tra tổng hợp',
+  'home.test': 'Kiểm tra',
+  'home.viewAllBooks': 'Xem tất cả',
+  'home.showFewerBooks': 'Thu gọn',
   'home.emptyBooks.title': 'Chưa có giáo trình nào.',
   'home.emptyBooks.description': 'Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung.',
 
@@ -73,6 +75,7 @@ export const VI_DICTIONARY = {
   'aria.openBook': 'Mở giáo trình {title}',
   'aria.bookCover': 'Bìa giáo trình {title}',
   'aria.learnCategory': 'Học theo loại: {category}',
+  'aria.createTest': 'Tạo bài kiểm tra',
   'aria.progressCoverage': 'Độ bao phủ: {percent}%',
 } as const;
 
@@ -131,7 +134,9 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   // Home Screen (SCREEN 01)
   'home.studyBooks': 'Study Books',
   'home.learnByType': 'Learn by Type',
-  'home.mixedTest': 'Mixed Test',
+  'home.test': 'Test',
+  'home.viewAllBooks': 'View all',
+  'home.showFewerBooks': 'Show less',
   'home.emptyBooks.title': 'No study books yet.',
   'home.emptyBooks.description': 'You can add study books from: Settings → Content Management.',
 
@@ -146,6 +151,7 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'aria.openBook': 'Open study book: {title}',
   'aria.bookCover': 'Book cover: {title}',
   'aria.learnCategory': 'Learn by type: {category}',
+  'aria.createTest': 'Create test',
   'aria.progressCoverage': 'Study coverage: {percent}%',
 };
 
