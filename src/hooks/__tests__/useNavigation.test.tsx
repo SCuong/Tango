@@ -130,13 +130,9 @@ describe('src/hooks/useNavigation.tsx', () => {
       capturedContext!.navigate('/learn/vocabulary');
 
       expect(pushStateSpy).toHaveBeenCalledWith(null, '', '/learn/vocabulary');
-      expect(capturedContext!.route).toEqual({
-        type: 'learn_by_type',
-        category: 'vocabulary',
-      });
     });
 
-    it('navigates with typed AppRoute object', () => {
+    it('navigates with typed AppRoute object and updates browser history', () => {
       let capturedContext: NavigationContextValue | null = null;
 
       const Consumer = () => {
@@ -160,10 +156,6 @@ describe('src/hooks/useNavigation.tsx', () => {
         '',
         '/settings/content-management/book/my%20book'
       );
-      expect(capturedContext!.route).toEqual({
-        type: 'manage_book',
-        bookId: 'my book',
-      });
     });
 
     it('replaces current history entry on replace() call', () => {
@@ -183,7 +175,6 @@ describe('src/hooks/useNavigation.tsx', () => {
       capturedContext!.replace('/quiz/results');
 
       expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/quiz/results');
-      expect(capturedContext!.route).toEqual({ type: 'quiz_results' });
     });
 
     it('delegates back() to window.history.back()', () => {

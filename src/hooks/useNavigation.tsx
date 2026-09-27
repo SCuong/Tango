@@ -10,7 +10,6 @@ import {
   createContext,
   useContext,
   useState,
-  useRef,
   useEffect,
   useCallback,
   useMemo,
@@ -47,16 +46,11 @@ export const NavigationProvider: FC<NavigationProviderProps> = ({
     return { type: 'home' };
   });
 
-  const routeRef = useRef(route);
-  routeRef.current = route;
-
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const handlePopState = () => {
-      const nextRoute = parseRoute(window.location.pathname);
-      routeRef.current = nextRoute;
-      setRoute(nextRoute);
+      setRoute(parseRoute(window.location.pathname));
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -72,7 +66,6 @@ export const NavigationProvider: FC<NavigationProviderProps> = ({
     if (typeof window !== 'undefined' && window.history) {
       window.history.pushState(null, '', path);
     }
-    routeRef.current = nextRoute;
     setRoute(nextRoute);
   }, []);
 
@@ -83,7 +76,6 @@ export const NavigationProvider: FC<NavigationProviderProps> = ({
     if (typeof window !== 'undefined' && window.history) {
       window.history.replaceState(null, '', path);
     }
-    routeRef.current = nextRoute;
     setRoute(nextRoute);
   }, []);
 
@@ -95,14 +87,12 @@ export const NavigationProvider: FC<NavigationProviderProps> = ({
 
   const contextValue = useMemo<NavigationContextValue>(
     () => ({
-      get route() {
-        return routeRef.current;
-      },
+      route,
       navigate,
       replace,
       back,
     }),
-    [navigate, replace, back]
+    [route, navigate, replace, back]
   );
 
   return (
