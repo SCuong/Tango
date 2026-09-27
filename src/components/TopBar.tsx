@@ -27,7 +27,7 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
         <button
           type="button"
           onClick={() => navigate({ type: 'home' })}
-          className="inline-flex items-center min-h-touch px-2 font-bold text-xl tracking-wider text-text-primary hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
+          className="inline-flex items-center min-h-touch px-2 font-bold text-xl tracking-wider text-text-primary hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page rounded-xl"
           aria-label={t('nav.home')}
         >
           TANGO
@@ -50,7 +50,7 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
             onClick={() => navigate({ type: 'settings' })}
             aria-label={t('nav.settings')}
             title={t('nav.settings')}
-            className="flex items-center justify-center w-12 h-12 rounded-full bg-surface hover:bg-surface-elevated hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed border border-border-subtle text-text-primary shadow-clay-card transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-touch"
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-surface hover:bg-surface-elevated hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed border border-border-subtle text-text-primary shadow-clay-card transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch"
           >
             <IconSettings size={22} stroke={2} aria-hidden="true" />
           </button>

@@ -44,6 +44,7 @@
   --primary: #4F46E5;
   --primary-hover: #4338CA;
   --primary-surface: #EEF2FF;
+  --primary-border-subtle: #C7D2FE;
 
   --success: #059669;
   --success-surface: #ECFDF5;
@@ -91,6 +92,7 @@
   --primary: #6366F1;
   --primary-hover: #818CF8;
   --primary-surface: #1E1B4B;
+  --primary-border-subtle: #3730A3;
 
   --success: #10B981;
   --success-surface: #064E3B;
@@ -138,6 +140,7 @@
   --primary: #D95379;
   --primary-hover: #C23E64;
   --primary-surface: #FDF0F3;
+  --primary-border-subtle: #F3C1D0;
 
   --success: #059669;
   --success-surface: #ECFDF5;

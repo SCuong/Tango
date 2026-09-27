@@ -30,6 +30,7 @@ export default {
           DEFAULT: 'var(--primary)',
           hover: 'var(--primary-hover)',
           surface: 'var(--primary-surface)',
+          border: 'var(--primary-border-subtle)',
         },
         success: {
           DEFAULT: 'var(--success)',

@@ -88,7 +88,7 @@ All primary interactive clay surfaces (Study Book cards, Learn by Type cards, pr
   - Tactile depression: `transform: translateY(1px)` (`active:translate-y-px`)
   - Compressed elevation: `--shadow-clay-pressed`
 - **Focus-Visible:**
-  - High-contrast primary focus ring with clear 2px offset (`focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none`)
+  - High-contrast primary focus ring with clear 2px offset (`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page`)
   - Never relies on shadow alone for keyboard focus
 - **Restraint Rule:** Dense vocabulary lists, dictionary tables, and administrative management tables retain flat surfaces with clean 1px dividers rather than clay cards.
 
@@ -224,6 +224,7 @@ Components **never** reference raw hex colors. All components consume semantic C
   --primary: ...;
   --primary-hover: ...;
   --primary-surface: ...;
+  --primary-border-subtle: ...;
 
   /* Semantic Feedback */
   --success: ...;
@@ -286,6 +287,7 @@ A warm, soft off-white canvas with gentle ceramic elevation and crisp slate typo
 | `--primary` | `#4F46E5` | Deep Indigo brand accent |
 | `--primary-hover` | `#4338CA` | Indigo 700 active tap state |
 | `--primary-surface` | `#EEF2FF` | Faint indigo wash for selected items |
+| `--primary-border-subtle` | `#C7D2FE` | Subtle indigo primary boundary |
 | `--category-vocabulary-surface` | `#F4F6FF` | Calm cool-indigo study card surface |
 | `--category-vocabulary-border` | `#DDE3FC` | Subtle indigo border |
 | `--category-vocabulary-icon` | `#4F46E5` | Primary indigo vocabulary icon |
@@ -315,6 +317,7 @@ Deep slate and midnight navy tones rather than pitch black. Emphasizes clean bor
 | `--primary` | `#6366F1` | Luminous Indigo brand accent |
 | `--primary-hover` | `#818CF8` | Indigo 400 hover state |
 | `--primary-surface` | `#1E1B4B` | Deep indigo surface wash |
+| `--primary-border-subtle` | `#3730A3` | Subtle indigo primary boundary |
 | `--category-vocabulary-surface` | `#18223C` | Deep indigo slate study card surface |
 | `--category-vocabulary-border` | `#29385C` | Crisp dark indigo border |
 | `--category-vocabulary-icon` | `#818CF8` | Luminous indigo vocabulary icon |
@@ -344,6 +347,7 @@ A serene, poetic theme inspired by Japanese cherry blossoms. Uses soft cream, pe
 | `--primary` | `#D95379` | Refined Sakura Rose primary accent |
 | `--primary-hover` | `#C23E64` | Deep rose hover state |
 | `--primary-surface` | `#FDF0F3` | Faint petal blush surface |
+| `--primary-border-subtle` | `#F3C1D0` | Subtle petal rose primary boundary |
 | `--category-vocabulary-surface` | `#F2F4FA` | Soft cool-slate study card surface |
 | `--category-vocabulary-border` | `#DCE1EF` | Soft slate-lavender border |
 | `--category-vocabulary-icon` | `#4F46E5` | Indigo vocabulary icon |
@@ -522,7 +526,7 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
     - **[IconWriting] Hán tự (Kanji):** `--category-kanji-surface`, `--category-kanji-border`, `--category-kanji-icon`, `--category-kanji-text`. Lesson count, total words.
   - Interactive cards apply the canonical clay recipe (`hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`).
 - **Combined Test Action Bar:**
-  - Full-width elevated clay button: `[IconBolt] Kiểm tra tổng hợp (Mixed Test)` across books (`bg-primary-surface border border-primary/20 text-primary shadow-clay-button hover:-translate-y-px hover:shadow-clay-card-hover active:translate-y-px active:shadow-clay-pressed`).
+  - Full-width elevated clay button: `[IconBolt] Kiểm tra tổng hợp (Mixed Test)` across books (`bg-primary-surface border border-primary-border text-primary shadow-clay-button hover:-translate-y-px hover:shadow-clay-card-hover active:translate-y-px active:shadow-clay-pressed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page`).
 - **Zero-Book Empty State:**
   - Renders a compact, restrained notice card (`max-w-md mx-auto w-full p-6 text-center`) with a rounded clay icon puck and tactile "Đi tới Cài đặt" button. Never places an "+ Add Book" button directly on Home.
 - **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
@@ -633,6 +637,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --primary: #4F46E5;
   --primary-hover: #4338CA;
   --primary-surface: #EEF2FF;
+  --primary-border-subtle: #C7D2FE;
 
   --success: #059669;
   --success-surface: #ECFDF5;
@@ -680,6 +685,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --primary: #6366F1;
   --primary-hover: #818CF8;
   --primary-surface: #1E1B4B;
+  --primary-border-subtle: #3730A3;
 
   --success: #10B981;
   --success-surface: #064E3B;
@@ -727,6 +733,7 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --primary: #D95379;
   --primary-hover: #C23E64;
   --primary-surface: #FDF0F3;
+  --primary-border-subtle: #F3C1D0;
 
   --success: #059669;
   --success-surface: #ECFDF5;

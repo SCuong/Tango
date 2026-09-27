@@ -377,7 +377,8 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
 
     // Mixed test styling
     expect(html).toContain('bg-primary-surface');
-    expect(html).toContain('border-primary/20');
+    expect(html).toContain('border-primary-border');
+    expect(html).not.toContain('border-primary/20');
     expect(html).toContain('shadow-clay-button');
 
     // Canonical clay recipe classes on cards
@@ -385,6 +386,25 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('hover:-translate-y-px');
     expect(html).toContain('active:translate-y-px');
     expect(html).toContain('active:shadow-clay-pressed');
+  });
+
+  it('applies 2px focus-ring offset to page consistently on all interactive Home controls', () => {
+    const html = renderHome(populatedState);
+
+    // Primary focus ring and 2px offset classes
+    expect(html).toContain('focus-visible:ring-2');
+    expect(html).toContain('focus-visible:ring-primary');
+    expect(html).toContain('focus-visible:ring-offset-2');
+    expect(html).toContain('focus-visible:ring-offset-page');
+    expect(html).toContain('focus-visible:outline-none');
+
+    // Test with empty state to check EmptyState action button focus offset
+    const emptyHtml = renderHome({
+      ...populatedState,
+      books: {},
+    });
+    expect(emptyHtml).toContain('focus-visible:ring-offset-2');
+    expect(emptyHtml).toContain('focus-visible:ring-offset-page');
   });
 
   it('renders compact constrained empty state layout when no books exist', () => {

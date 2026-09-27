@@ -159,7 +159,7 @@ export const HomeStudyHub: React.FC = () => {
               aria-label={t('aria.learnCategory', {
                 category: t('category.vocabulary'),
               })}
-              className="w-full text-left bg-category-vocabulary-surface border border-category-vocabulary-border rounded-2xl p-4 shadow-clay-card hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary flex items-center gap-4 min-h-[56px]"
+              className="w-full text-left bg-category-vocabulary-surface border border-category-vocabulary-border rounded-2xl p-4 shadow-clay-card hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page flex items-center gap-4 min-h-[56px]"
             >
               <div
                 className="w-12 h-12 rounded-xl bg-surface text-category-vocabulary-icon flex items-center justify-center shrink-0 border border-category-vocabulary-border shadow-sm"
@@ -206,7 +206,7 @@ export const HomeStudyHub: React.FC = () => {
               aria-label={t('aria.learnCategory', {
                 category: t('category.kanji'),
               })}
-              className="w-full text-left bg-category-kanji-surface border border-category-kanji-border rounded-2xl p-4 shadow-clay-card hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary flex items-center gap-4 min-h-[56px]"
+              className="w-full text-left bg-category-kanji-surface border border-category-kanji-border rounded-2xl p-4 shadow-clay-card hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page flex items-center gap-4 min-h-[56px]"
             >
               <div
                 className="w-12 h-12 rounded-xl bg-surface text-category-kanji-icon flex items-center justify-center shrink-0 border border-category-kanji-border shadow-sm"
@@ -249,7 +249,7 @@ export const HomeStudyHub: React.FC = () => {
             id="home-mixed-test-heading"
             data-study-card="true"
             onClick={() => navigate({ type: 'mixed_quiz_config' })}
-            className="w-full text-left bg-primary-surface border border-primary/20 rounded-2xl p-4 sm:p-5 shadow-clay-button hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary flex items-center gap-4 min-h-[56px]"
+            className="w-full text-left bg-primary-surface border border-primary-border rounded-2xl p-4 sm:p-5 shadow-clay-button hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page flex items-center gap-4 min-h-[56px]"
           >
             <div
               className="w-12 h-12 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 shadow-sm"

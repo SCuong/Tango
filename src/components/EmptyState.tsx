@@ -38,7 +38,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <button
             type="button"
             onClick={action.onClick}
-            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-surface hover:bg-surface-elevated hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed border border-border-subtle text-text-primary text-sm font-medium transition-all shadow-clay-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-touch"
+            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-surface hover:bg-surface-elevated hover:shadow-clay-card-hover hover:-translate-y-px active:translate-y-px active:shadow-clay-pressed border border-border-subtle text-text-primary text-sm font-medium transition-all shadow-clay-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch"
           >
             {action.label}
           </button>
