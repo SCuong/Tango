@@ -259,6 +259,14 @@ Components **never** reference raw hex colors. All components consume semantic C
   --category-kanji-icon: ...;
   --category-kanji-text: ...;
 
+  /* Primary Study CTA (solid clay action, e.g. Home Mixed Test) */
+  --cta-surface: ...;
+  --cta-border: ...;
+  --cta-text: ...;
+  --cta-text-secondary: ...;
+  --cta-puck-surface: ...;
+  --cta-puck-border: ...;
+
   /* Clay Elevation Shadows & Highlights */
   --shadow-clay-card: ...;
   --shadow-clay-card-hover: ...;
@@ -288,14 +296,20 @@ A warm, soft off-white canvas with gentle ceramic elevation and crisp slate typo
 | `--primary-hover` | `#4338CA` | Indigo 700 active tap state |
 | `--primary-surface` | `#EEF2FF` | Faint indigo wash for selected items |
 | `--primary-border-subtle` | `#C7D2FE` | Subtle indigo primary boundary |
-| `--category-vocabulary-surface` | `#F4F6FF` | Calm cool-indigo study card surface |
-| `--category-vocabulary-border` | `#DDE3FC` | Subtle indigo border |
+| `--category-vocabulary-surface` | `#E6EAFB` | Visible cool-indigo clay tile surface |
+| `--category-vocabulary-border` | `#C9D1F4` | Soft indigo tile border |
 | `--category-vocabulary-icon` | `#4F46E5` | Primary indigo vocabulary icon |
 | `--category-vocabulary-text` | `#312E81` | Deep indigo header text |
-| `--category-kanji-surface` | `#FFF7ED` | Warm amber-peach study card surface |
-| `--category-kanji-border` | `#F6E5D3` | Subtle warm amber border |
+| `--category-kanji-surface` | `#FBEAD6` | Visible warm amber-peach clay tile surface |
+| `--category-kanji-border` | `#EFCFA8` | Soft warm amber tile border |
 | `--category-kanji-icon` | `#B45309` | Warm amber Kanji icon |
 | `--category-kanji-text` | `#78350F` | Deep amber-plum Kanji header text |
+| `--cta-surface` | `#4F46E5` | Solid indigo primary study CTA |
+| `--cta-border` | `#4338CA` | Deep indigo CTA edge |
+| `--cta-text` | `#FFFFFF` | CTA title (6.3:1 on surface) |
+| `--cta-text-secondary` | `#E0E7FF` | CTA subtitle (5.1:1 on surface) |
+| `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte icon puck on CTA |
+| `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
 | `--shadow-clay-card` | `0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Subtle clay lift |
 | `--shadow-clay-card-hover` | `0 8px 20px -2px rgba(0, 0, 0, 0.09), 0 3px 8px -1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)` | Tactile hover lift |
 | `--shadow-clay-button`| `0 4px 12px rgba(79, 70, 229, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.45)` | Tactile button depth |
@@ -318,14 +332,20 @@ Deep slate and midnight navy tones rather than pitch black. Emphasizes clean bor
 | `--primary-hover` | `#818CF8` | Indigo 400 hover state |
 | `--primary-surface` | `#1E1B4B` | Deep indigo surface wash |
 | `--primary-border-subtle` | `#3730A3` | Subtle indigo primary boundary |
-| `--category-vocabulary-surface` | `#18223C` | Deep indigo slate study card surface |
-| `--category-vocabulary-border` | `#29385C` | Crisp dark indigo border |
+| `--category-vocabulary-surface` | `#1D2850` | Deep indigo clay tile surface |
+| `--category-vocabulary-border` | `#33437A` | Crisp dark indigo border |
 | `--category-vocabulary-icon` | `#818CF8` | Luminous indigo vocabulary icon |
 | `--category-vocabulary-text` | `#E0E7FF` | Crisp off-white vocabulary header text |
-| `--category-kanji-surface` | `#291D1A` | Deep warm charcoal-amber study card surface |
-| `--category-kanji-border` | `#442E25` | Subtle dark warm border |
+| `--category-kanji-surface` | `#3A2618` | Deep warm amber-umber clay tile surface |
+| `--category-kanji-border` | `#5E3F28` | Dark warm amber border |
 | `--category-kanji-icon` | `#F59E0B` | Luminous warm amber Kanji icon |
 | `--category-kanji-text` | `#FEF3C7` | Warm amber-plum Kanji header text |
+| `--cta-surface` | `#4F46E5` | Solid indigo CTA (keeps 6.3:1 white text; `--primary` is 4.5:1) |
+| `--cta-border` | `#6366F1` | Luminous indigo CTA edge |
+| `--cta-text` | `#FFFFFF` | CTA title |
+| `--cta-text-secondary` | `#E0E7FF` | CTA subtitle |
+| `--cta-puck-surface` | `rgba(255, 255, 255, 0.14)` | Matte icon puck on CTA |
+| `--cta-puck-border` | `rgba(255, 255, 255, 0.24)` | CTA puck rim highlight |
 | `--shadow-clay-card` | `0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)` | Restrained dark elevation |
 | `--shadow-clay-card-hover` | `0 8px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12)` | Dark tactile hover lift |
 | `--shadow-clay-button`| `0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)` | Dark tactile button depth |
@@ -348,14 +368,20 @@ A serene, poetic theme inspired by Japanese cherry blossoms. Uses soft cream, pe
 | `--primary-hover` | `#C23E64` | Deep rose hover state |
 | `--primary-surface` | `#FDF0F3` | Faint petal blush surface |
 | `--primary-border-subtle` | `#F3C1D0` | Subtle petal rose primary boundary |
-| `--category-vocabulary-surface` | `#F2F4FA` | Soft cool-slate study card surface |
-| `--category-vocabulary-border` | `#DCE1EF` | Soft slate-lavender border |
+| `--category-vocabulary-surface` | `#E4E8F5` | Visible cool-slate clay tile surface |
+| `--category-vocabulary-border` | `#C8CFE6` | Soft slate-lavender border |
 | `--category-vocabulary-icon` | `#4F46E5` | Indigo vocabulary icon |
 | `--category-vocabulary-text` | `#232C42` | Deep slate-plum vocabulary header text |
-| `--category-kanji-surface` | `#FAF0EC` | Soft plum-amber study card surface |
-| `--category-kanji-border` | `#EEDCD2` | Soft warm rose-linen border |
+| `--category-kanji-surface` | `#F8E3D6` | Visible plum-amber clay tile surface |
+| `--category-kanji-border` | `#E9C6B0` | Warm rose-linen border |
 | `--category-kanji-icon` | `#C05621` | Warm amber-plum Kanji icon |
 | `--category-kanji-text` | `#4A232E` | Deep plum Kanji header text |
+| `--cta-surface` | `#B83A60` | Deep rose CTA (5.5:1 white text; `--primary` is too light for body text) |
+| `--cta-border` | `#A32F52` | Deep rose CTA edge |
+| `--cta-text` | `#FFFFFF` | CTA title |
+| `--cta-text-secondary` | `#FDE7EE` | CTA subtitle |
+| `--cta-puck-surface` | `rgba(255, 255, 255, 0.16)` | Matte icon puck on CTA |
+| `--cta-puck-border` | `rgba(255, 255, 255, 0.28)` | CTA puck rim highlight |
 | `--shadow-clay-card` | `0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95)` | Gentle warm blossom lift |
 | `--shadow-clay-card-hover` | `0 8px 22px rgba(180, 120, 135, 0.18), 0 2px 6px rgba(180, 120, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1)` | Warm blossom hover lift |
 | `--shadow-clay-button`| `0 4px 12px rgba(217, 83, 121, 0.22), 0 1px 3px rgba(180, 120, 135, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.55)` | Soft tactile rose depth |
@@ -514,21 +540,25 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 
 ### 16.1 Home Screen (Safe Study Hub)
 - **Top Bar:** Solid surface (`bg-surface`, `border-b border-subtle`), matte clay finish with zero translucent frosted glass or blur. Contains Tango wordmark, appearance theme icon (`Tabler IconSun` / `IconMoon` / `IconFlower`), and `IconSettings` wrapped in tactile `rounded-full` clay icon action controls. (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
-- **Hero Area:** Brief study greeting in selected UI language: `"Bạn muốn học gì hôm nay?"` / `"What would you like to learn today?"`.
+- **Composition order:** Greeting → Study paths (Learn by Type + Mixed Test) → Study Books. The always-available study paths come first so they sit in the first viewport on every device, whether or not any Study Book exists.
+- **Greeting:** `text-2xl sm:text-3xl` bold heading `"Bạn muốn học gì hôm nay?"` / `"What would you like to learn today?"` with a single localized supporting line (`home.greetingHint`). No avatars, streaks, stats, or decorative phrases.
+- **Study path row:**
+  - **Mobile / tablet:** Vocabulary and Kanji as a 2-column pair of tiles, Mixed Test as a full-width horizontal CTA below.
+  - **Desktop (`lg`):** One 3-column row inside `max-w-4xl`: Vocabulary, Kanji, Mixed Test as three equal-height tiles. Mixed Test is offset by the Learn by Type heading height so the three tiles align.
+- **Learn by Type tiles (Học theo loại):** Solid, clearly visible semantic clay surfaces (never near-white washes). Each tile is a tactile object:
+  - Raised white icon puck (`bg-surface`, category border, `shadow-clay-card`) holding the category icon.
+  - The Japanese category name as a large, low-opacity typographic mark (`語彙` for Vocabulary, `漢字` for Kanji; `font-japanese`, `lang="ja"`, `aria-hidden`). It is study content, not UI locale, and not decoration without meaning.
+  - Localized category name and lesson/item counts anchored to the bottom of the tile.
+  - **[IconBook] Từ vựng (Vocabulary):** `--category-vocabulary-*` (cool indigo / slate).
+  - **[IconWriting] Hán tự (Kanji):** `--category-kanji-*` (warm amber / plum).
+- **Mixed Test CTA:** The only solid-color surface on Home: `bg-cta-surface border-cta-border text-cta-text shadow-clay-button`, translucent matte icon puck (`--cta-puck-*`) and a trailing `IconArrowRight` puck. Hierarchy: neutral book cards < semantic category tiles < solid Mixed Test CTA.
 - **Study Books Section (Giáo trình):**
-  - Responsive grid / scroll of textbook cards with cover image thumbnail, title, and lesson counts.
-  - Cards apply the canonical clay interaction recipe: `shadow-clay-card`, `hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`.
-  - Fallback placeholder uses a theme-aware clay card with `IconBook` (no emojis).
+  - Compact horizontal cards: 3:4 cover thumbnail, title (2-line clamp), lesson/item counts, and one Study Coverage bar. Stacked on mobile, 2 columns on tablet, 3 columns on desktop (aligned with the study path row).
+  - Fallback placeholder uses a theme-aware primary-tinted cover with a spine band and `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
-- **Learn by Type Section (Học theo loại):**
-  - Distinct semantic clay surfaces preserving brand harmony:
-    - **[IconBook] Từ vựng (Vocabulary):** `--category-vocabulary-surface`, `--category-vocabulary-border`, `--category-vocabulary-icon`, `--category-vocabulary-text`. Lesson count, total words.
-    - **[IconWriting] Hán tự (Kanji):** `--category-kanji-surface`, `--category-kanji-border`, `--category-kanji-icon`, `--category-kanji-text`. Lesson count, total words.
-  - Interactive cards apply the canonical clay recipe (`hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`).
-- **Combined Test Action Bar:**
-  - Full-width elevated clay button: `[IconBolt] Kiểm tra tổng hợp (Mixed Test)` across books (`bg-primary-surface border border-primary-border text-primary shadow-clay-button hover:-translate-y-px hover:shadow-clay-card-hover active:translate-y-px active:shadow-clay-pressed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page`).
+- **Interaction:** All interactive tiles and cards apply the canonical clay recipe (`hover:-translate-y-px`, `hover:shadow-clay-card-hover`, `active:translate-y-px`, `active:shadow-clay-pressed`, primary focus ring with 2px page offset).
 - **Zero-Book Empty State:**
-  - Renders a compact, restrained notice card (`max-w-md mx-auto w-full p-6 text-center`) with a rounded clay icon puck and tactile "Đi tới Cài đặt" button. Never places an "+ Add Book" button directly on Home.
+  - Renders inline inside the Study Books section as a full-width recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, title, and description in one row, with a tactile `[IconSettings] Cài đặt` button (right-aligned on desktop, under the text on mobile). Never a centered floating card. Never places an "+ Add Book" button directly on Home.
 - **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
 ### 16.2 Lesson List & Category Screens
@@ -653,15 +683,23 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-4-bg: #FFE4E6; --answer-4-border: #FDA4AF; --answer-4-text: #881337;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #F4F6FF;
-  --category-vocabulary-border: #DDE3FC;
+  --category-vocabulary-surface: #E6EAFB;
+  --category-vocabulary-border: #C9D1F4;
   --category-vocabulary-icon: #4F46E5;
   --category-vocabulary-text: #312E81;
 
-  --category-kanji-surface: #FFF7ED;
-  --category-kanji-border: #F6E5D3;
+  --category-kanji-surface: #FBEAD6;
+  --category-kanji-border: #EFCFA8;
   --category-kanji-icon: #B45309;
   --category-kanji-text: #78350F;
+
+  /* Primary Study CTA (solid clay action) */
+  --cta-surface: #4F46E5;
+  --cta-border: #4338CA;
+  --cta-text: #FFFFFF;
+  --cta-text-secondary: #E0E7FF;
+  --cta-puck-surface: rgba(255, 255, 255, 0.16);
+  --cta-puck-border: rgba(255, 255, 255, 0.28);
 
   /* Clay Shadows */
   --shadow-clay-card: 0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -701,15 +739,23 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-4-bg: #33141F; --answer-4-border: #7A223B; --answer-4-text: #FECDD3;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #18223C;
-  --category-vocabulary-border: #29385C;
+  --category-vocabulary-surface: #1D2850;
+  --category-vocabulary-border: #33437A;
   --category-vocabulary-icon: #818CF8;
   --category-vocabulary-text: #E0E7FF;
 
-  --category-kanji-surface: #291D1A;
-  --category-kanji-border: #442E25;
+  --category-kanji-surface: #3A2618;
+  --category-kanji-border: #5E3F28;
   --category-kanji-icon: #F59E0B;
   --category-kanji-text: #FEF3C7;
+
+  /* Primary Study CTA (solid clay action) */
+  --cta-surface: #4F46E5;
+  --cta-border: #6366F1;
+  --cta-text: #FFFFFF;
+  --cta-text-secondary: #E0E7FF;
+  --cta-puck-surface: rgba(255, 255, 255, 0.14);
+  --cta-puck-border: rgba(255, 255, 255, 0.24);
 
   /* Clay Shadows (Dark structural emphasis) */
   --shadow-clay-card: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -749,15 +795,23 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --answer-4-bg: #FCEEF1; --answer-4-border: #EBB3C0; --answer-4-text: #641E2F;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #F2F4FA;
-  --category-vocabulary-border: #DCE1EF;
+  --category-vocabulary-surface: #E4E8F5;
+  --category-vocabulary-border: #C8CFE6;
   --category-vocabulary-icon: #4F46E5;
   --category-vocabulary-text: #232C42;
 
-  --category-kanji-surface: #FAF0EC;
-  --category-kanji-border: #EEDCD2;
+  --category-kanji-surface: #F8E3D6;
+  --category-kanji-border: #E9C6B0;
   --category-kanji-icon: #C05621;
   --category-kanji-text: #4A232E;
+
+  /* Primary Study CTA (solid clay action) */
+  --cta-surface: #B83A60;
+  --cta-border: #A32F52;
+  --cta-text: #FFFFFF;
+  --cta-text-secondary: #FDE7EE;
+  --cta-puck-surface: rgba(255, 255, 255, 0.16);
+  --cta-puck-border: rgba(255, 255, 255, 0.28);
 
   /* Clay Shadows (Warm pink-slate lift) */
   --shadow-clay-card: 0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);

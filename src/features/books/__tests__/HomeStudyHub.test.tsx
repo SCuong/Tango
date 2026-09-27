@@ -375,9 +375,10 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('text-category-kanji-icon');
     expect(html).toContain('text-category-kanji-text');
 
-    // Mixed test styling
-    expect(html).toContain('bg-primary-surface');
-    expect(html).toContain('border-primary-border');
+    // Mixed Test uses the dedicated solid primary CTA tokens
+    expect(html).toContain('bg-cta-surface');
+    expect(html).toContain('border-cta-border');
+    expect(html).toContain('text-cta-text');
     expect(html).not.toContain('border-primary/20');
     expect(html).toContain('shadow-clay-button');
 
@@ -407,7 +408,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(emptyHtml).toContain('focus-visible:ring-offset-page');
   });
 
-  it('renders compact constrained empty state layout when no books exist', () => {
+  it('renders the empty Study Books state inline inside its section, not as a floating card', () => {
     const emptyBooksState: UserStudyState = {
       ...populatedState,
       books: {},
@@ -415,9 +416,72 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
 
     const html = renderHome(emptyBooksState);
 
-    // Constrained width container
-    expect(html).toContain('max-w-md mx-auto w-full');
-    // Rounded clay puck
-    expect(html).toContain('rounded-full bg-surface-elevated');
+    // No longer a centered, width-constrained floating card
+    expect(html).not.toContain('max-w-md mx-auto w-full');
+
+    // Empty state sits inside the Study Books section, after its heading
+    const booksSectionStart = html.indexOf('aria-labelledby="home-study-books-heading"');
+    const emptyTitleIndex = html.indexOf('Chưa có giáo trình nào.');
+    expect(booksSectionStart).toBeGreaterThan(-1);
+    expect(emptyTitleIndex).toBeGreaterThan(booksSectionStart);
+
+    // The only action is a real button leading to Settings with a 48px touch target
+    expect(html).toMatch(/<button[^>]*class="[^"]*min-h-touch[^"]*"[^>]*>(?:(?!<\/button>).)*Cài đặt<\/button>/);
+  });
+
+  it('places the always-available study paths before Study Books', () => {
+    const html = renderHome(populatedState);
+
+    const greetingIndex = html.indexOf('id="home-greeting-heading"');
+    const learnIndex = html.indexOf('id="home-learn-by-type-heading"');
+    const mixedIndex = html.indexOf('id="home-mixed-test-heading"');
+    const booksIndex = html.indexOf('id="home-study-books-heading"');
+
+    expect(greetingIndex).toBeGreaterThan(-1);
+    expect(learnIndex).toBeGreaterThan(greetingIndex);
+    expect(mixedIndex).toBeGreaterThan(learnIndex);
+    expect(booksIndex).toBeGreaterThan(mixedIndex);
+  });
+
+  it('renders a localized supporting line under the greeting', () => {
+    expect(renderHome(populatedState)).toContain('Chọn một lối học để bắt đầu.');
+
+    const enHtml = renderHome({
+      ...populatedState,
+      preferences: { ...populatedState.preferences, language: 'en' },
+    });
+    expect(enHtml).toContain('Pick a study path to begin.');
+  });
+
+  it('gives Vocabulary and Kanji tiles distinct category identities and accessible labels', () => {
+    const html = renderHome(populatedState);
+
+    // Each tile is a registered study card tagged with its category
+    expect(html).toMatch(/<button[^>]*data-study-card="true"[^>]*data-category="vocabulary"/);
+    expect(html).toMatch(/<button[^>]*data-study-card="true"[^>]*data-category="kanji"/);
+    expect(html).toContain('aria-label="Học theo loại: Từ vựng"');
+    expect(html).toContain('aria-label="Học theo loại: Hán tự"');
+
+    // Japanese category names are decorative study-content marks hidden from screen readers
+    expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>語彙<\/span>/);
+    expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>漢字<\/span>/);
+
+    // Study action order for arrow-key navigation: Vocabulary, Kanji, Mixed Test, then books
+    const cardOrder = Array.from(
+      html.matchAll(/<button[^>]*data-study-card="true"[^>]*>/g),
+      (match) => {
+        const tag = match[0];
+        if (tag.includes('data-category="vocabulary"')) return 'vocabulary';
+        if (tag.includes('data-category="kanji"')) return 'kanji';
+        if (tag.includes('id="home-mixed-test-heading"')) return 'mixed';
+        return 'book';
+      }
+    );
+    expect(cardOrder).toEqual(['vocabulary', 'kanji', 'mixed', 'book']);
+  });
+
+  it('renders a single Study Coverage progress bar per book card', () => {
+    const html = renderHome(populatedState);
+    expect(html.match(/role="progressbar"/g)).toHaveLength(1);
   });
 });

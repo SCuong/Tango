@@ -60,15 +60,23 @@
   --answer-4-bg: #FFE4E6; --answer-4-border: #FDA4AF; --answer-4-text: #881337;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #F4F6FF;
-  --category-vocabulary-border: #DDE3FC;
+  --category-vocabulary-surface: #E6EAFB;
+  --category-vocabulary-border: #C9D1F4;
   --category-vocabulary-icon: #4F46E5;
   --category-vocabulary-text: #312E81;
 
-  --category-kanji-surface: #FFF7ED;
-  --category-kanji-border: #F6E5D3;
+  --category-kanji-surface: #FBEAD6;
+  --category-kanji-border: #EFCFA8;
   --category-kanji-icon: #B45309;
   --category-kanji-text: #78350F;
+
+  /* Primary Study CTA (solid clay action) */
+  --cta-surface: #4F46E5;
+  --cta-border: #4338CA;
+  --cta-text: #FFFFFF;
+  --cta-text-secondary: #E0E7FF;
+  --cta-puck-surface: rgba(255, 255, 255, 0.16);
+  --cta-puck-border: rgba(255, 255, 255, 0.28);
 
   /* Clay Shadows */
   --shadow-clay-card: 0 4px 14px -1px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -108,15 +116,23 @@
   --answer-4-bg: #33141F; --answer-4-border: #7A223B; --answer-4-text: #FECDD3;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #18223C;
-  --category-vocabulary-border: #29385C;
+  --category-vocabulary-surface: #1D2850;
+  --category-vocabulary-border: #33437A;
   --category-vocabulary-icon: #818CF8;
   --category-vocabulary-text: #E0E7FF;
 
-  --category-kanji-surface: #291D1A;
-  --category-kanji-border: #442E25;
+  --category-kanji-surface: #3A2618;
+  --category-kanji-border: #5E3F28;
   --category-kanji-icon: #F59E0B;
   --category-kanji-text: #FEF3C7;
+
+  /* Primary Study CTA (solid clay action) */
+  --cta-surface: #4F46E5;
+  --cta-border: #6366F1;
+  --cta-text: #FFFFFF;
+  --cta-text-secondary: #E0E7FF;
+  --cta-puck-surface: rgba(255, 255, 255, 0.14);
+  --cta-puck-border: rgba(255, 255, 255, 0.24);
 
   /* Clay Shadows (Dark structural emphasis) */
   --shadow-clay-card: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -156,15 +172,23 @@
   --answer-4-bg: #FCEEF1; --answer-4-border: #EBB3C0; --answer-4-text: #641E2F;
 
   /* Category Semantic Identities */
-  --category-vocabulary-surface: #F2F4FA;
-  --category-vocabulary-border: #DCE1EF;
+  --category-vocabulary-surface: #E4E8F5;
+  --category-vocabulary-border: #C8CFE6;
   --category-vocabulary-icon: #4F46E5;
   --category-vocabulary-text: #232C42;
 
-  --category-kanji-surface: #FAF0EC;
-  --category-kanji-border: #EEDCD2;
+  --category-kanji-surface: #F8E3D6;
+  --category-kanji-border: #E9C6B0;
   --category-kanji-icon: #C05621;
   --category-kanji-text: #4A232E;
+
+  /* Primary Study CTA (solid clay action) */
+  --cta-surface: #B83A60;
+  --cta-border: #A32F52;
+  --cta-text: #FFFFFF;
+  --cta-text-secondary: #FDE7EE;
+  --cta-puck-surface: rgba(255, 255, 255, 0.16);
+  --cta-puck-border: rgba(255, 255, 255, 0.28);
 
   /* Clay Shadows (Warm pink-slate lift) */
   --shadow-clay-card: 0 4px 14px rgba(180, 120, 135, 0.12), 0 1px 4px rgba(180, 120, 135, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);

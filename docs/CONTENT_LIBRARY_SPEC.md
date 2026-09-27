@@ -124,34 +124,29 @@ Every card or button on the Home study area leads toward **browsing, reading, or
 
 ```text
 ┌────────────────────────────────────────────────────────┐
-│ TANGO                                   [IconSettings] │
+│ TANGO                           [Theme] [IconSettings] │
 │                                                        │
-│ GIÁO TRÌNH (STUDY BOOKS)                               │
-│ ────────────────────────────────────────────────────── │
-│ ┌──────────────────────┐    ┌──────────────────────┐   │
-│ │ [Cover]              │    │ [Cover]              │   │
-│ │ 中級へ行こう         │    │ Mimikara             │   │
-│ │ 8 bài · 164 mục      │    │ 5 bài · 110 mục      │   │
-│ └──────────────────────┘    └──────────────────────┘   │
+│ Bạn muốn học gì hôm nay?                               │
 │                                                        │
 │ HỌC THEO LOẠI (LEARN BY TYPE)                          │
-│ ────────────────────────────────────────────────────── │
-│ ┌────────────────────────────────────────────────────┐ │
-│ │ [IconBook] Từ vựng (Vocabulary)                    │ │
-│ └────────────────────────────────────────────────────┘ │
-│ ┌────────────────────────────────────────────────────┐ │
-│ │ [IconWriting] Hán tự (Kanji)                       │ │
-│ └────────────────────────────────────────────────────┘ │
-│                                                        │
+│ ┌────────────────────────┐ ┌─────────────────────────┐ │
+│ │ [IconBook] Từ vựng     │ │ [IconWriting] Hán tự    │ │
+│ └────────────────────────┘ └─────────────────────────┘ │
 │ ┌────────────────────────────────────────────────────┐ │
 │ │ [IconBolt] Kiểm tra tổng hợp (Mixed Test)          │ │
 │ └────────────────────────────────────────────────────┘ │
+│                                                        │
+│ GIÁO TRÌNH (STUDY BOOKS)                               │
+│ ┌──────────────────────┐    ┌──────────────────────┐   │
+│ │ [Cover] 中級へ行こう │    │ [Cover] Mimikara     │   │
+│ │ 8 bài · 164 mục      │    │ 5 bài · 110 mục      │   │
+│ └──────────────────────┘    └──────────────────────┘   │
 └────────────────────────────────────────────────────────┘
 ```
 
 - **Top Bar:** Wordmark `TANGO` and `[IconSettings]` (`IconSettings` opens Settings. Content Management is accessed from the Study Content section inside Settings).
-- **GIÁO TRÌNH:** Stacked tactile cards with 1:1 thumbnails on mobile, responsive 2-4 column grid on desktop/tablet (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)). Tapping a card opens the **Book Study View**.
-- **HỌC THEO LOẠI:** Direct entry to browse lessons by category across all books.
+- **HỌC THEO LOẠI:** Direct entry to browse lessons by category across all books. Shown first because it is always available.
+- **GIÁO TRÌNH:** Compact tactile cards with 3:4 cover thumbnails, stacked on mobile and in a 2-3 column grid on tablet/desktop (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). Tapping a card opens the **Book Study View**.
 - **Kiểm tra tổng hợp:** Direct access to global multi-lesson quiz selection.
 
 ### 4.1 Safe Empty States (Zero Management Clutter on Study Screens)

@@ -96,13 +96,14 @@ export const BookCover: React.FC<BookCoverProps> = ({
     );
   }
 
-  // Documented theme-aware clay placeholder (IconBook, no emoji)
+  // Documented theme-aware clay placeholder (IconBook, no emoji) with a book-spine band
   return (
     <div
-      className={`w-full h-full flex items-center justify-center bg-surface-elevated text-text-muted border border-border-subtle ${className}`}
+      className={`w-full h-full relative flex items-center justify-center bg-primary-surface text-primary ${className}`}
       aria-hidden="true"
     >
-      <IconBook size={28} stroke={1.5} className="text-text-muted" />
+      <span className="absolute inset-y-0 left-0 w-1.5 bg-primary-border" />
+      <IconBook size={24} stroke={1.5} />
     </div>
   );
 };

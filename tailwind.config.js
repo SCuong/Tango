@@ -78,6 +78,14 @@ export default {
             text: 'var(--category-kanji-text)',
           },
         },
+        cta: {
+          surface: 'var(--cta-surface)',
+          border: 'var(--cta-border)',
+          text: 'var(--cta-text)',
+          'text-secondary': 'var(--cta-text-secondary)',
+          'puck-surface': 'var(--cta-puck-surface)',
+          'puck-border': 'var(--cta-puck-border)',
+        },
       },
       boxShadow: {
         'clay-card': 'var(--shadow-clay-card)',

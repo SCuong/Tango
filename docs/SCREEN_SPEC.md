@@ -184,7 +184,7 @@ flowchart TD
 
 | Screen ID | Screen Name | Mobile (< 640px) | Tablet (640px–1024px) | Desktop (> 1024px) | Empty State Handling | Keyboard Shortcuts | Destructive Actions | Detailed Specification |
 |---|---|---|---|---|---|---|---|---|
-| **SCREEN 01** | Home / Study Hub | Stacked tactile cards | 2-col card grid | 3-4 col card grid (`max-w-4xl`) | Calm empty card with link to Settings | `Enter` (open), `Alt+S` (settings) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-01-home--study-hub) |
+| **SCREEN 01** | Home / Study Hub | Study paths first (2-col category tiles + Mixed Test CTA), stacked book cards | 2-col tiles, 2-col book grid | 3-col study row + 3-col book grid (`max-w-4xl`) | Inline recessed empty shelf with link to Settings | `Enter` (open), `Alt+S` (settings) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-01-home--study-hub) |
 | **SCREEN 02** | Book Study View | Stacked cards + sticky CTA | Centered 2-col category row (`max-w-2xl`) | Centered 2-col category row (`max-w-2xl`) | Disabled category card if 0 lessons | `Esc` (back), `Enter` (test) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-02-book-study-view) |
 | **SCREEN 03** | Category View Inside Book | Full-width lesson list | 2-col lesson grid | 2-col lesson grid (`max-w-4xl`) | Empty message if 0 lessons in category | `Esc` (back) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-03-category-view-inside-book) |
 | **SCREEN 04** | Learn by Type | Stacked groups by book | 2-col grouped cards | 2-col grouped cards (`max-w-4xl`) | Message if no lessons exist | `Esc` (back) | None | [STUDY_SCREENS](./screens/STUDY_SCREENS.md#screen-04-learn-by-type-học-theo-loại) |
