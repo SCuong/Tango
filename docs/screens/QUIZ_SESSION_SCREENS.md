@@ -156,6 +156,7 @@ Prevents accidental abandonment of an ongoing quiz session.
   - Actions:
     - Primary Button: `[ Tiếp tục học ]` (receives initial focus)
     - Secondary Button: `[ Thoát ]` (neutral outline)
+- **Browser Back** during an active session opens this dialog instead of leaving; `Escape` and the HUD `[IconX]` open it too. `Thoát` returns to the screen that started the session and discards the session (no progress or history is written).
 
 ---
 
@@ -185,6 +186,7 @@ Post-quiz assessment metrics and mistake review triggers.
 
 #### Purpose:
 Launches a targeted review session containing only items failed in the recent quiz or marked weak in history.
-- Reuses SCREEN 10 (Quiz Runner) scoped strictly to `missedItemIds`.
+- Reuses SCREEN 10 (Quiz Runner) scoped strictly to `missedItemIds` (from Results) or to the lesson's weak items (from Lesson Detail), using the engine's review focus (see [`docs/DATA_MODEL.md` §4.3](../DATA_MODEL.md)).
+- A correct answer in a review session clears the item's weak flag.
 - Once all weak items are answered correctly, returns gracefully to SCREEN 14 or Home.
 - **Empty State:** If launched when 0 items are weak, displays: *"Tuyệt vời! Bạn không có từ nào cần ôn lại."*.

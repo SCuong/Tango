@@ -104,7 +104,7 @@ Selecting a lesson opens the **Lesson Detail view**, offering:
 
 ### Screen 3: Mixed Multi-Lesson Test (Kiểm tra tổng hợp)
 
-A dedicated, mobile-friendly configuration modal/screen allowing users to combine any set of lessons across textbooks and categories:
+A dedicated, mobile-friendly configuration screen (`/quiz/mixed-config`, see [SCREEN 09](./screens/QUIZ_CONFIG_SCREENS.md)) allowing users to combine any set of lessons across textbooks and categories:
 
 ```text
 KIỂM TRA TỔNG HỢP
@@ -219,8 +219,8 @@ Nghĩa:
 
 - **Celebration Header:** "Hoàn thành bài kiểm tra!"
 - **Metrics Grid (2x2):**
-  - **Điểm số:** 450 pts
-  - **Độ chính xác:** 85% (17/20)
+  - **Số câu đúng:** 17 / 20
+  - **Độ chính xác:** 85%
   - **Chuỗi đúng dài nhất:** 8 liên tiếp
   - **Thời gian:** 1 phút 40 giây
 - **Missed Items Section:** Displays cards for failed items.
@@ -302,7 +302,7 @@ A protected administrative screen accessed intentionally via **Settings → Qu�
 | Component / Screen | Mobile (< 640px) | Tablet (640px - 1024px) | Desktop (> 1024px) |
 |---|---|---|---|
 | **Home Screen** | First 2 large Study Book cards (+ `Xem tất cả`), 2-col Vocabulary/Kanji tiles, full-width Test (+) CTA | 2-column Study Book grid, shortcut row | 2-column Study Book grid (max-w-4xl), one row of Vocabulary/Kanji tiles + Test (+) CTA |
-| **Mixed Test Selector**| Full-screen modal, stacked checkboxes | Centered modal (max-w-lg) | Centered modal (max-w-xl) |
+| **Mixed Test Selector**| Full-screen route, stacked checkboxes, sticky Start bar | Centered 2-column route (`max-w-4xl`) | Centered 2-column route (`max-w-4xl`), sticky settings panel |
 | **Lesson List** | Single column list | 2-column grid | 2-column grid (max-w-4xl) |
 | **Quiz Container** | Full screen (100% width, 16px padding) | Centered canvas (max-w-lg) | Centered canvas (max-w-xl) |
 | **Option Buttons** | Full width stacked, 56px height | Full width stacked, 58px height | Full width stacked (clean content-only, no indices) |

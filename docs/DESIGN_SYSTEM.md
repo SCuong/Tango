@@ -48,7 +48,8 @@ Before building or modifying user-facing components, contributors must consult:
 | **Content cards** | Study Books, lesson cards, results cards | Soft clay elevation (`--shadow-clay-card`), neutral or semantic surface |
 | **Secondary controls** | Category shortcuts, icon buttons, segmented controls, secondary buttons | Restrained clay; press = 1px sink with compressed shadow (`CLAY_PRESSED_CLASSES`) |
 | **Primary CTA** | The main action of a screen (Home `Kiểm tra`, `Bắt đầu`, `Tiếp tục`, `Đã hiểu — Tiếp tục`) | Visibly raised physical button: `--cta-*` surface plus a solid depth lip (`--cta-depth`, `.cta-raised`) |
-| **Flat** | Dense lists, dictionary rows, settings lists, import tables, form inputs | Flat surface with 1px dividers; no clay stacking |
+| **Flat** | Dense lists, dictionary rows, settings lists, import tables, form inputs | Flat surface with 1px dividers; no clay stacking. Interactive flat rows use `.flat-interactive`: pressed = background tint from `usePressFeedback`, hover tint only on fine pointers |
+| **Destructive** | Danger Zone actions, confirm-delete buttons | Restrained `--error-surface` / `--error-border` / `--error-text`; never the raised primary treatment |
 
 - The pressed state must look like the control **physically compressing** (moving down onto its lip or base), not merely gaining or losing a shadow.
 - Quiz answer choices keep their own positional treatment (§10–§12); they are not primary CTAs.
@@ -314,12 +315,14 @@ Tango stays mature and restrained, but it never falls back to near-white or near
 - **Identity lives in the material, not only the accents:** Theme identity must be visible from the page canvas, surfaces, borders, and elevation. Cards must separate from the canvas by color before any shadow is considered.
 - **Separate the three color roles:** Canvas creates atmosphere; category surfaces create identity; CTA creates action emphasis. These three roles must not collapse into the same hue family. In practice: keep the canvas and neutral card surfaces low-saturation, give each category surface its own clearly different hue, and reserve the most saturated color on screen for the CTA. Sakura is the reference: blush canvas, lavender/peach categories, plum-rose action.
 - **Personality comes only from:** palette, material contrast, typography, the existing study illustrations, and hierarchy.
-- **Never:** gradient color fills, decorative blobs, neon, glow, glassmorphism, or wallpaper illustrations (alpha-mask feathers on cut edges are allowed, §8.2). Sakura petals and Japanese motifs (shoji, seigaiha, moon, lantern, mist, branch) are allowed **only** inside the restrained ambience layer of §8.2. Sakura petals and Japanese motifs (shoji, moon, lantern, mist) are allowed **only** inside the restrained ambience layer of §8.2.
+- **Never:** gradient color fills, decorative blobs, neon, glow, glassmorphism, or wallpaper illustrations (alpha-mask feathers on cut edges are allowed, §8.2). Sakura petals and Japanese motifs (shoji, seigaiha, moon, lantern, mist, branch) are allowed **only** inside the restrained ambience layer of §8.2.
 - **Restraint:** Shadows stay soft and are tinted to each theme's material; never make them heavier to fake personality.
 - **Settings previews:** The palettes in §9 are exactly what the Settings theme preview cards display (§16.5).
 
 ### 8.2 Restrained Japanese Ambience (Explicit Exception)
-Each theme shows a quiet but recognizably Japanese scene behind all content. This is the **only** exception to the "no decorative shapes / no petals / no Japanese patterns" rules in §2 and §8.1, and it applies only to this fixed background layer (`ThemeAmbience`, used on Home). Use a few intentional motifs per theme, never a collage of clichés.
+Each theme shows a quiet but recognizably Japanese scene behind all content. This is the **only** exception to the "no decorative shapes / no petals / no Japanese patterns" rules in §2 and §8.1, and it applies only to this fixed background layer (`ThemeAmbience`).
+
+**Where ambience appears:** Home, the study browsing screens (Book Study View, Category Inside Book, Learn by Type, Lesson Detail), and the test configuration screens. It is intentionally **absent** from focused or administrative screens: the dense Lesson Items list, the quiz runner and results, Settings, Content Management, the importer, and dialogs. Quiz screens keep attention on the prompt and answers; management screens prioritize clarity and safety. Use a few intentional motifs per theme, never a collage of clichés.
 
 - **Light — Japanese daytime:** daylight through a washi shoji window (kumiko lattice), a quarter fan of seigaiha waves in cool pearl-indigo, and one soft mist band.
 - **Dark — Japanese night:** a dim moon, a warmly lit shoji window, one paper lantern, four warm firefly points, and a few 3px stars. Warm and quiet, never neon or cyberpunk.
@@ -364,6 +367,8 @@ Components **never** reference raw hex colors. All components consume semantic C
   --error: ...;
   --error-surface: ...;
   --error-border: ...;
+  --success-text: ...;        /* readable text on --success-surface */
+  --error-text: ...;          /* readable text on --error-surface (destructive buttons, errors) */
   --warning: ...;
 
   /* 4 Positional Multiple-Choice Answer Identities */
@@ -498,7 +503,7 @@ A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and s
 | `--shadow-clay-pressed` | `0 1px 2px rgba(0, 2, 10, 0.55), inset 0 2px 4px rgba(0, 2, 10, 0.40)` | Night pressed state |
 
 ### 9.3 Sakura Theme (Sakura) — Warm Blossom Paper
-A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted raised surfaces, deep plum-ink text, and a rose-plum primary. Vocabulary stays a compatible wisteria lavender; Kanji stays warm peach/plum. It is the reference for role separation: blush atmosphere, lavender/peach identity, plum-rose action. **No petals, patterns, neon, or candy pink.**
+A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted raised surfaces, deep plum-ink text, and a rose-plum primary. Vocabulary stays a compatible wisteria lavender; Kanji stays warm peach/plum. It is the reference for role separation: blush atmosphere, lavender/peach identity, plum-rose action. **No petals or patterns on surfaces (they live only in the §8.2 ambience layer), no neon, no candy pink.**
 
 | Token | Value | Visual Role |
 |---|---|---|
@@ -766,7 +771,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
 - **Danger Zone (Vùng nguy hiểm):** Bordered with a muted semantic warning/error line.
 - **Destructive Confirmation Dialog:**
   - High-emphasis modal with semi-opaque backdrop (`backdrop-blur-sm`).
-  - Destructive action button: Semantic error red token (`--error`, `--error-surface`, `--error-border`).
+  - Destructive action button: Semantic error tokens (`--error-surface` fill, `--error-border` edge, `--error-text` label; `--error-text` keeps AA contrast in every theme).
   - Cancel button: Neutral surface, visually distinct, safe spacing from delete button, holds initial focus.
   - Never default-focus the destructive action; `Enter` does not execute deletion.
   - See [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md) for UX dialog specifications.
@@ -831,6 +836,8 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --error: #DC2626;
   --error-surface: #FEF2F2;
   --error-border: #FCA5A5;
+  --success-text: #047857;
+  --error-text: #B91C1C;
   --warning: #D97706;
 
   /* 4 Positional Answer Choices */
@@ -893,6 +900,8 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --error: #EF4444;
   --error-surface: #7F1D1D;
   --error-border: #B91C1C;
+  --success-text: #A7F3D0;
+  --error-text: #FECACA;
   --warning: #F59E0B;
 
   /* 4 Positional Answer Choices (Muted Rich Dark Hues) */
@@ -955,6 +964,8 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --error: #DC2626;
   --error-surface: #FEF2F2;
   --error-border: #FCA5A5;
+  --success-text: #047857;
+  --error-text: #B91C1C;
   --warning: #D97706;
 
   /* 4 Positional Answer Choices (Blossom Garden Harmony) */

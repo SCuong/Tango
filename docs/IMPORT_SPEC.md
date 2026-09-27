@@ -201,6 +201,8 @@ Column 4: Vietnamese Meaning
 
 A compact manual mapping selector is accessible in Preview if auto-mapping requires adjustment.
 
+**When the mapping step (SCREEN 22) is shown:** whenever no header row was recognized (positional fallback) or the recognized header has no Japanese column. When a header with a Japanese column is recognized, the importer goes straight to Preview, which still offers `Điều chỉnh cột` to open the mapping step.
+
 ---
 
 ## 8. Markdown Table Import
@@ -225,7 +227,7 @@ For `.xlsx` spreadsheet uploads:
 - Reads the **first usable worksheet**.
 - Automatically locates the first non-empty header row.
 - Ignores completely blank rows and styling.
-- *Implementation note:* Parsed client-side via a lightweight spreadsheet parser when implemented; no server needed.
+- *Implementation note:* Parsed client-side by `src/lib/xlsx.ts` without a third-party dependency: the ZIP container is read directly and entries are inflated with the browser-native `DecompressionStream('deflate-raw')`. Shared strings, inline strings, and numbers are read; Japanese phonetic (`<rPh>`) runs are ignored. The downloadable Excel template is written by the same module.
 
 ---
 
