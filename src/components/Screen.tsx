@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useI18n } from '../hooks/useI18n';
 import { IconButton } from './Button';
-import { ThemeAmbience } from './ThemeAmbience';
+import { MeoEdgeAmbience, ThemeAmbience } from './ThemeAmbience';
 
 /** Canvas widths (DESIGN_SYSTEM B9): browsing 4xl, focused study/config 2xl–3xl, quiz xl. */
 export type ScreenWidth = 'xl' | '2xl' | '3xl' | '4xl';
@@ -127,7 +127,7 @@ export const Screen: React.FC<ScreenProps> = ({
   useEscapeKey(onEscape);
   return (
     <div className="min-h-screen bg-page text-text-primary flex flex-col">
-      {ambience && <ThemeAmbience subtle />}
+      {ambience ? <ThemeAmbience subtle /> : <MeoEdgeAmbience />}
       {header}
       <main
         className={`relative flex-1 w-full ${WIDTH_CLASSES[width]} mx-auto px-4 pt-3 sm:pt-5 ${bottomBar ? 'pb-4' : 'pb-10 sm:pb-14'} ${mainClassName}`}

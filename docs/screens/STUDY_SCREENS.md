@@ -32,7 +32,7 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
 
 #### Routes & Navigation:
 - **Route:** `/` — one of the three primary destinations (Home / Test / Settings, see [`DESIGN_SYSTEM.md` §16.0](../DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings)).
-- **Entry:** Application launch, the `TANGO` wordmark, the Home tab of the primary navigation, or "Về trang chủ".
+- **Entry:** Application launch, the Tango cat wordmark, the Home tab of the primary navigation, or "Về trang chủ".
 - **Exit:**
   - Tapping a Study Book card $\rightarrow$ [SCREEN 02: Book Study View](#screen-02-book-study-view) (`/book/:bookId`).
   - Tapping the `語彙 Từ vựng` or `漢字 Hán tự` shortcut $\rightarrow$ [SCREEN 04: Learn by Type](#screen-04-learn-by-type-học-theo-loại) (`/learn/:category`).
@@ -41,7 +41,7 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
 
 #### Responsive Layout Strategy:
 - **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts are secondary. Home does **not** own a Test CTA: Test is a primary destination.
-- **Top Bar:** Opaque theme canvas (`bg-page`) with no divider line (zero blur); content scrolling underneath fades out through a short page-colored feather. Mobile: the `TANGO` wordmark only. From `sm` up: the wordmark plus the compact Home / Test / Settings header navigation. No theme status or theme control on Home.
+- **Top Bar:** Opaque theme canvas (`bg-page`) with no divider line (zero blur); content scrolling underneath fades out through a short page-colored feather. Mobile: the Tango cat wordmark only. From `sm` up: the wordmark plus the compact Home / Test / Settings header navigation. No theme status or theme control on Home.
 - **Primary navigation (mobile):** the floating clay bottom bar with Home active; Home reserves its height so `Xem tất cả` and the category tiles are never covered.
 - **No greeting, no visible section labels:** Semantic structure uses visually hidden headings (`sr-only` page `h1`, `sr-only` `h2` for "Giáo trình" and "Học theo loại").
 - **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.

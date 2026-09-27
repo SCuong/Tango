@@ -302,13 +302,15 @@ describe('mobile primary navigation mounting', () => {
 });
 
 describe('settings and content management', () => {
-  it('Settings shows three real theme previews as a radio group, language, sound, and content link', () => {
+  it('Settings shows real theme previews as a radio group, language, sound, and content link', () => {
     const html = render('/settings');
     expect(html).toContain('role="radiogroup"');
-    expect(html.match(/data-theme="(light|dark|sakura)"/g)).toEqual([
+    // Four genuine previews on the carousel track: the three standard themes and Meo's World
+    expect(html.match(/data-theme="(light|dark|sakura|meo)"/g)).toEqual([
       'data-theme="light"',
       'data-theme="dark"',
       'data-theme="sakura"',
+      'data-theme="meo"',
     ]);
     expect(html).toMatch(/role="radio" aria-checked="true"[^>]*>/);
     expect(html).toContain('Tiếng Việt');

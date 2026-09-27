@@ -217,7 +217,7 @@ export const LessonDetail: React.FC<{ lessonId: string }> = ({ lessonId }) => {
 const ActionIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span
     aria-hidden="true"
-    className="w-11 h-11 rounded-xl bg-primary-surface border border-primary-border text-primary flex items-center justify-center shrink-0"
+    className="tango-icon-puck w-11 h-11 rounded-xl bg-primary-surface border border-primary-border text-primary flex items-center justify-center shrink-0"
   >
     {children}
   </span>

@@ -2,7 +2,7 @@
 
 This document defines the functional UX flows, screen layouts, interaction patterns, and ergonomics for Tango across mobile and desktop form factors.
 
-> **Visual Design System Reference:** For the complete, authoritative design token architecture, Soft Claymorphism specifications, Light/Dark/Sakura palettes, typography, and Tabler Icons, see [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
+> **Visual Design System Reference:** For the complete, authoritative design token architecture, Soft Claymorphism specifications, Light/Dark/Sakura palettes (plus the special Meo's World theme), typography, and Tabler Icons, see [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
 >
 > **Screen-by-Screen Specification Reference:** For the exhaustive, authoritative 27-screen wireframes, routes, responsive layouts (Mobile, Tablet, Desktop), touch targets, and keyboard shortcuts, see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md).
 
@@ -56,7 +56,7 @@ MOBILE (< 640px)
 - **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts are secondary.
 - **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
 - **Primary navigation:** Home / Test / Settings as a root-only floating bottom bar on mobile and compact header links from `sm` up (see [`DESIGN_SYSTEM.md` §16.0](./DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings)).
-- **Top Bar:** Wordmark `TANGO` (plus the header navigation from `sm` up), with no divider line. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
+- **Top Bar:** The Tango cat wordmark (plus the header navigation from `sm` up), with no divider line. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
 - **Study Book cards:** The first 2 books as large cards (3:4 cover, title up to 3 lines with full title on hover, Study Coverage). A centered, compact dashed `Xem tất cả` / `View all` bridge reveals the rest in place when more than 2 exist. Tapping a book opens its **Book Study View**. (Never triggers edit/delete). Reordering books is not available on Home; it belongs to the future full Books list / management view.
 - **Vocabulary / Kanji shortcuts:** Equal-height `語彙 Từ vựng` and `漢字 Hán tự` tiles (glyph top-left, illustration top-right, label bottom-left, no wrapping) to browse lessons by category across all textbooks.
 - **Ambience:** A restrained per-theme Japanese scene sits quietly behind the content (see [`docs/DESIGN_SYSTEM.md` §8.2](./DESIGN_SYSTEM.md#82-restrained-japanese-ambience-explicit-exception)).
@@ -242,7 +242,7 @@ Nghĩa:
 A clean, minimalist preferences modal/sheet:
 - **Language (Ngôn ngữ):** Segmented control `[ Tiếng Việt ]` | `[ English ]`.
 - **Theme (Giao diện):**
-  - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
+  - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`; an arrow beside the group reveals the special fourth theme `Mèo mập 😺` / `Meo's World` (see [`DESIGN_SYSTEM.md` §16.5](./DESIGN_SYSTEM.md#165-settings-screen)).
   - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
   - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
   - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.

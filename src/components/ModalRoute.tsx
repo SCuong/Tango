@@ -3,6 +3,7 @@ import { IconArrowLeft, IconX } from '@tabler/icons-react';
 import { useI18n } from '../hooks/useI18n';
 import { IconButton } from './Button';
 import { useEscapeKey } from './Screen';
+import { MeoEdgeAmbience } from './ThemeAmbience';
 
 export interface ModalRouteProps {
   titleId: string;
@@ -33,6 +34,7 @@ export const ModalRoute: React.FC<ModalRouteProps> = ({
   useEscapeKey(onClose);
   return (
     <div className="min-h-screen bg-page text-text-primary flex flex-col sm:flex-row sm:items-center sm:justify-center sm:p-6">
+      <MeoEdgeAmbience />
       <div className="hidden sm:block tango-backdrop fixed inset-0" aria-hidden="true" onClick={onClose} />
       <div
         role="region"

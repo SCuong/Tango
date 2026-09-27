@@ -11,11 +11,23 @@ export interface ItemProgress {
   isMarkedWeak: boolean;          // Persisted weak/review flag; read selectors consume it as-is
 }
 
-export type AppTheme = 'light' | 'dark' | 'sakura';
+/**
+ * Light / Dark / Sakura are the standard themes; 'meo' (Mèo mập 😺 / Meo's World) is the special
+ * easter-egg theme revealed from the Settings theme carousel.
+ */
+export type AppTheme = 'light' | 'dark' | 'sakura' | 'meo';
+
+/** Every accepted theme identifier, in theme-picker order. */
+export const APP_THEMES: readonly AppTheme[] = ['light', 'dark', 'sakura', 'meo'];
+
+/** True for a supported theme identifier (unknown stored values fall back to the default). */
+export function isAppTheme(value: unknown): value is AppTheme {
+  return typeof value === 'string' && (APP_THEMES as readonly string[]).includes(value);
+}
 export type AppLanguage = 'vi' | 'en';
 
 export interface UserPreferences {
-  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura'
+  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura' | 'meo'
   language: AppLanguage;         // 'vi' (default) | 'en'
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
 }

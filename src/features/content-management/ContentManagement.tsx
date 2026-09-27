@@ -72,7 +72,7 @@ export const ContentManagement: React.FC = () => {
             onClick={() => navigate({ type: 'add_book' })}
             className="pr-2.5"
             trailingIcon={
-              <span className="w-8 h-8 rounded-full bg-primary-surface border border-primary-border text-primary flex items-center justify-center">
+              <span className="tango-icon-puck w-8 h-8 rounded-full bg-primary-surface border border-primary-border text-primary flex items-center justify-center">
                 <IconPlus size={18} stroke={2.25} />
               </span>
             }
@@ -117,7 +117,7 @@ const ImportCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
       onClick={onOpen}
       className={`clay-interactive w-full text-left bg-surface border border-border-subtle rounded-xl p-4 flex items-center gap-3.5 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${FOCUS_RING}`}
     >
-      <span aria-hidden="true" className="w-11 h-11 rounded-xl bg-primary-surface border border-primary-border text-primary flex items-center justify-center shrink-0">
+      <span aria-hidden="true" className="tango-icon-puck w-11 h-11 rounded-xl bg-primary-surface border border-primary-border text-primary flex items-center justify-center shrink-0">
         <IconFileImport size={22} stroke={1.75} />
       </span>
       <span className="flex-1 min-w-0">

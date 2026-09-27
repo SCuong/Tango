@@ -296,11 +296,11 @@ export interface ItemProgress {
   isMarkedWeak: boolean;          // Persisted weak/review flag; read selectors consume it as-is
 }
 
-export type AppTheme = 'light' | 'dark' | 'sakura';
+export type AppTheme = 'light' | 'dark' | 'sakura' | 'meo'; // 'meo' = Meo's World (special theme)
 export type AppLanguage = 'vi' | 'en';
 
 export interface UserPreferences {
-  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura'
+  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura' | 'meo'
   language: AppLanguage;         // 'vi' (default) | 'en'
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
 }

@@ -103,7 +103,7 @@ const MobileNavTab: React.FC<{ destination: DestinationConfig; active: boolean }
       <span
         aria-hidden="true"
         data-nav-puck=""
-        className={`tango-nav-puck flex items-center justify-center w-14 h-8 rounded-full border transition-[transform,box-shadow,background-color,border-color] duration-100 ease-out ${puckClasses}`}
+        className={`tango-nav-puck tango-icon-puck flex items-center justify-center w-14 h-8 rounded-full border transition-[transform,box-shadow,background-color,border-color] duration-100 ease-out ${puckClasses}`}
       >
         <Icon size={24} stroke={active ? ACTIVE_STROKE : INACTIVE_STROKE} />
       </span>
@@ -124,7 +124,9 @@ export const MobileBottomNav: React.FC<{ active: PrimaryDestination }> = ({ acti
   const { t } = useI18n();
   return (
     <nav aria-label={t('nav.primary')} className="tango-bottom-nav sm:hidden">
-      <div className="flex items-stretch gap-1 h-[72px] px-1.5 py-1.5 rounded-[26px] bg-surface border border-border-subtle shadow-clay-card">
+      <div className="tango-bottom-nav-bar relative flex items-stretch gap-1 h-[72px] px-1.5 py-1.5 rounded-[26px] bg-surface border border-border-subtle shadow-clay-card">
+        <NavEar side="left" />
+        <NavEar side="right" />
         {PRIMARY_DESTINATIONS.map((destination) => (
           <MobileNavTab key={destination.id} destination={destination} active={destination.id === active} />
         ))}
@@ -132,6 +134,15 @@ export const MobileBottomNav: React.FC<{ active: PrimaryDestination }> = ({ acti
     </nav>
   );
 };
+
+/** Cat ear on the bottom bar's top edge; shown only in Meo's World (CSS), decorative. */
+const NavEar: React.FC<{ side: 'left' | 'right' }> = ({ side }) => (
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 28 16" className={side === 'left' ? 'tango-nav-ear tango-nav-ear-left' : 'tango-nav-ear tango-nav-ear-right'}>
+    <path d="M1 16 L11.5 2.5 Q14 0 16.5 2.5 L27 16 Z" fill="var(--meo-fur)" />
+    <path d="M8 16 L13 8.5 Q14 7.5 15 8.5 L20 16 Z" fill="var(--meo-blush)" opacity="0.85" />
+    <path d="M1 16 L11.5 2.5 Q14 0 16.5 2.5 L27 16" fill="none" stroke="var(--meo-outline)" strokeWidth="2.2" strokeLinejoin="round" />
+  </svg>
+);
 
 const DesktopNavLink: React.FC<{ destination: DestinationConfig; active: boolean }> = ({
   destination,

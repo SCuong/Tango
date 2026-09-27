@@ -2,7 +2,7 @@
 
 This document is the authoritative master index, architectural route map, and responsive foundation for **Tango**. It establishes the screen inventory, platform invariants, breakpoint tiers, and route hierarchy, linking directly to domain-specific layout specifications.
 
-> **Design System Reference:** All visual and interaction rules, tokens, Soft Claymorphism specifications, Light/Dark/Sakura themes, and typography are defined in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Every screen must follow its [Canonical Cross-Screen UI Baseline](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline); this document covers routes, breakpoints, and global structure only.
+> **Design System Reference:** All visual and interaction rules, tokens, Soft Claymorphism specifications, Light/Dark/Sakura themes (plus the special Meo's World theme), and typography are defined in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Every screen must follow its [Canonical Cross-Screen UI Baseline](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline); this document covers routes, breakpoints, and global structure only.
 >
 > **Domain Screen Specifications:**
 > - [Study Screens (SCREEN 01 – 06)](./screens/STUDY_SCREENS.md)
@@ -54,7 +54,7 @@ Tango is built as **ONE unified responsive React Single Page Application (SPA) +
 
 All screens compose a standardized set of Soft Claymorphism UI primitives specified in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Their clay level follows the [clay hierarchy (B5)](./DESIGN_SYSTEM.md#canonical-cross-screen-ui-baseline):
 - **Primary navigation (Home / Test / Settings):** a root-only floating bottom bar on mobile and compact header links from `sm` up; canonical rules in [`DESIGN_SYSTEM.md` §16.0](./DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings).
-- **`TopBar`:** Restrained Home header: `TANGO` wordmark on mobile, plus the compact primary navigation from `sm` up. It never shows a theme status or theme control; theme selection lives only in Settings. A hard divider is optional; content scrolling beneath it may fade out through a soft page-colored feather.
+- **`TopBar`:** Restrained Home header: the Tango cat wordmark on mobile, plus the compact primary navigation from `sm` up. It never shows a theme status or theme control; theme selection lives only in Settings. A hard divider is optional; content scrolling beneath it may fade out through a soft page-colored feather.
 - **`Button`:** Three roles. **Primary CTA** (one main action per screen): a visibly raised physical button on `--cta-*` with a solid depth lip (`--cta-depth`) that sinks onto the lip when pressed. **Neutral/Secondary** (`--bg-surface`): restrained clay with a 1px press sink. **Destructive** (`--error-surface`): restrained, never the raised primary treatment.
 - **`AnswerOption`:** Positional choice button with Amber, Sky Blue, Violet, or Rose tint.
 - **`CheckboxRow`:** Touch selection row with `IconSquare` / `IconSquareCheckFilled` and item count badge.

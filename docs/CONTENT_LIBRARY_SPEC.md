@@ -147,7 +147,7 @@ Home mirrors the content hierarchy **Study Book → Category → Lesson → Stud
 └────────────────────────────────────────────────────────┘
 ```
 
-- **Top Bar:** Wordmark `TANGO` (mobile) plus the compact Home / Test / Settings header navigation from `sm` up; no divider line. On mobile the same destinations live in the floating bottom navigation. Content Management is accessed from the Study Content section inside Settings. No theme status or theme control on Home.
+- **Top Bar:** The Tango cat wordmark (mobile) plus the compact Home / Test / Settings header navigation from `sm` up; no divider line. On mobile the same destinations live in the floating bottom navigation. Content Management is accessed from the Study Content section inside Settings. No theme status or theme control on Home.
 - **GIÁO TRÌNH (primary):** The first 2 books as large tactile cards (3:4 cover, title, Study Coverage); a centered, compact dashed `Xem tất cả` bridge reveals the rest in place (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). Lesson/item counts appear in the Book Study View, not on Home. The section label is screen-reader only. Tapping a card opens the **Book Study View**.
 - **Book order:** Home shows books in library order and offers no reordering (no drag, no long-press). Drag-reordering / manual ordering belongs to the future full Books list / management experience.
 - **`Xem tất cả` is browsing, not management:** it reveals the remaining books for study (in place today; a full Books list later). It never enters edit, reorder, or delete modes.

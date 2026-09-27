@@ -13,6 +13,7 @@ import {
   ItemProgress,
   QuizSessionResult,
   UserPreferences,
+  isAppTheme,
 } from '../types';
 
 /**
@@ -185,10 +186,7 @@ export function loadPreferences(): UserPreferences {
   }
 
   return {
-    theme:
-      data.theme === 'dark' || data.theme === 'sakura'
-        ? data.theme
-        : DEFAULT_PREFERENCES.theme,
+    theme: isAppTheme(data.theme) ? data.theme : DEFAULT_PREFERENCES.theme,
     language: data.language === 'en' ? 'en' : DEFAULT_PREFERENCES.language,
     soundEnabled:
       typeof data.soundEnabled === 'boolean'

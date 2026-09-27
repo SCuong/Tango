@@ -120,7 +120,7 @@ export const IconButton: React.FC<IconButtonProps> = ({ label, icon, onClick, cl
       onClick={onClick}
       aria-label={label}
       title={label}
-      className={`clay-interactive clay-hover-surface flex items-center justify-center w-12 h-12 shrink-0 rounded-full bg-surface border border-border-subtle text-text-primary ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${FOCUS_RING} ${className}`}
+      className={`tango-icon-puck clay-interactive clay-hover-surface flex items-center justify-center w-12 h-12 shrink-0 rounded-full bg-surface border border-border-subtle text-text-primary ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${FOCUS_RING} ${className}`}
     >
       <span aria-hidden="true" className="inline-flex">
         {icon}

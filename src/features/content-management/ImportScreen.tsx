@@ -305,7 +305,7 @@ export const ImportScreen: React.FC = () => {
         </div>
       ) : (
         <div className="rounded-xl border-2 border-dashed border-border-strong bg-surface p-5 flex flex-col items-center text-center gap-3">
-          <span aria-hidden="true" className="w-11 h-11 rounded-xl bg-primary-surface text-primary flex items-center justify-center">
+          <span aria-hidden="true" className="tango-icon-puck w-11 h-11 rounded-xl bg-primary-surface text-primary flex items-center justify-center">
             <IconFileImport size={22} stroke={1.75} />
           </span>
           <input

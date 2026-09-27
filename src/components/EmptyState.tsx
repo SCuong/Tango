@@ -35,7 +35,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
         {icon && (
           <div
-            className="w-11 h-11 rounded-xl bg-surface border border-border-subtle shadow-clay-card text-text-secondary flex items-center justify-center shrink-0"
+            className="tango-icon-puck w-11 h-11 rounded-xl bg-surface border border-border-subtle shadow-clay-card text-text-secondary flex items-center justify-center shrink-0"
             aria-hidden="true"
           >
             {icon}

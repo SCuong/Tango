@@ -38,12 +38,14 @@ App preferences management and intentional gateway to administrative content ope
 1. **Giao diện & Tùy chọn (Appearance & Preferences):**
    - **Language:** Segmented control `[ Tiếng Việt ]` | `[ English ]`
    - **Theme (Chủ đề màu sắc):**
-     - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
+     - Three visual preview cards are visible, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura` (the standard themes).
+     - **Easter-egg reveal:** a small clay arrow button beside the right-middle edge of the group (`Xem thêm chủ đề` / `More themes`; its name never spoils the surprise) slides the track **one card** to the left (≈280ms, `cubic-bezier(0.22, 1, 0.36, 1)`): Light slides out and the fourth theme, `Mèo mập 😺` / `Meo's World`, enters from the right. A left arrow (`Quay lại các chủ đề trước` / `Previous themes`) then replaces it beside the left-middle edge and reverses the shift. It is an overflow-clipped track (cards keep their size and spacing), not a page of three and never a teleport; off-screen cards fade out, are `aria-hidden`, and are not focusable. Arrows are real 48px buttons with a 36px visual puck, keyboard operable with focus-visible rings; reduced motion makes the shift instant.
+     - If the persisted theme is `meo`, Settings opens on the second position so the selected card is visible. Choosing Dark or Sakura there does not force the carousel back; arrow-key selection of a hidden theme brings it into view.
      - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
      - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
      - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
      - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control; do not add a theme toggle to any TopBar.
-     - The previews use the canonical palettes and ambience identities (Light — Cool Pearl, Dark — Midnight Ink, Sakura — Warm Blossom Paper) defined in [`docs/DESIGN_SYSTEM.md` §9 / §16.5](../DESIGN_SYSTEM.md#9-theme-palette-specifications).
+     - The previews use the canonical palettes and ambience identities (Light — Cool Pearl, Dark — Midnight Ink, Sakura — Warm Blossom Paper, Meo's World — the special cat theme of §9.4) defined in [`docs/DESIGN_SYSTEM.md` §9 / §16.5](../DESIGN_SYSTEM.md#9-theme-palette-specifications).
    - **Sound Effects:** Segmented control `[ Off / Tắt ]` | `[ On / Bật ]` (Default: **Off**)
 2. **Nội dung học (Study Content):**
    - Clickable row: `Quản lý giáo trình và bài học` $\rightarrow$ navigates to [SCREEN 17: Content Management](#screen-17-content-management-quản-lý-nội-dung).

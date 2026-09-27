@@ -23,6 +23,7 @@ import { playFeedbackSound } from '../../lib/sound';
 import { Button, FOCUS_RING, IconButton } from '../../components/Button';
 import { Dialog, dismissModalHistory } from '../../components/Dialog';
 import { Screen, ScreenHeader, isDialogOpen } from '../../components/Screen';
+import { MeoEdgeAmbience } from '../../components/ThemeAmbience';
 import { formatMeanings } from '../study/LessonItems';
 import { useQuizSession } from './QuizSessionContext';
 
@@ -201,8 +202,10 @@ const ActiveQuiz: React.FC<{ session: QuizSessionState }> = ({ session }) => {
 
   return (
     <div className="min-h-[100dvh] bg-page text-text-primary flex flex-col">
+      {/* Meo's World only, wide screens only: static cats in the outer margins, never behind the prompt or answers */}
+      <MeoEdgeAmbience wideOnly />
       {/* Top HUD: exit, progress, counter, streak (and timer in test mode) */}
-      <header className="w-full pt-[env(safe-area-inset-top)]">
+      <header className="relative w-full pt-[env(safe-area-inset-top)]">
         <div className="max-w-xl mx-auto px-4 h-16 flex items-center gap-3">
           <IconButton label={t('quiz.exit')} icon={<IconX size={22} stroke={2} />} onClick={() => setExitOpen(true)} />
           <div className="flex-1 min-w-0">
@@ -236,7 +239,7 @@ const ActiveQuiz: React.FC<{ session: QuizSessionState }> = ({ session }) => {
 
       {/* During correct feedback a tap anywhere on the canvas advances */}
       <main
-        className="flex-1 w-full max-w-xl mx-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col"
+        className="relative flex-1 w-full max-w-xl mx-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col"
         onClick={correctFeedback ? goNext : undefined}
       >
         {/* Prompt stage: dominant upper half */}

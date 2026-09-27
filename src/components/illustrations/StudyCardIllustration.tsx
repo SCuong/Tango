@@ -64,6 +64,11 @@ export const StudyCardIllustration: React.FC<StudyCardIllustrationProps> = ({
 
       {/* Front study card */}
       <g transform="rotate(14 246 275)" filter={`url(#${shadowId})`}>
+        {/* Meo's World only: the card wears cat ears (the Japanese glyph itself is never altered) */}
+        <g className="meo-only">
+          <path d="M146 178 L168 96 Q173 84 183 92 L230 146 Z M346 178 L324 96 Q319 84 309 92 L262 146 Z" className="fill-surface" />
+          <path d="M168 142 L176 110 L198 136 Z M324 142 L316 110 L294 136 Z" fill="currentColor" fillOpacity="0.22" />
+        </g>
         <rect x="125" y="137" width="242" height="286" rx="48" className="fill-surface" />
 
         {/* Very subtle clay tint */}
@@ -92,6 +97,15 @@ export const StudyCardIllustration: React.FC<StudyCardIllustrationProps> = ({
         >
           {glyph}
         </text>
+
+        {/* Meo's World only: a paw print in the card's corner */}
+        <g className="meo-only" fill="currentColor" fillOpacity="0.3" transform="translate(326 378) scale(1.9)">
+          <path d="M-9 8 C-9 -1 -4 -4 0 -4 C4 -4 9 -1 9 8 C9 12 5 13 0 11 C-5 13 -9 12 -9 8 Z" />
+          <ellipse cx="-10" cy="-7" rx="3.4" ry="4.2" />
+          <ellipse cx="-3.6" cy="-12" rx="3.4" ry="4.2" />
+          <ellipse cx="3.6" cy="-12" rx="3.4" ry="4.2" />
+          <ellipse cx="10" cy="-7" rx="3.4" ry="4.2" />
+        </g>
       </g>
     </svg>
   );

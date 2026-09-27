@@ -222,6 +222,82 @@
 }
 
 /*
+ * 4. MEO'S WORLD (special easter-egg theme, DESIGN_SYSTEM §9.4): Tango the cat takes over.
+ * Canvas = honey-orange cat world; content surfaces = milk-white / cream islands; text = warm
+ * tabby brown; CTA = rich orange with a dark brown depth lip. The --meo-* tokens carry the
+ * mascot palette (fur, tabby stripe, cream, outline, blush) for the cat ambience and icon accents.
+ */
+[data-theme="meo"] {
+  --bg-page: #F8D9AE;
+  --bg-surface: #FFF9F0;
+  --bg-surface-elevated: #F7E4C8;
+  --border-subtle: #EBCB9E;
+  --border-strong: #CF9E68;
+
+  --text-primary: #3A1C0C;
+  --text-secondary: #653A20;
+  --text-muted: #7A4A2A;
+
+  --primary: #B4480B;
+  --primary-hover: #963B08;
+  --primary-surface: #FFE3C2;
+  --primary-border-subtle: #F2B97C;
+
+  --success: #059669;
+  --success-surface: #ECFDF5;
+  --success-text: #047857;
+  --error: #DC2626;
+  --error-surface: #FEF2F2;
+  --error-border: #FCA5A5;
+  --error-text: #B91C1C;
+  --warning: #D97706;
+
+  /* 4 Positional Answer Choices (warm cat-house harmony, still clearly distinct) */
+  --answer-1-bg: #FFF4D6; --answer-1-border: #F4CB6B; --answer-1-text: #5C3B08;
+  --answer-2-bg: #E9F3F8; --answer-2-border: #A9CFE3; --answer-2-text: #1F4A63;
+  --answer-3-bg: #F3ECF8; --answer-3-border: #CDB3E0; --answer-3-text: #4A2A60;
+  --answer-4-bg: #FFE9E3; --answer-4-border: #F2AE9C; --answer-4-text: #6B2414;
+
+  /* Category Semantic Identities (Vocabulary stays cool lilac; Kanji becomes honey tabby) */
+  --category-vocabulary-surface: #E7E1F6;
+  --category-vocabulary-border: #C9BFEA;
+  --category-vocabulary-icon: #5445C2;
+  --category-vocabulary-text: #2B2456;
+
+  --category-kanji-surface: #FFD9A6;
+  --category-kanji-border: #EDB066;
+  --category-kanji-icon: #A3450A;
+  --category-kanji-text: #552407;
+
+  /* Primary Study CTA: rich warm orange on a dark brown depth lip */
+  --cta-surface: #C2560E;
+  --cta-border: #A5470B;
+  --cta-depth: #6E2E0B;
+  --cta-text: #FFFFFF;
+  --cta-text-secondary: #FFE9D2;
+  --cta-puck-surface: rgba(255, 246, 232, 0.2);
+  --cta-puck-border: rgba(255, 246, 232, 0.34);
+
+  /* Ambient cat world (outline brown lines, cream glow, orange fur accent) */
+  --ambience-line: #5E270E;
+  --ambience-glow: #FFF6E6;
+  --ambience-accent: #EE8A3A;
+
+  /* Mascot palette (sampled from the Tango wordmark) */
+  --meo-fur: #F6BA6A;
+  --meo-stripe: #EE7F2F;
+  --meo-cream: #FDEED6;
+  --meo-outline: #5E270E;
+  --meo-blush: #F2A39A;
+
+  /* Clay Shadows (warm tabby brown lift) */
+  --shadow-clay-card: 0 5px 14px rgba(110, 52, 14, 0.14), 0 1px 4px rgba(110, 52, 14, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-clay-card-hover: 0 9px 22px rgba(110, 52, 14, 0.18), 0 2px 6px rgba(110, 52, 14, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --shadow-clay-button: 0 4px 12px rgba(194, 86, 14, 0.28), 0 1px 3px rgba(110, 52, 14, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --shadow-clay-pressed: 0 1px 2px rgba(110, 52, 14, 0.18), inset 0 2px 4px rgba(110, 52, 14, 0.14);
+}
+
+/*
  * Canonical clay interaction.
  * - Hover lift runs only on devices with a real hovering pointer, so touch screens never
  *   keep a sticky hover elevation.
@@ -313,6 +389,49 @@
    */
   .tango-root-enter > .min-h-screen > :not(.tango-ambience):not(.tango-backdrop) {
     animation: tango-root-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  /*
+   * Settings theme carousel (DESIGN_SYSTEM §16.5): three cards visible; the track slides by exactly
+   * one card to reveal Meo's World. The viewport clips horizontally but pads by the card gap, so
+   * shadows and the selection ring are never cut; off-screen cards fade out and ignore pointers.
+   */
+  .theme-carousel-viewport {
+    overflow: hidden;
+    margin: -12px;
+    padding: 12px;
+  }
+
+  .theme-carousel-track {
+    --theme-gap: 10px;
+    gap: var(--theme-gap);
+    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .theme-carousel-track[data-position="1"] {
+    transform: translateX(calc((100% + var(--theme-gap)) / -3));
+  }
+
+  .theme-carousel-card.clay-interactive {
+    flex: 0 0 calc((100% - 2 * var(--theme-gap)) / 3);
+    min-width: 0;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+      background-color var(--transition-fast), opacity 280ms ease-out;
+  }
+
+  .theme-carousel-card[data-offscreen="true"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .theme-carousel-arrow {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (min-width: 640px) {
+    .theme-carousel-track {
+      --theme-gap: 12px;
+    }
   }
 
   /* Mobile sticky action bar: content scrolling under it fades out toward the bar */
@@ -436,7 +555,7 @@
     inset: 0;
   }
 
-  html:not([data-theme="dark"]):not([data-theme="sakura"]) .ambience-light,
+  html:not([data-theme="dark"]):not([data-theme="sakura"]):not([data-theme="meo"]) .ambience-light,
   [data-theme="dark"] .ambience-dark,
   [data-theme="sakura"] .ambience-sakura {
     display: block;
@@ -511,6 +630,207 @@
   .ambience-petal-3 { top: 90%; left: 70%; animation: ambience-fall 70s linear -34s infinite; }
   .ambience-petal-4 { top: 55%; left: 94%; animation: ambience-fall 82s linear -45s infinite; }
   .ambience-petal-5 { top: 68%; left: 4%; animation: ambience-fall 88s linear -50s infinite; }
+}
+
+/*
+ * Meo's World (DESIGN_SYSTEM §9.4): full cat background. Large cats at the page edges and in
+ * open canvas (not a repeated tile), composed per breakpoint: on phones motifs peek from the
+ * margins around the vertical scroll; from `lg` the wider canvas holds larger cats in the outer
+ * sides and corners. Content surfaces stay opaque cream islands above it. Only the tail sways and
+ * the fish floats, both very slowly; reduced motion makes everything static.
+ */
+@layer components {
+  [data-theme="meo"] .ambience-meo {
+    display: block;
+  }
+
+  .ambience-meo > * {
+    position: absolute;
+    display: block;
+  }
+
+  .meo-blob {
+    border-radius: 9999px;
+    background: var(--meo-fur);
+  }
+
+  /* Phones and small tablets (default composition) */
+  .meo-blob-1 { top: -110px; left: -120px; width: 300px; height: 300px; opacity: 0.5; }
+  .meo-blob-2 { bottom: -150px; right: -130px; width: 380px; height: 380px; background: var(--meo-cream); opacity: 0.7; }
+  .meo-blob-3 { top: 40%; left: -170px; width: 260px; height: 260px; opacity: 0.32; }
+  .meo-trail { right: 5%; top: 30%; width: 112px; height: 210px; opacity: 0.1; }
+  .meo-tail {
+    top: 22%;
+    left: -30px;
+    width: 92px;
+    height: 173px;
+    opacity: 0.55;
+    transform-origin: 28% 100%;
+    animation: meo-tail-sway 9s ease-in-out infinite alternate;
+  }
+  .meo-loaf { bottom: 20px; left: -58px; width: 236px; height: 162px; opacity: 0.62; }
+  .meo-peek { top: 54%; right: -56px; width: 168px; height: 112px; opacity: 0.6; transform: rotate(-90deg); }
+  .meo-fish { top: 66%; left: 6px; width: 42px; height: 26px; opacity: 0.5; animation: meo-float 14s ease-in-out infinite alternate; }
+  .meo-yarn { bottom: 38%; right: 10px; width: 40px; height: 34px; opacity: 0.45; }
+
+  @media (min-width: 640px) {
+    .meo-loaf { left: -40px; bottom: -20px; width: 300px; height: 206px; }
+    .meo-peek { right: -50px; width: 200px; height: 133px; }
+    .meo-tail { width: 110px; height: 207px; }
+  }
+
+  /* Laptop / desktop: the outer sides beside the centered content column hold the big cats */
+  @media (min-width: 1024px) {
+    .meo-blob-1 { top: -170px; left: -150px; width: 480px; height: 480px; }
+    .meo-blob-2 { bottom: -200px; right: -160px; width: 520px; height: 520px; }
+    .meo-blob-3 { top: 26%; left: auto; right: -200px; width: 380px; height: 380px; }
+    .meo-loaf { left: 1%; bottom: -46px; width: 360px; height: 248px; }
+    .meo-peek { top: auto; bottom: -6px; right: 3%; width: 250px; height: 167px; transform: none; }
+    .meo-tail { top: 96px; left: auto; right: 2%; width: 140px; height: 264px; }
+    .meo-trail { right: auto; left: 3%; top: 16%; width: 140px; height: 262px; opacity: 0.14; }
+    .meo-fish { top: 132px; left: 14%; width: 60px; height: 38px; }
+    .meo-yarn { bottom: 34%; right: 11%; width: 58px; height: 48px; }
+  }
+
+  /* Focused flows (Settings, management, import, quiz): only the static edge cats */
+  .tango-ambience-quiet .meo-busy {
+    display: none;
+  }
+
+  .tango-ambience-quiet .meo-tail {
+    display: none;
+    animation: none;
+  }
+
+  @media (min-width: 1024px) {
+    /* Wide canvases keep the static tail in the outer margin, away from content */
+    .tango-ambience-quiet .meo-tail {
+      display: block;
+    }
+  }
+
+  [data-theme="meo"] .tango-ambience-subtle {
+    opacity: 0.75;
+  }
+
+  @media (max-width: 1023px) {
+    .tango-ambience-wide-only {
+      display: none;
+    }
+  }
+
+  .tango-ambience-quiet .ambience-meo {
+    opacity: 0.8;
+  }
+
+  /* Mobile full-screen route panels let the cat world show around their content */
+  @media (max-width: 639px) {
+    [data-theme="meo"] .tango-route-panel {
+      background-color: transparent;
+    }
+  }
+
+  /*
+   * Catified icon language (Meo's World only): the same Tabler glyphs, drawn chunkier and
+   * rounder, so every icon keeps its function. Icon pucks grow small cat ears (inheriting the
+   * puck's own surface), the active bottom-nav puck carries a paw, and cards / CTAs get rounder.
+   */
+  /* Meo-only accents inside shared artwork (e.g. cat ears and a paw on the category study cards) */
+  .meo-only {
+    display: none;
+  }
+
+  [data-theme="meo"] .meo-only {
+    display: inline;
+  }
+
+  [data-theme="meo"] .tabler-icon {
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  [data-theme="meo"] .tabler-icon[stroke-width="2.4"] { stroke-width: 2.8; }
+  [data-theme="meo"] .tabler-icon[stroke-width="2.7"] { stroke-width: 3.1; }
+  [data-theme="meo"] .tabler-icon[stroke-width="3"] { stroke-width: 3.2; }
+
+  [data-theme="meo"] .tango-icon-puck {
+    position: relative;
+  }
+
+  [data-theme="meo"] .tango-icon-puck::before {
+    content: "";
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    top: -7px;
+    height: 10px;
+    background: inherit;
+    clip-path: polygon(0 100%, 13% 0, 36% 100%, 64% 100%, 87% 0, 100% 100%);
+    pointer-events: none;
+  }
+
+  [data-theme="meo"] .tango-nav-tab[aria-current="page"] .tango-nav-puck::after {
+    content: "";
+    position: absolute;
+    right: 5px;
+    bottom: 3px;
+    width: 11px;
+    height: 11px;
+    background-color: var(--primary);
+    opacity: 0.55;
+    -webkit-mask: var(--meo-paw-mask) center / contain no-repeat;
+    mask: var(--meo-paw-mask) center / contain no-repeat;
+    pointer-events: none;
+  }
+
+  [data-theme="meo"] .tango-bottom-nav-bar {
+    border: 2px solid var(--meo-outline);
+    box-shadow: 0 5px 0 0 color-mix(in srgb, var(--meo-outline) 85%, transparent), var(--shadow-clay-card);
+  }
+
+  .tango-nav-ear {
+    display: none;
+  }
+
+  [data-theme="meo"] .tango-nav-ear {
+    display: block;
+    position: absolute;
+    top: -14px;
+    width: 28px;
+    height: 16px;
+    pointer-events: none;
+  }
+
+  .tango-nav-ear-left { left: 30px; transform: rotate(-8deg); }
+  .tango-nav-ear-right { right: 30px; transform: rotate(8deg); }
+
+  [data-theme="meo"] .rounded-xl { border-radius: 1rem; }
+  [data-theme="meo"] .rounded-2xl { border-radius: 1.375rem; }
+
+  [data-theme="meo"] .cta-raised {
+    box-shadow: 0 6px 0 0 var(--cta-depth), var(--shadow-clay-button);
+  }
+
+  [data-theme="meo"] .cta-raised[data-pressed="true"] {
+    transform: translateY(5px);
+    box-shadow: 0 1px 0 0 var(--cta-depth), var(--shadow-clay-pressed);
+  }
+}
+
+:root {
+  /* Paw print used as a CSS mask for Meo's World icon accents */
+  --meo-paw-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-14 -17 28 31'%3E%3Cpath d='M-9 8C-9-1-4-4 0-4S9-1 9 8C9 12 5 13 0 11C-5 13-9 12-9 8Z'/%3E%3Cellipse cx='-10' cy='-7' rx='3.4' ry='4.2'/%3E%3Cellipse cx='-3.6' cy='-12' rx='3.4' ry='4.2'/%3E%3Cellipse cx='3.6' cy='-12' rx='3.4' ry='4.2'/%3E%3Cellipse cx='10' cy='-7' rx='3.4' ry='4.2'/%3E%3C/svg%3E");
+}
+
+@keyframes meo-tail-sway {
+  from { transform: rotate(-3deg); }
+  to { transform: rotate(4deg); }
+}
+
+@keyframes meo-float {
+  0% { transform: translate(0, 0) rotate(-4deg); }
+  100% { transform: translate(-10px, 8px) rotate(3deg); }
 }
 
 @keyframes tango-fade-in {

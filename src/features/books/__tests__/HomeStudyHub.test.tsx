@@ -125,8 +125,8 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     // 1. No visible greeting
     expect(html).not.toContain('Bạn muốn học gì hôm nay?');
 
-    // 2. TopBar wordmark; primary destinations only in the sm+ header navigation
-    expect(html).toContain('TANGO');
+    // 2. TopBar cat wordmark; primary destinations only in the sm+ header navigation
+    expect(html).toContain('tango-wordmark');
     expect(html).toContain('min-h-touch');
     expect(html).toMatch(/<nav[^>]*aria-label="Điều hướng chính"[^>]*class="hidden sm:flex/);
 
@@ -151,12 +151,17 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).not.toMatch(COUNT_PATTERN);
   });
 
-  it('preserves an interactive TANGO wordmark button with 48px minimum touch-target class', () => {
+  it('preserves an interactive Tango cat wordmark button (Home) with a 48px minimum touch target', () => {
     const html = renderHome(populatedState);
 
-    expect(html).toContain('TANGO');
-    expect(html).toContain('min-h-touch');
-    expect(html).toMatch(/<button[^>]*class="[^"]*min-h-touch[^"]*"[^>]*>[^<]*TANGO[^<]*<\/button>/);
+    // The button carries the accessible name; the decorative image has empty alt text
+    const brand = html.match(/<button[^>]*aria-label="Trang chủ"[^>]*>(?:(?!<\/button>).)*<\/button>/);
+    expect(brand).not.toBeNull();
+    expect(brand![0]).toContain('min-h-touch');
+    expect(brand![0]).toMatch(/<img[^>]*alt=""[^>]*class="tango-wordmark[^"]*h-10 sm:h-11 w-auto/);
+    expect(brand![0]).toMatch(/width="488"[^>]*height="176"/);
+    // The plain-text wordmark is gone
+    expect(brand![0]).not.toContain('TANGO');
   });
 
   it('renders English Home labels without counts or a Test CTA', () => {
@@ -775,7 +780,8 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
 
     it('styles the raised CTA from explicit press state with a per-theme depth lip', () => {
       const css = readFileSync(resolve(__dirname, '../../../index.css'), 'utf-8');
-      expect(css.match(/--cta-depth:\s*#[0-9A-Fa-f]{6};/g)).toHaveLength(3);
+      // Light, Dark, Sakura, and Meo's World each define their own depth lip
+      expect(css.match(/--cta-depth:\s*#[0-9A-Fa-f]{6};/g)).toHaveLength(4);
       expect(css).toMatch(/\.cta-raised\s*\{[^}]*box-shadow:\s*0 5px 0 0 var\(--cta-depth\)/);
       expect(css).toMatch(/\.cta-raised\[data-pressed="true"\]\s*\{[^}]*transform:\s*translateY\(4px\);/);
       expect(css).not.toMatch(/\.cta-raised[^{]*:active/);

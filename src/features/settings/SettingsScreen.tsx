@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   IconAlertTriangle,
   IconCheck,
+  IconChevronLeft,
   IconChevronRight,
   IconFolders,
   IconVolume,
@@ -39,6 +40,8 @@ const THEMES: { value: AppTheme; nameKey: TranslationKey; descKey: TranslationKe
   { value: 'light', nameKey: 'preferences.theme.light', descKey: 'settings.themeDesc.light' },
   { value: 'dark', nameKey: 'preferences.theme.dark', descKey: 'settings.themeDesc.dark' },
   { value: 'sakura', nameKey: 'preferences.theme.sakura', descKey: 'settings.themeDesc.sakura' },
+  // Special easter-egg theme: revealed by the carousel arrow, never in the initial three
+  { value: 'meo', nameKey: 'preferences.theme.meo', descKey: 'settings.themeDesc.meo' },
 ];
 
 /**
@@ -136,7 +139,7 @@ const ContentManagementRow: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
       onClick={onOpen}
       className={`flat-interactive w-full min-h-[64px] px-4 py-3 rounded-xl border border-border-subtle bg-surface flex items-center gap-3 text-left ${FOCUS_RING}`}
     >
-      <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-primary-surface text-primary flex items-center justify-center shrink-0">
+      <span aria-hidden="true" className="tango-icon-puck w-10 h-10 rounded-lg bg-primary-surface text-primary flex items-center justify-center shrink-0">
         <IconFolders size={20} stroke={1.75} />
       </span>
       <span className="flex-1 min-w-0">
@@ -148,11 +151,56 @@ const ContentManagementRow: React.FC<{ onOpen: () => void }> = ({ onOpen }) => {
 };
 
 /**
- * Three genuine theme previews: each miniature sets its own `data-theme`, so it renders with
- * that theme's real tokens (canvas, surface card, category identities, CTA, ambience motif).
+ * Theme carousel positions: 0 shows the three standard themes (Light, Dark, Sakura); 1 shifts the
+ * track one card to the left, hiding Light and revealing Meo's World (the easter-egg theme).
+ */
+export type ThemeCarouselPosition = 0 | 1;
+
+/** Number of theme cards visible at once. */
+export const VISIBLE_THEME_CARDS = 3;
+
+/** Themes visible at a carousel position, in picker order. */
+export function visibleThemes(position: ThemeCarouselPosition): AppTheme[] {
+  return THEMES.slice(position, position + VISIBLE_THEME_CARDS).map((theme) => theme.value);
+}
+
+/**
+ * Position that keeps `theme` visible: the current one when it already shows the theme, otherwise
+ * the one position that does (Light only at 0, Meo's World only at 1). A persisted Meo's World
+ * therefore opens Settings on the second position.
+ */
+export function carouselPositionFor(theme: AppTheme, current: ThemeCarouselPosition = 0): ThemeCarouselPosition {
+  if (visibleThemes(current).includes(theme)) return current;
+  return theme === THEMES[0].value ? 0 : 1;
+}
+
+/**
+ * Theme previews: each miniature sets its own `data-theme`, so it renders with that theme's real
+ * tokens (canvas, surface card, category identities, CTA, ambience motif). Three cards are visible;
+ * a subtle arrow beside the group slides the track by one card to reveal Meo's World and back.
  */
 const ThemePicker: React.FC<{ value: AppTheme; onChange: (theme: AppTheme) => void }> = ({ value, onChange }) => {
+  const { t } = useI18n();
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
+  const arrowRef = useRef<HTMLButtonElement | null>(null);
+  const moveFocusToArrow = useRef(false);
+  const [position, setPosition] = useState<ThemeCarouselPosition>(() => carouselPositionFor(value));
+  const visible = visibleThemes(position);
+  const tabbable = visible.includes(value) ? value : visible[0];
+
+  // The arrow swaps sides after a shift; keep keyboard focus on the arrow that replaced it
+  useEffect(() => {
+    if (moveFocusToArrow.current) {
+      moveFocusToArrow.current = false;
+      arrowRef.current?.focus();
+    }
+  }, [position]);
+
+  const shift = (next: ThemeCarouselPosition) => {
+    moveFocusToArrow.current = typeof document !== 'undefined' && document.activeElement === arrowRef.current;
+    setPosition(next);
+  };
+
   const onKeyDown = (e: React.KeyboardEvent, index: number) => {
     let next = -1;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % THEMES.length;
@@ -160,36 +208,88 @@ const ThemePicker: React.FC<{ value: AppTheme; onChange: (theme: AppTheme) => vo
     if (next >= 0) {
       e.preventDefault();
       onChange(THEMES[next].value);
+      setPosition((current) => carouselPositionFor(THEMES[next].value, current));
       refs.current[next]?.focus();
     }
   };
+
   return (
-    <div role="radiogroup" aria-labelledby="settings-theme" className="grid grid-cols-3 gap-2.5 sm:gap-3">
-      {THEMES.map((theme, index) => (
-        <ThemeCard
-          key={theme.value}
-          ref={(el) => {
-            refs.current[index] = el;
-          }}
-          theme={theme}
-          selected={value === theme.value}
-          onSelect={() => onChange(theme.value)}
-          onKeyDown={(e) => onKeyDown(e, index)}
-        />
-      ))}
+    <div className="relative">
+      <div className="theme-carousel-viewport">
+        <div
+          id="settings-theme-track"
+          role="radiogroup"
+          aria-labelledby="settings-theme"
+          data-position={position}
+          className="theme-carousel-track flex"
+        >
+          {THEMES.map((theme, index) => (
+            <ThemeCard
+              key={theme.value}
+              ref={(el) => {
+                refs.current[index] = el;
+              }}
+              theme={theme}
+              selected={value === theme.value}
+              offscreen={!visible.includes(theme.value)}
+              tabbable={tabbable === theme.value}
+              onSelect={() => onChange(theme.value)}
+              onKeyDown={(e) => onKeyDown(e, index)}
+            />
+          ))}
+        </div>
+      </div>
+      {position === 0 ? (
+        <CarouselArrow ref={arrowRef} side="right" label={t('settings.themeMore')} onPress={() => shift(1)} />
+      ) : (
+        <CarouselArrow ref={arrowRef} side="left" label={t('settings.themeBack')} onPress={() => shift(0)} />
+      )}
     </div>
   );
 };
+
+/** Small clay arrow beside the middle of the theme group; a 48px touch target around a 36px puck. */
+const CarouselArrow = React.forwardRef<
+  HTMLButtonElement,
+  { side: 'left' | 'right'; label: string; onPress: () => void }
+>(function CarouselArrow({ side, label, onPress }, ref) {
+  const { isPressed, pressHandlers } = usePressFeedback();
+  const Icon = side === 'right' ? IconChevronRight : IconChevronLeft;
+  return (
+    <button
+      ref={ref}
+      type="button"
+      {...pressHandlers}
+      onClick={onPress}
+      aria-label={label}
+      title={label}
+      aria-controls="settings-theme-track"
+      data-carousel-arrow={side}
+      className={`theme-carousel-arrow absolute top-1/2 -translate-y-1/2 ${side === 'right' ? '-right-4 sm:-right-5' : '-left-4 sm:-left-5'} z-10 w-12 h-12 flex items-center justify-center rounded-full ${FOCUS_RING}`}
+    >
+      <span
+        aria-hidden="true"
+        className={`tango-icon-puck flex items-center justify-center w-9 h-9 rounded-full bg-surface border border-border-subtle text-text-secondary transition-[transform,box-shadow] duration-100 ease-out ${
+          isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'
+        }`}
+      >
+        <Icon size={18} stroke={2.4} />
+      </span>
+    </button>
+  );
+});
 
 const ThemeCard = React.forwardRef<
   HTMLButtonElement,
   {
     theme: (typeof THEMES)[number];
     selected: boolean;
+    offscreen: boolean;
+    tabbable: boolean;
     onSelect: () => void;
     onKeyDown: (e: React.KeyboardEvent) => void;
   }
->(function ThemeCard({ theme, selected, onSelect, onKeyDown }, ref) {
+>(function ThemeCard({ theme, selected, offscreen, tabbable, onSelect, onKeyDown }, ref) {
   const { t } = useI18n();
   const { isPressed, pressHandlers } = usePressFeedback();
   const descId = `theme-desc-${theme.value}`;
@@ -201,20 +301,25 @@ const ThemeCard = React.forwardRef<
       aria-checked={selected}
       aria-label={t(theme.nameKey)}
       aria-describedby={descId}
-      tabIndex={selected ? 0 : -1}
+      aria-hidden={offscreen || undefined}
+      data-offscreen={offscreen}
+      data-theme-option={theme.value}
+      tabIndex={tabbable && !offscreen ? 0 : -1}
       {...pressHandlers}
       onKeyDown={(e) => {
         pressHandlers.onKeyDown(e);
         onKeyDown(e);
       }}
       onClick={onSelect}
-      className={`clay-interactive relative text-left rounded-xl border bg-surface p-1.5 sm:p-2 ${
+      className={`theme-carousel-card clay-interactive relative text-left rounded-xl border bg-surface p-1.5 sm:p-2 ${
         selected ? 'border-primary ring-2 ring-primary' : 'border-border-subtle'
       } ${isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'} ${FOCUS_RING}`}
     >
       <ThemeMiniature theme={theme.value} />
-      <span className="flex items-center justify-between gap-1 px-1 pt-2 pb-0.5">
-        <span className="text-sm font-semibold text-text-primary leading-snug truncate">{t(theme.nameKey)}</span>
+      <span className="flex items-start justify-between gap-1 px-1 pt-2 pb-0.5">
+        <span className="min-w-0 text-[13px] sm:text-sm font-semibold text-text-primary leading-snug break-words">
+          {t(theme.nameKey)}
+        </span>
         {selected && (
           <span aria-hidden="true" className="w-5 h-5 shrink-0 rounded-full bg-primary text-page flex items-center justify-center">
             <IconCheck size={14} stroke={3} />
@@ -237,7 +342,8 @@ const ThemeMiniature: React.FC<{ theme: AppTheme }> = ({ theme }) => (
   >
     <MiniMotif theme={theme} />
     <span className="relative flex h-full flex-col gap-1 sm:gap-1.5">
-      <span className="flex items-center gap-1 rounded-md bg-surface border border-border-subtle shadow-clay-card p-1">
+      <span className="relative flex items-center gap-1 rounded-md bg-surface border border-border-subtle shadow-clay-card p-1">
+        {theme === 'meo' && <MiniCatEars />}
         <span className="w-3.5 sm:w-4 aspect-[3/4] rounded-sm bg-primary-surface border-l-2 border-primary-border shrink-0" />
         <span className="flex-1 space-y-1">
           <span className="block h-1 rounded-full bg-text-primary opacity-70 w-4/5" />
@@ -256,10 +362,42 @@ const ThemeMiniature: React.FC<{ theme: AppTheme }> = ({ theme }) => (
       </span>
       <span className="h-3 sm:h-3.5 rounded-md bg-cta-surface shadow-[0_2px_0_0_var(--cta-depth)] shrink-0 mb-0.5" />
     </span>
+    {theme === 'meo' && <MiniCatFace />}
   </span>
 );
 
+/** Meo's World preview: the book card wears cat ears, echoing the catified icon pucks. */
+const MiniCatEars: React.FC = () => (
+  <svg viewBox="0 0 40 8" preserveAspectRatio="none" className="absolute left-1.5 right-1.5 -top-[5px] h-[6px] w-[calc(100%-12px)]" focusable="false">
+    <path d="M2 8 L6 0 L11 8 Z M29 8 L34 0 L38 8 Z" fill="var(--meo-outline)" />
+  </svg>
+);
+
+/** Meo's World preview: a tiny Tango face peeking over the Kanji tile. */
+const MiniCatFace: React.FC = () => (
+  <svg viewBox="0 0 40 30" className="absolute right-0.5 bottom-5 sm:bottom-6 w-4 sm:w-5 h-auto" focusable="false">
+    <g stroke="var(--meo-outline)" strokeWidth="2.6" strokeLinejoin="round" fill="var(--meo-fur)">
+      <path d="M7 16 L9 2 L18 9 Z M33 16 L31 2 L22 9 Z" />
+      <path d="M3 30 C3 16 11 8 20 8 C29 8 37 16 37 30 Z" />
+    </g>
+    <path d="M11 20 Q14 17 17 20 M23 20 Q26 17 29 20" stroke="var(--meo-outline)" strokeWidth="2" fill="none" strokeLinecap="round" />
+    <ellipse cx="20" cy="26" rx="6" ry="3.4" fill="var(--meo-cream)" />
+  </svg>
+);
+
 const MiniMotif: React.FC<{ theme: AppTheme }> = ({ theme }) => {
+  if (theme === 'meo') {
+    return (
+      <svg viewBox="0 0 40 50" className="absolute inset-0 w-full h-full" preserveAspectRatio="none" focusable="false">
+        <circle cx="38" cy="4" r="14" fill="var(--meo-fur)" opacity="0.7" />
+        <circle cx="2" cy="44" r="12" fill="var(--meo-cream)" opacity="0.8" />
+        <g fill="var(--meo-outline)" opacity="0.3">
+          <circle cx="4" cy="24" r="1.3" />
+          <circle cx="36" cy="30" r="1.3" />
+        </g>
+      </svg>
+    );
+  }
   if (theme === 'light') {
     return (
       <svg viewBox="0 0 40 50" className="absolute -right-2 top-1 w-8 h-10" focusable="false">
