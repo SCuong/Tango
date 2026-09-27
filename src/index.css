@@ -649,47 +649,80 @@
     display: block;
   }
 
-  .meo-blob {
-    border-radius: 9999px;
-    background: var(--meo-fur);
-  }
-
-  /* Phones and small tablets (default composition) */
-  .meo-blob-1 { top: -110px; left: -120px; width: 300px; height: 300px; opacity: 0.5; }
-  .meo-blob-2 { bottom: -150px; right: -130px; width: 380px; height: 380px; background: var(--meo-cream); opacity: 0.7; }
-  .meo-blob-3 { top: 40%; left: -170px; width: 260px; height: 260px; opacity: 0.32; }
-  .meo-trail { right: 5%; top: 30%; width: 112px; height: 210px; opacity: 0.1; }
+  /*
+   * Phones (default): composed for portrait scrolling. Far washes sit in the upper-right and
+   * lower-left corners; the tail curls in from the right edge near the top; the sleeping cat,
+   * its yarn, and a short paw trail rest in the open canvas just above the bottom navigation
+   * (never beneath its labels).
+   */
+  .meo-wash-1 { top: 14%; right: -96px; width: 250px; height: 212px; }
+  .meo-wash-2 { bottom: 8%; left: -110px; width: 280px; height: 237px; }
   .meo-tail {
-    top: 22%;
-    left: -30px;
-    width: 92px;
-    height: 173px;
-    opacity: 0.55;
-    transform-origin: 28% 100%;
+    top: 21%;
+    right: -6px;
+    width: 44px;
+    height: 90px;
+    opacity: 0.85;
+    transform-origin: 90% 100%;
     animation: meo-tail-sway 9s ease-in-out infinite alternate;
   }
-  .meo-loaf { bottom: 20px; left: -58px; width: 236px; height: 162px; opacity: 0.62; }
-  .meo-peek { top: 54%; right: -56px; width: 168px; height: 112px; opacity: 0.6; transform: rotate(-90deg); }
-  .meo-fish { top: 66%; left: 6px; width: 42px; height: 26px; opacity: 0.5; animation: meo-float 14s ease-in-out infinite alternate; }
-  .meo-yarn { bottom: 38%; right: 10px; width: 40px; height: 34px; opacity: 0.45; }
+  /* Phones: content height varies too much for a guaranteed quiet spot, so no peeking cat */
+  .meo-peek { top: 56%; left: -2px; width: 88px; height: 80px; opacity: 0.9; }
+  .ambience-meo .meo-peek { display: none; }
+  .meo-sleeper {
+    right: 14px;
+    bottom: calc(var(--tango-bottom-nav-space, 0px) + 10px);
+    width: 128px;
+    height: 79px;
+    opacity: 0.92;
+    transform-origin: 50% 100%;
+    animation: meo-breathe 8s ease-in-out infinite alternate;
+  }
+  .meo-yarn { right: 146px; bottom: calc(var(--tango-bottom-nav-space, 0px) + 12px); width: 26px; height: 19px; opacity: 0.85; }
+  .meo-trail { left: 14px; bottom: calc(var(--tango-bottom-nav-space, 0px) + 22px); width: 128px; height: 45px; opacity: 0.13; }
 
-  @media (min-width: 640px) {
-    .meo-loaf { left: -40px; bottom: -20px; width: 300px; height: 206px; }
-    .meo-peek { right: -50px; width: 200px; height: 133px; }
-    .meo-tail { width: 110px; height: 207px; }
+  /* Narrow phones: a slightly smaller sleeper that tucks right above the navigation */
+  @media (max-width: 374px) {
+    .meo-sleeper { right: 10px; bottom: calc(var(--tango-bottom-nav-space, 0px) + 4px); width: 108px; height: 67px; }
+    .meo-yarn { right: 122px; bottom: calc(var(--tango-bottom-nav-space, 0px) + 6px); width: 22px; height: 16px; }
   }
 
-  /* Laptop / desktop: the outer sides beside the centered content column hold the big cats */
+  /* Tablets: the same scene, a little larger, with the Home peeking cat beside "View all" */
+  @media (min-width: 640px) {
+    .meo-tail { width: 54px; height: 111px; }
+    .ambience-meo .meo-peek { display: block; }
+    .meo-sleeper { right: 24px; bottom: 18px; width: 164px; height: 101px; }
+    .meo-yarn { right: 194px; bottom: 20px; width: 32px; height: 23px; }
+    .meo-trail { left: 24px; bottom: 34px; width: 170px; height: 60px; }
+  }
+
+  /*
+   * Laptop / desktop: the cats live in the side margins around the centered study column,
+   * larger but still whole characters, never a wallpaper scaled behind the content.
+   */
   @media (min-width: 1024px) {
-    .meo-blob-1 { top: -170px; left: -150px; width: 480px; height: 480px; }
-    .meo-blob-2 { bottom: -200px; right: -160px; width: 520px; height: 520px; }
-    .meo-blob-3 { top: 26%; left: auto; right: -200px; width: 380px; height: 380px; }
-    .meo-loaf { left: 1%; bottom: -46px; width: 360px; height: 248px; }
-    .meo-peek { top: auto; bottom: -6px; right: 3%; width: 250px; height: 167px; transform: none; }
-    .meo-tail { top: 96px; left: auto; right: 2%; width: 140px; height: 264px; }
-    .meo-trail { right: auto; left: 3%; top: 16%; width: 140px; height: 262px; opacity: 0.14; }
-    .meo-fish { top: 132px; left: 14%; width: 60px; height: 38px; }
-    .meo-yarn { bottom: 34%; right: 11%; width: 58px; height: 48px; }
+    .meo-wash-1 { top: 10%; right: -60px; width: 380px; height: 322px; }
+    .meo-wash-2 { bottom: 4%; left: -80px; width: 420px; height: 355px; }
+    .meo-tail { top: 16%; right: -4px; width: 70px; height: 144px; }
+    .meo-sleeper { right: 2.5%; bottom: 28px; width: 220px; height: 136px; }
+    .meo-yarn { right: calc(2.5% + 222px); bottom: 30px; width: 40px; height: 29px; }
+    .meo-trail { left: 3%; bottom: 60px; width: 210px; height: 74px; opacity: 0.15; }
+  }
+
+  /* Wide margins (1280px+) hold a larger peeking cat beside every screen */
+  @media (min-width: 1280px) {
+    .meo-peek { top: 44%; width: 124px; height: 113px; }
+  }
+
+  /*
+   * Below that, the peeking cat appears only on Home, where it has a quiet row beside "View all";
+   * elsewhere left-aligned headings and controls sit where it would be.
+   */
+  @media (max-width: 1279px) {
+    .tango-ambience-subtle .meo-peek,
+    .tango-ambience-quiet .meo-peek {
+      display: none;
+    }
   }
 
   /* Focused flows (Settings, management, import, quiz): only the static edge cats */
@@ -699,6 +732,10 @@
 
   .tango-ambience-quiet .meo-tail {
     display: none;
+    animation: none;
+  }
+
+  .tango-ambience-quiet .meo-sleeper {
     animation: none;
   }
 
@@ -824,13 +861,13 @@
 }
 
 @keyframes meo-tail-sway {
-  from { transform: rotate(-3deg); }
-  to { transform: rotate(4deg); }
+  from { transform: rotate(-2.5deg); }
+  to { transform: rotate(3deg); }
 }
 
-@keyframes meo-float {
-  0% { transform: translate(0, 0) rotate(-4deg); }
-  100% { transform: translate(-10px, 8px) rotate(3deg); }
+@keyframes meo-breathe {
+  from { transform: scale(1, 1); }
+  to { transform: scale(1.012, 1.03); }
 }
 
 @keyframes tango-fade-in {

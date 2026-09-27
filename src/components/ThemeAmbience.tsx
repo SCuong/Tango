@@ -181,110 +181,166 @@ export const MeoEdgeAmbience: React.FC<{ wideOnly?: boolean }> = ({ wideOnly = f
 };
 
 /*
- * Meo's World motif language, derived from the Tango wordmark: chunky warm-brown outlines,
- * orange fur with tabby stripes, cream muzzle and paws, blush cheeks, happy closed eyes.
- * Everything sits at the page edges or in open canvas; content surfaces stay readable islands.
- * Positions and the responsive composition live in src/index.css (.meo-*).
+ * Meo's World cat world, drawn in the Tango mascot's own family style: chubby rounded shapes,
+ * warm dark-brown outlines with round joins, orange tabby stripes, cream muzzle and belly, soft
+ * blush, sleepy happy eyes. A small illustrated scene instead of scattered stickers, in three
+ * depth layers:
+ *   far        soft organic fur washes with faint tabby bands and whisker curves (very low contrast)
+ *   midground  one curled tail entering from an edge, a small paw trail, a yarn ball
+ *   characters one sleeping Tango cat and one cat peeking from behind the page edge, both whole
+ *              faces, small, at the edges and never under the bottom navigation labels
+ * Positions and the per-breakpoint composition live in src/index.css (.meo-*).
  */
 const MeoWorldScene: React.FC = () => (
   <div className="ambience-scene ambience-meo">
-    <span className="meo-blob meo-blob-1" />
-    <span className="meo-blob meo-blob-2" />
-    <span className="meo-blob meo-blob-3 meo-busy" />
-    <MeoPawTrail className="meo-trail meo-busy" />
+    <MeoWash className="meo-wash meo-wash-1" />
+    <MeoWash className="meo-wash meo-wash-2" flip />
     <MeoTail className="meo-tail" />
-    <MeoLoaf className="meo-loaf" />
+    <MeoPawTrail className="meo-trail meo-busy" />
     <MeoPeek className="meo-peek" />
-    <MeoFish className="meo-fish meo-busy" />
-    <MeoYarn className="meo-yarn meo-busy" />
+    <MeoYarn className="meo-yarn" />
+    <MeoSleeper className="meo-sleeper" />
   </div>
 );
 
 const OUTLINE = 'var(--meo-outline)';
 
-/** Chubby cat loaf (front view), resting at the bottom edge with its paws tucked in. */
-const MeoLoaf: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 320 220" focusable="false">
-    <g stroke={OUTLINE} strokeWidth="6" strokeLinejoin="round" fill="var(--meo-fur)">
-      <path d="M68 96 L82 24 L140 66 Z" />
-      <path d="M252 96 L238 24 L180 66 Z" />
-      <path d="M16 224 C12 150 40 94 98 70 C132 56 188 56 222 70 C280 94 308 150 304 224 Z" />
+/** Far layer: an organic fur-colored wash with a few faint tabby bands and whisker curves. */
+const MeoWash: React.FC<{ className: string; flip?: boolean }> = ({ className, flip = false }) => (
+  <svg className={className} viewBox="0 0 260 220" focusable="false">
+    <g transform={flip ? 'translate(260 0) scale(-1 1)' : undefined}>
+      <path
+        d="M18 118 C8 76 36 34 86 22 C130 12 176 20 208 48 C240 76 252 122 232 158 C212 194 162 208 114 204 C64 200 28 164 18 118 Z"
+        fill="var(--meo-fur)"
+        opacity="0.2"
+      />
+      <path
+        d="M70 40 C82 60 84 80 76 100 M112 30 C124 54 126 80 116 104 M154 34 C166 58 166 84 156 108"
+        stroke="var(--meo-stripe)"
+        strokeWidth="14"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.07"
+      />
+      <path
+        d="M150 150 C176 144 200 146 222 154 M146 164 C172 164 196 170 214 180"
+        stroke={OUTLINE}
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.1"
+      />
     </g>
-    <path d="M88 46 L93 80 L118 66 Z M232 46 L227 80 L202 66 Z" fill="var(--meo-blush)" opacity="0.8" />
-    <path d="M98 224 C98 174 124 144 160 144 C196 144 222 174 222 224 Z" fill="var(--meo-cream)" />
-    <ellipse cx="160" cy="134" rx="48" ry="30" fill="var(--meo-cream)" />
+  </svg>
+);
+
+/**
+ * Character: a chubby Tango cat asleep on its paws, tail wrapped around its front, with a
+ * couple of tiny "z"s. It breathes very slowly (CSS) and is fully static under reduced motion.
+ */
+const MeoSleeper: React.FC<{ className: string }> = ({ className }) => (
+  <svg className={`${className} ambience-animated`} viewBox="0 0 200 124" focusable="false">
+    <ellipse cx="102" cy="116" rx="86" ry="6" fill={OUTLINE} opacity="0.08" />
+    <g stroke={OUTLINE} strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round">
+      {/* Body */}
+      <path
+        d="M30 104 C16 100 14 82 22 68 C32 50 58 38 88 37 C118 36 140 44 152 58 C160 68 162 82 158 94 C154 104 144 108 132 108 L46 108 C38 108 33 106 30 104 Z"
+        fill="var(--meo-fur)"
+      />
+      {/* Ears */}
+      <path d="M118 62 C114 50 115 40 120 34 C128 38 135 45 139 53" fill="var(--meo-fur)" />
+      <path d="M156 54 C161 45 168 40 175 38 C178 46 177 56 173 64" fill="var(--meo-fur)" />
+    </g>
+    {/* Back highlight and tabby stripes */}
+    <path d="M44 56 C60 45 82 41 104 42" stroke="var(--meo-cream)" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.55" />
     <path
-      d="M146 64 L150 86 M160 60 V84 M174 64 L170 86 M38 146 Q56 140 70 152 M32 178 Q50 172 64 184 M282 146 Q264 140 250 152 M288 178 Q270 172 256 184"
+      d="M58 46 C63 56 63 66 58 74 M78 41 C84 52 84 64 79 73 M98 41 C103 51 103 62 99 70"
       stroke="var(--meo-stripe)"
-      strokeWidth="8"
+      strokeWidth="5"
       strokeLinecap="round"
       fill="none"
+      opacity="0.85"
     />
-    <g stroke={OUTLINE} strokeWidth="5" strokeLinecap="round" fill="none">
-      <path d="M110 114 Q124 101 138 114 M182 114 Q196 101 210 114" />
-      <path d="M150 134 Q155 141 160 134 Q165 141 170 134" />
+    <path d="M123 41 L130 51 Z M170 43 L167 55 Z" stroke="var(--meo-blush)" strokeWidth="5" strokeLinecap="round" opacity="0.8" />
+    {/* Head */}
+    <path
+      d="M110 86 C108 68 122 54 144 53 C166 52 182 64 182 82 C182 98 168 108 146 108 C124 108 111 100 110 86 Z"
+      fill="var(--meo-fur)"
+      stroke={OUTLINE}
+      strokeWidth="3.4"
+      strokeLinejoin="round"
+    />
+    <path d="M136 57 C138 62 138 67 136 71 M146 55 V67 M156 57 C154 62 154 67 156 71" stroke="var(--meo-stripe)" strokeWidth="3.4" strokeLinecap="round" fill="none" />
+    {/* Cream muzzle */}
+    <path d="M128 94 C129 86 138 83 146 87 C154 83 163 86 164 94 C163 102 154 105 146 102 C138 105 129 102 128 94 Z" fill="var(--meo-cream)" />
+    {/* Sleepy face */}
+    <g stroke={OUTLINE} strokeWidth="2.6" strokeLinecap="round" fill="none">
+      <path d="M125 80 Q131 84.5 137 80 M155 80 Q161 84.5 167 80" />
+      <path d="M141.5 93 Q143.8 95.6 146 93 Q148.2 95.6 150.5 93" strokeWidth="2" />
     </g>
-    <path d="M154 125 H166 L160 131 Z" fill={OUTLINE} stroke={OUTLINE} strokeWidth="2" strokeLinejoin="round" />
-    <ellipse cx="102" cy="132" rx="12" ry="7" fill="var(--meo-blush)" opacity="0.75" />
-    <ellipse cx="218" cy="132" rx="12" ry="7" fill="var(--meo-blush)" opacity="0.75" />
-    <path d="M90 126 L56 120 M90 136 L54 138 M230 126 L264 120 M230 136 L266 138" stroke={OUTLINE} strokeWidth="3.5" strokeLinecap="round" />
-    <g fill="var(--meo-cream)" stroke={OUTLINE} strokeWidth="5">
-      <ellipse cx="124" cy="208" rx="27" ry="18" />
-      <ellipse cx="196" cy="208" rx="27" ry="18" />
+    <path d="M143 88.5 H149 L146 91.5 Z" fill={OUTLINE} stroke={OUTLINE} strokeWidth="1.4" strokeLinejoin="round" />
+    <ellipse cx="124" cy="90" rx="6" ry="3.4" fill="var(--meo-blush)" opacity="0.65" />
+    <ellipse cx="168" cy="90" rx="6" ry="3.4" fill="var(--meo-blush)" opacity="0.65" />
+    {/* Tail wrapped around the front, with its cream tip */}
+    <path d="M32 104 C26 116 58 120 92 117 C106 116 114 113 112 108" stroke={OUTLINE} strokeWidth="13" strokeLinecap="round" fill="none" />
+    <path d="M32 104 C26 116 58 120 92 117 C106 116 114 113 112 108" stroke="var(--meo-fur)" strokeWidth="7.6" strokeLinecap="round" fill="none" />
+    <path d="M40 113 C50 118 70 119 88 117" stroke="var(--meo-stripe)" strokeWidth="7.6" strokeDasharray="6 9" fill="none" />
+    <path d="M100 116 C108 115 113 112 112 108" stroke="var(--meo-cream)" strokeWidth="7.6" strokeLinecap="round" fill="none" />
+    {/* Front paws tucked under the chin */}
+    <g fill="var(--meo-cream)" stroke={OUTLINE} strokeWidth="2.8">
+      <path d="M118 108 C118 102 124 99 130 100 C136 101 138 105 137 108 Z" />
+      <path d="M152 108 C152 102 158 99 164 100 C170 101 172 105 171 108 Z" />
     </g>
-    <path d="M115 202 V212 M130 202 V212 M187 202 V212 M202 202 V212" stroke={OUTLINE} strokeWidth="3" strokeLinecap="round" />
+    {/* Zz */}
+    <path d="M178 26 H186 L178 35 H186 M190 12 H196 L190 19 H196" stroke={OUTLINE} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.45" />
   </svg>
 );
 
-/** Cat head peeking over an edge, both paws gripping it (open, curious eyes). */
+/**
+ * Character: a Tango cat peeking from behind the left page edge. The edge cuts the back of the
+ * head only; the whole face, both ears, and one gripping paw stay visible.
+ */
 const MeoPeek: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 240 160" focusable="false">
-    <g stroke={OUTLINE} strokeWidth="6" strokeLinejoin="round" fill="var(--meo-fur)">
-      <path d="M50 78 L60 16 L106 48 Z" />
-      <path d="M190 78 L180 16 L134 48 Z" />
-      <path d="M26 164 C26 88 68 44 120 44 C172 44 214 88 214 164 Z" />
+  <svg className={className} viewBox="0 0 110 100" focusable="false">
+    <g stroke={OUTLINE} strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="var(--meo-fur)">
+      <path d="M22 34 C19 22 21 12 27 8 C35 13 41 19 44 26" />
+      <path d="M64 25 C70 16 78 11 85 11 C88 19 88 30 85 38" />
+      <path d="M-12 62 C-12 38 12 22 46 22 C78 22 98 40 98 62 C98 84 78 96 46 96 C12 96 -12 84 -12 62 Z" />
     </g>
-    <path d="M66 36 L70 66 L92 52 Z M174 36 L170 66 L148 52 Z" fill="var(--meo-blush)" opacity="0.8" />
-    <ellipse cx="120" cy="124" rx="44" ry="30" fill="var(--meo-cream)" />
-    <path d="M108 52 L111 72 M120 50 V70 M132 52 L129 72" stroke="var(--meo-stripe)" strokeWidth="7" strokeLinecap="round" />
-    <circle cx="92" cy="100" r="8" fill={OUTLINE} />
-    <circle cx="148" cy="100" r="8" fill={OUTLINE} />
-    <circle cx="95" cy="97" r="2.6" fill="var(--meo-cream)" />
-    <circle cx="151" cy="97" r="2.6" fill="var(--meo-cream)" />
-    <path d="M114 114 H126 L120 120 Z" fill={OUTLINE} stroke={OUTLINE} strokeWidth="2" strokeLinejoin="round" />
-    <path d="M110 124 Q115 131 120 124 Q125 131 130 124" stroke={OUTLINE} strokeWidth="4.5" strokeLinecap="round" fill="none" />
-    <ellipse cx="72" cy="118" rx="11" ry="6.5" fill="var(--meo-blush)" opacity="0.75" />
-    <ellipse cx="168" cy="118" rx="11" ry="6.5" fill="var(--meo-blush)" opacity="0.75" />
-    <path d="M62 112 L30 104 M62 122 L28 124 M178 112 L210 104 M178 122 L212 124" stroke={OUTLINE} strokeWidth="3.5" strokeLinecap="round" />
-    <g fill="var(--meo-cream)" stroke={OUTLINE} strokeWidth="5">
-      <ellipse cx="68" cy="152" rx="26" ry="15" />
-      <ellipse cx="172" cy="152" rx="26" ry="15" />
-    </g>
-    <path d="M60 145 V154 M74 145 V154 M164 145 V154 M178 145 V154" stroke={OUTLINE} strokeWidth="3" strokeLinecap="round" />
+    <path d="M28 14 C32 18 35 22 37 27 L28 30 Z M80 17 C82 23 82 29 81 34 L73 28 Z" fill="var(--meo-blush)" opacity="0.8" />
+    <path d="M41 29 C43 35 43 40 41 45 M51 27 V39 M61 29 C59 35 59 40 61 45" stroke="var(--meo-stripe)" strokeWidth="3.4" strokeLinecap="round" fill="none" />
+    <path d="M40 77 C40 67 50 63 58 65 C66 63 78 67 78 77 C78 86 66 90 58 87 C50 90 40 86 40 77 Z" fill="var(--meo-cream)" />
+    <circle cx="45" cy="60" r="4.3" fill={OUTLINE} />
+    <circle cx="72" cy="60" r="4.3" fill={OUTLINE} />
+    <circle cx="46.6" cy="58.4" r="1.5" fill="var(--meo-cream)" />
+    <circle cx="73.6" cy="58.4" r="1.5" fill="var(--meo-cream)" />
+    <path d="M55.5 70 H61.5 L58.5 73.2 Z" fill={OUTLINE} stroke={OUTLINE} strokeWidth="1.4" strokeLinejoin="round" />
+    <path d="M53.5 76 Q56 78.8 58.5 76 Q61 78.8 63.5 76" stroke={OUTLINE} strokeWidth="2" strokeLinecap="round" fill="none" />
+    <ellipse cx="37" cy="72" rx="5.4" ry="3" fill="var(--meo-blush)" opacity="0.65" />
+    <ellipse cx="81" cy="70" rx="5.4" ry="3" fill="var(--meo-blush)" opacity="0.65" />
+    <path d="M86 67 C92 65 97 64 103 64 M86 72 C92 72 97 73 102 75" stroke={OUTLINE} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.75" />
+    <path d="M2 94 C2 86 9 82 16 83 C23 84 26 89 25 94 C24 98 18 99 13 98 C8 99 2 98 2 94 Z" fill="var(--meo-cream)" stroke={OUTLINE} strokeWidth="2.8" strokeLinejoin="round" />
+    <path d="M10 89 V94 M17 89 V94" stroke={OUTLINE} strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 );
 
-/** The wordmark's striped, curled tail: outline, orange fur, tabby stripes, cream tip. */
+/** Midground: the wordmark's striped tail with its cream tip, curling in from the right edge. */
 const MeoTail: React.FC<{ className: string }> = ({ className }) => {
-  const d = 'M40 262 C40 200 98 182 100 122 C102 62 58 40 42 66 C32 84 52 100 66 88';
+  const d = 'M74 152 C54 136 38 116 38 92 C38 66 56 54 52 34 C49 20 34 18 30 28 C27 36 34 42 41 37';
   return (
-    <svg className={`${className} ambience-animated`} viewBox="0 0 140 264" focusable="false">
-      <path d={d} fill="none" stroke={OUTLINE} strokeWidth="34" strokeLinecap="round" />
-      <path d={d} fill="none" stroke="var(--meo-fur)" strokeWidth="24" strokeLinecap="round" />
-      <path d={d} fill="none" stroke="var(--meo-stripe)" strokeWidth="24" strokeDasharray="14 24" />
-      <path d="M42 66 C32 84 52 100 66 88" fill="none" stroke="var(--meo-cream)" strokeWidth="24" strokeLinecap="round" />
+    <svg className={`${className} ambience-animated`} viewBox="0 0 74 152" focusable="false">
+      <path d={d} fill="none" stroke={OUTLINE} strokeWidth="17" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={d} fill="none" stroke="var(--meo-fur)" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={d} fill="none" stroke="var(--meo-stripe)" strokeWidth="11" strokeDasharray="8 13" strokeDashoffset="4" />
+      <path d="M37 21 C31 22 28 30 32 36 C35 39 39 39 41 37" fill="none" stroke="var(--meo-cream)" strokeWidth="11" strokeLinecap="round" />
+      <path d="M60 128 C48 114 42 100 42 88" fill="none" stroke="var(--meo-cream)" strokeWidth="2.4" strokeLinecap="round" opacity="0.45" />
     </svg>
   );
 };
 
-/** One paw print: main pad and four toe beans. */
-export const MeoPaw: React.FC<{ x: number; y: number; angle?: number; scale?: number }> = ({
-  x,
-  y,
-  angle = 0,
-  scale = 1,
-}) => (
-  <g transform={`translate(${x} ${y}) rotate(${angle}) scale(${scale})`}>
+/** One small paw print: main pad and four toe beans. */
+const MeoPaw: React.FC<{ x: number; y: number; angle: number }> = ({ x, y, angle }) => (
+  <g transform={`translate(${x} ${y}) rotate(${angle}) scale(0.62)`}>
     <path d="M-9 8 C-9 -1 -4 -4 0 -4 C4 -4 9 -1 9 8 C9 12 5 13 0 11 C-5 13 -9 12 -9 8 Z" />
     <ellipse cx="-10" cy="-7" rx="3.4" ry="4.2" />
     <ellipse cx="-3.6" cy="-12" rx="3.4" ry="4.2" />
@@ -293,17 +349,17 @@ export const MeoPaw: React.FC<{ x: number; y: number; angle?: number; scale?: nu
   </g>
 );
 
+/** Midground: a short, gentle paw trail that leads toward the sleeping cat. */
 const MeoPawTrail: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 160 300" focusable="false">
-    <g fill="var(--meo-outline)">
+  <svg className={className} viewBox="0 0 170 60" focusable="false">
+    <g fill={OUTLINE}>
       {[
-        [118, 282, -24],
-        [84, 246, -28],
-        [110, 196, -22],
-        [70, 162, -30],
-        [92, 112, -20],
-        [52, 78, -26],
-        [72, 26, -18],
+        [12, 46, 70],
+        [36, 34, 84],
+        [62, 42, 78],
+        [88, 28, 90],
+        [114, 34, 84],
+        [140, 22, 96],
       ].map(([x, y, angle]) => (
         <MeoPaw key={`${x}-${y}`} x={x} y={y} angle={angle} />
       ))}
@@ -311,25 +367,21 @@ const MeoPawTrail: React.FC<{ className: string }> = ({ className }) => (
   </svg>
 );
 
-const MeoFish: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={`${className} ambience-animated`} viewBox="0 0 64 40" focusable="false">
-    <g stroke={OUTLINE} strokeWidth="3.5" strokeLinejoin="round">
-      <path d="M48 20 L61 8 L61 32 Z" fill="var(--meo-stripe)" />
-      <path d="M4 20 C14 4 40 4 50 20 C40 36 14 36 4 20 Z" fill="var(--meo-cream)" />
-    </g>
-    <path d="M22 11 Q27 20 22 29 M31 10 Q36 20 31 30" stroke="var(--meo-fur)" strokeWidth="3" fill="none" strokeLinecap="round" />
-    <circle cx="13" cy="18" r="2.6" fill={OUTLINE} />
-  </svg>
-);
-
+/** Midground: the sleeping cat's yarn ball, its loose thread trailing away. */
 const MeoYarn: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 72 60" focusable="false">
-    <path d="M44 44 C54 56 64 44 70 56" stroke={OUTLINE} strokeWidth="3" fill="none" strokeLinecap="round" />
-    <circle cx="28" cy="28" r="23" fill="var(--meo-stripe)" stroke={OUTLINE} strokeWidth="4" />
+  <svg className={className} viewBox="0 0 60 44" focusable="false">
+    <path d="M36 34 C44 42 52 34 58 40" stroke={OUTLINE} strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.7" />
     <path
-      d="M10 18 C22 22 34 34 38 50 M14 40 C22 30 36 20 50 22 M24 6 C26 20 34 30 50 34"
+      d="M4 24 C4 13 12 5 22 5 C33 5 40 13 40 23 C40 34 32 41 21 41 C11 41 4 34 4 24 Z"
+      fill="var(--meo-blush)"
+      stroke={OUTLINE}
+      strokeWidth="2.6"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 15 C18 17 28 26 31 38 M8 30 C15 22 26 14 37 16 M18 6 C19 16 26 24 39 27"
       stroke="var(--meo-cream)"
-      strokeWidth="3"
+      strokeWidth="2"
       fill="none"
       strokeLinecap="round"
       opacity="0.9"

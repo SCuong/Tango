@@ -17,12 +17,18 @@ function withTheme(theme: AppTheme, node: React.ReactNode): string {
 }
 
 describe("Meo's World ambience", () => {
-  it('adds a full cat scene (layered motifs, no repeated logo) to the theme ambience', () => {
+  it('adds a composed cat scene in three depth layers (no stickers, no repeated logo)', () => {
     const html = withTheme('meo', <ThemeAmbience />);
     expect(html).toContain('ambience-scene ambience-meo');
-    for (const motif of ['meo-loaf', 'meo-peek', 'meo-tail', 'meo-trail', 'meo-fish', 'meo-yarn', 'meo-blob-1']) {
+    // Far washes, midground tail / trail / yarn, and two Tango-family characters
+    for (const motif of ['meo-wash-1', 'meo-wash-2', 'meo-tail', 'meo-trail', 'meo-yarn', 'meo-sleeper', 'meo-peek']) {
       expect(html, motif).toContain(motif);
     }
+    // Each character appears once; no scattered fish stamps or flat blobs
+    expect(html.match(/class="meo-sleeper/g)).toHaveLength(1);
+    expect(html.match(/class="meo-peek/g)).toHaveLength(1);
+    expect(html).not.toContain('meo-fish');
+    expect(html).not.toContain('meo-blob');
     // Derived motif language, never the wordmark image tiled as wallpaper
     expect(html).not.toContain('tango-wordmark');
     expect(html).not.toContain('<img');
