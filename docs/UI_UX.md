@@ -29,35 +29,35 @@ The Home screen is dedicated purely to reading and studying. Administrative, imp
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ TANGO                            [IconSettings]│
+│ TANGO                           [IconSettings]│
 ├───────────────────────────────────────────────┤
 │ ┌───────────────────────────────────────────┐ │
-│ │ ┌───────┐  中級へ行こう 日本語の文型と   │ │
-│ │ │ Cover │  表現55 第2版                  │ │  <- primary: large 3:4 cover,
-│ │ │  3:4  │  2 bài · 20 mục                │ │     title up to 3 lines,
-│ │ └───────┘  [━━━━━━░░░░░░]           45%  │ │     Study Coverage bar
+│ │ ┌───────┐  中級へ行こう 日本語の文型と   │ │  <- primary: large 3:4 cover,
+│ │ │ Cover │  表現55 第2版                  │ │     full title (up to 3 lines),
+│ │ │  3:4  │                                │ │     Study Coverage only
+│ │ └───────┘  [━━━━━━░░░░░░░]          45%  │ │
 │ └───────────────────────────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
 │ │ ┌───────┐  耳から覚える 日本語能力試験   │ │
 │ │ │ Cover │  文法トレーニング N3           │ │
-│ │ └───────┘  1 bài · 10 mục   [━━░░░] 30%  │ │
+│ │ └───────┘  [━━━░░░░░░░░░░]          30%  │ │
 │ └───────────────────────────────────────────┘ │
 │ ┌────────────────────┐ ┌────────────────────┐ │
-│ │ [IconBook] Từ vựng │ │ [IconWriting] Hán tự│ │  <- secondary shortcuts
-│ │ 2 bài · 22 mục     │ │ 1 bài · 8 mục      │ │
+│ │ 語彙               │ │ 漢字               │ │  <- secondary: glyph + name
+│ │ Từ vựng            │ │ Hán tự             │ │
 │ └────────────────────┘ └────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
-│ │ [IconBolt] Kiểm tra tổng hợp          (→) │ │  <- compact CTA
+│ │ Kiểm tra tổng hợp                      →  │ │  <- concise action
 │ └───────────────────────────────────────────┘ │
 └───────────────────────────────────────────────┘
 ```
 
 - **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Mixed Test are secondary.
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Mixed Test = concise action label. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. No visible section labels or greeting. Theme controls remain Settings-only.
 - **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
-- **No greeting and no visible section labels:** Section headings exist only for screen readers.
-- **Study Book cards:** Large 3:4 cover, title (up to 3 lines, full title on hover), counts, and Study Coverage. Tapping a book opens its **Book Study View**. (Never triggers edit/delete).
-- **Vocabulary / Kanji shortcuts:** Compact secondary tiles to browse lessons by category across all textbooks.
-- **[IconBolt] Kiểm tra tổng hợp:** Compact CTA to the global multi-lesson quiz builder across books.
+- **Study Book cards:** Large 3:4 cover, title (up to 3 lines, full title on hover), and Study Coverage. Tapping a book opens its **Book Study View**. (Never triggers edit/delete).
+- **Vocabulary / Kanji shortcuts:** `語彙 Từ vựng` and `漢字 Hán tự` tiles to browse lessons by category across all textbooks.
+- **Kiểm tra tổng hợp →:** Concise CTA to the global multi-lesson quiz builder across books.
 - **Strict Safety Rule:** Zero Add, Import, Edit, or Delete controls on Home.
 
 ---

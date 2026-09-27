@@ -33,8 +33,8 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
 - **Entry:** Application launch, clicking `TANGO` logo, or "Về trang chủ" action.
 - **Exit:**
   - Tapping a Study Book card $\rightarrow$ [SCREEN 02: Book Study View](#screen-02-book-study-view) (`/book/:bookId`).
-  - Tapping `[IconBook] Từ vựng` or `[IconWriting] Hán tự` $\rightarrow$ [SCREEN 04: Learn by Type](#screen-04-learn-by-type-học-theo-loại) (`/learn/:category`).
-  - Tapping `[IconBolt] Kiểm tra tổng hợp` $\rightarrow$ [SCREEN 09: Global Mixed Test](./QUIZ_CONFIG_SCREENS.md#screen-09-global-mixed-test) (`/quiz/mixed-config`).
+  - Tapping the `語彙 Từ vựng` or `漢字 Hán tự` shortcut $\rightarrow$ [SCREEN 04: Learn by Type](#screen-04-learn-by-type-học-theo-loại) (`/learn/:category`).
+  - Tapping `Kiểm tra tổng hợp →` $\rightarrow$ [SCREEN 09: Global Mixed Test](./QUIZ_CONFIG_SCREENS.md#screen-09-global-mixed-test) (`/quiz/mixed-config`).
   - Tapping `[IconSettings]` $\rightarrow$ [SCREEN 16: Settings](./SETTINGS_CONTENT_SCREENS.md#screen-16-settings) (`/settings`).
 
 #### Responsive Layout Strategy:
@@ -42,36 +42,37 @@ The learner's primary gateway. Exclusively focused on reading, exploring textboo
 - **Top Bar:** Solid matte clay surface (`bg-surface`, `border-b border-subtle`, zero blur) with the `TANGO` wordmark and a tactile `rounded-full` Settings button only. No theme status or theme control on Home.
 - **No greeting, no visible section labels:** Semantic structure uses visually hidden headings (`sr-only` page `h1`, `sr-only` `h2` for "Giáo trình" and "Học theo loại").
 - **Composition order (all breakpoints):** Study Books → Vocabulary / Kanji shortcuts → Mixed Test.
-- **Mobile (< 640px):** Study Books as stacked horizontal cards where the large 3:4 cover (`w-20`), title (up to 3 lines), and Study Coverage bar dominate. Below them, a compact 2-column Vocabulary / Kanji shortcut row, then a compact full-width Mixed Test CTA.
+- **Mobile (< 640px):** Study Books as stacked horizontal cards where the large 3:4 cover (`w-20`), full title (up to 3 lines), and Study Coverage bar fill the card. Below them, a compact 2-column Vocabulary / Kanji shortcut row, then a compact full-width Mixed Test CTA.
 - **Tablet (640px – 1024px):** Study Books in a 2-column grid (cover `w-24`); shortcuts as above.
 - **Desktop (> 1024px):** Centered container (`max-w-4xl`). Study Books in a 2-column primary grid (cover `w-28`). One compact shortcut row below: Vocabulary and Kanji in the wider track, Mixed Test in the narrower track (`lg:grid-cols-[3fr_2fr]`).
 - **Book titles:** `.font-study-title` (UI font for Latin/Vietnamese, Japanese stack for Kana/Kanji), `line-clamp-3`, full title in the native `title` attribute for hover.
-- **Visual hierarchy:** Large neutral book cards > compact tinted category shortcuts (`--category-vocabulary-*`, `--category-kanji-*`, raised icon puck, `語彙` / `漢字` mark from `sm`) ≈ compact solid Mixed Test CTA (`--cta-*`, `shadow-clay-button`).
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Mixed Test = concise action label. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. No visible section labels or greeting. Theme controls remain Settings-only.
+- **Visual hierarchy:** Large neutral book cards (cover + title + Study Coverage) > typography-led tinted category shortcuts (`語彙` / `漢字` glyph in `--category-*-icon` over the localized name) ≈ concise solid Mixed Test CTA (`--cta-*`, `shadow-clay-button`, title + trailing arrow).
 - **Tactile Clay Recipe:** Every interactive Home card and button uses `.clay-interactive` (hover lift only under `@media (hover: hover) and (pointer: fine)`) plus `usePressFeedback` (explicit `data-pressed` state that swaps in `translate-y-px shadow-clay-pressed`). Never Tailwind `hover:*` / `active:*` elevation utilities, which stick on touch screens. Focus ring: `focus-visible:ring-2 ring-primary ring-offset-2 ring-offset-page`. See [`docs/DESIGN_SYSTEM.md` §3.1](../DESIGN_SYSTEM.md#31-canonical-clay-interaction-recipe).
 
 #### Wireframes:
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ TANGO                            [IconSettings]│
+│ TANGO                           [IconSettings]│
 ├───────────────────────────────────────────────┤
 │ ┌───────────────────────────────────────────┐ │
-│ │ ┌───────┐  中級へ行こう 日本語の文型と   │ │
-│ │ │ Cover │  表現55 第2版                  │ │  <- primary: large 3:4 cover,
-│ │ │  3:4  │  2 bài · 20 mục                │ │     title up to 3 lines,
-│ │ └───────┘  [━━━━━━░░░░░░]           45%  │ │     Study Coverage bar
+│ │ ┌───────┐  中級へ行こう 日本語の文型と   │ │  <- primary: large 3:4 cover,
+│ │ │ Cover │  表現55 第2版                  │ │     full title (up to 3 lines),
+│ │ │  3:4  │                                │ │     Study Coverage only
+│ │ └───────┘  [━━━━━━░░░░░░░]          45%  │ │
 │ └───────────────────────────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
 │ │ ┌───────┐  耳から覚える 日本語能力試験   │ │
 │ │ │ Cover │  文法トレーニング N3           │ │
-│ │ └───────┘  1 bài · 10 mục   [━━░░░] 30%  │ │
+│ │ └───────┘  [━━━░░░░░░░░░░]          30%  │ │
 │ └───────────────────────────────────────────┘ │
 │ ┌────────────────────┐ ┌────────────────────┐ │
-│ │ [IconBook] Từ vựng │ │ [IconWriting] Hán tự│ │  <- secondary shortcuts
-│ │ 2 bài · 22 mục     │ │ 1 bài · 8 mục      │ │
+│ │ 語彙               │ │ 漢字               │ │  <- secondary: glyph + name
+│ │ Từ vựng            │ │ Hán tự             │ │
 │ └────────────────────┘ └────────────────────┘ │
 │ ┌───────────────────────────────────────────┐ │
-│ │ [IconBolt] Kiểm tra tổng hợp          (→) │ │  <- compact CTA
+│ │ Kiểm tra tổng hợp                      →  │ │  <- concise action
 │ └───────────────────────────────────────────┘ │
 └───────────────────────────────────────────────┘
 
@@ -82,13 +83,13 @@ DESKTOP (> 1024px - max-w-4xl Centered)
 │ ┌──────────────────────────────────┐ ┌───────────────────────────────┐ │
 │ │ ┌────────┐ 中級へ行こう 日本語の │ │ ┌────────┐ 耳から覚える      │ │
 │ │ │ Cover  │ 文型と表現55 第2版    │ │ │ Cover  │ 日本語能力試験    │ │
-│ │ │  3:4   │ 2 bài · 20 mục        │ │ │  3:4   │ 文法トレーニング  │ │
-│ │ └────────┘ [━━━━━░░░░]      45%  │ │ └────────┘ [━━░░░░░]    30%  │ │
+│ │ │  3:4   │                       │ │ │  3:4   │ 文法トレーニング  │ │
+│ │ └────────┘ [━━━━━░░░░░]     45%  │ │ └────────┘ [━━░░░░░░]   30%  │ │
 │ └──────────────────────────────────┘ └───────────────────────────────┘ │
-│ ┌───────────────────┐ ┌───────────────────┐ ┌────────────────────────┐ │
-│ │ [IconBook] Từ vựng│ │[IconWriting] Hán tự│ │ [IconBolt] Kiểm tra (→)│ │
-│ │ 2 bài · 22 mục 語彙│ │ 1 bài · 8 mục 漢字 │ │ tổng hợp               │ │
-│ └───────────────────┘ └───────────────────┘ └────────────────────────┘ │
+│ ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────────────┐ │
+│ │ 語彙             │ │ 漢字             │ │ Kiểm tra tổng hợp     →  │ │
+│ │ Từ vựng          │ │ Hán tự           │ │                          │ │
+│ └──────────────────┘ └──────────────────┘ └──────────────────────────┘ │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 

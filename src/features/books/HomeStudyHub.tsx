@@ -1,17 +1,9 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  IconArrowRight,
-  IconBolt,
-  IconBook,
-  IconBooks,
-  IconSettings,
-  IconWriting,
-} from '@tabler/icons-react';
+import { IconArrowRight, IconBooks, IconSettings } from '@tabler/icons-react';
 import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
 import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeedback';
-import { getCategoryStudyMetrics, StudyCollectionMetrics } from '../../lib/studyMetrics';
 import { TranslationKey } from '../../lib/i18n';
 import { StudyCategory } from '../../types';
 import { TopBar } from '../../components/TopBar';
@@ -24,15 +16,14 @@ const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page';
 
 // Full class strings per category so Tailwind detects them statically.
-// `glyph` is the Japanese name of the category (study content, not UI locale).
+// `glyph` is the Japanese name of the category (study content, not UI locale) and is the
+// shortcut's visual identity; the localized label sits under it.
 const CATEGORY_TILES: Record<
   StudyCategory,
   {
     labelKey: TranslationKey;
     glyph: string;
-    Icon: typeof IconBook;
     surface: string;
-    puck: string;
     glyphColor: string;
     title: string;
   }
@@ -40,18 +31,14 @@ const CATEGORY_TILES: Record<
   vocabulary: {
     labelKey: 'category.vocabulary',
     glyph: '語彙',
-    Icon: IconBook,
     surface: 'bg-category-vocabulary-surface border-category-vocabulary-border',
-    puck: 'border-category-vocabulary-border text-category-vocabulary-icon',
     glyphColor: 'text-category-vocabulary-icon',
     title: 'text-category-vocabulary-text',
   },
   kanji: {
     labelKey: 'category.kanji',
     glyph: '漢字',
-    Icon: IconWriting,
     surface: 'bg-category-kanji-surface border-category-kanji-border',
-    puck: 'border-category-kanji-border text-category-kanji-icon',
     glyphColor: 'text-category-kanji-icon',
     title: 'text-category-kanji-text',
   },
@@ -59,11 +46,11 @@ const CATEGORY_TILES: Record<
 
 interface CategoryTileProps {
   category: StudyCategory;
-  metrics: StudyCollectionMetrics;
   onClick: () => void;
 }
 
-const CategoryTile: React.FC<CategoryTileProps> = ({ category, metrics, onClick }) => {
+// Typography-led navigation shortcut: Japanese glyph + localized category name, no counts.
+const CategoryTile: React.FC<CategoryTileProps> = ({ category, onClick }) => {
   const { t } = useI18n();
   const { isPressed, pressHandlers } = usePressFeedback();
   const tile = CATEGORY_TILES[category];
@@ -77,40 +64,16 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, metrics, onClick 
       {...pressHandlers}
       onClick={onClick}
       aria-label={t('aria.learnCategory', { category: label })}
-      className={`clay-interactive w-full h-full text-left border rounded-2xl p-3 sm:p-4 min-h-[72px] flex items-center gap-3 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
+      className={`clay-interactive w-full h-full text-left border rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 min-h-[72px] flex flex-col justify-center gap-1.5 ${isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${tile.surface} ${FOCUS_RING}`}
     >
-      <div
-        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-surface border flex items-center justify-center shrink-0 shadow-clay-card ${tile.puck}`}
-        aria-hidden="true"
-      >
-        <tile.Icon size={22} stroke={1.75} />
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <h3 className={`font-bold text-base leading-snug ${tile.title}`}>{label}</h3>
-        <div className="text-xs text-text-secondary flex items-center gap-x-1.5 gap-y-0.5 flex-wrap">
-          <span>
-            {t(
-              metrics.lessonCount === 1 ? 'metrics.lessonCount.one' : 'metrics.lessonCount.other',
-              { count: metrics.lessonCount }
-            )}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span>
-            {t(metrics.itemCount === 1 ? 'metrics.itemCount.one' : 'metrics.itemCount.other', {
-              count: metrics.itemCount,
-            })}
-          </span>
-        </div>
-      </div>
-
       <span
         lang="ja"
         aria-hidden="true"
-        className={`hidden sm:block font-japanese font-bold leading-none text-2xl opacity-40 select-none shrink-0 ${tile.glyphColor}`}
+        className={`font-japanese font-bold leading-none text-2xl sm:text-3xl tracking-wide select-none ${tile.glyphColor}`}
       >
         {tile.glyph}
       </span>
+      <h3 className={`font-semibold text-sm sm:text-base leading-snug ${tile.title}`}>{label}</h3>
     </button>
   );
 };
@@ -177,16 +140,6 @@ export const HomeStudyHub: React.FC = () => {
   };
 
   const bookList = Object.values(state.books);
-  const vocabMetrics = getCategoryStudyMetrics(
-    'vocabulary',
-    state.lessons,
-    state.progressByItem
-  );
-  const kanjiMetrics = getCategoryStudyMetrics(
-    'kanji',
-    state.lessons,
-    state.progressByItem
-  );
 
   return (
     <div className="min-h-screen bg-page text-text-primary flex flex-col">
@@ -243,7 +196,6 @@ export const HomeStudyHub: React.FC = () => {
             <div className="grid grid-cols-2 gap-3 sm:gap-4 h-full">
               <CategoryTile
                 category="vocabulary"
-                metrics={vocabMetrics}
                 onClick={() =>
                   navigate({
                     type: 'learn_by_type',
@@ -253,7 +205,6 @@ export const HomeStudyHub: React.FC = () => {
               />
               <CategoryTile
                 category="kanji"
-                metrics={kanjiMetrics}
                 onClick={() =>
                   navigate({
                     type: 'learn_by_type',
@@ -264,7 +215,7 @@ export const HomeStudyHub: React.FC = () => {
             </div>
           </section>
 
-          {/* Mixed Test: compact solid CTA, visually below the books in hierarchy */}
+          {/* Mixed Test: concise solid CTA (title + trailing arrow), below the books in hierarchy */}
           <section aria-labelledby="home-mixed-test-heading">
             <button
               type="button"
@@ -272,28 +223,17 @@ export const HomeStudyHub: React.FC = () => {
               data-study-card="true"
               {...mixedTestPressHandlers}
               onClick={() => navigate({ type: 'mixed_quiz_config' })}
-              className={`clay-interactive w-full h-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl p-3 sm:p-4 min-h-[72px] flex items-center gap-3 ${isMixedTestPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-button'} ${FOCUS_RING}`}
+              className={`clay-interactive w-full h-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 min-h-[72px] flex items-center justify-between gap-3 ${isMixedTestPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-button'} ${FOCUS_RING}`}
             >
-              <div
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0"
+              <h3 className="font-bold text-base sm:text-lg leading-snug text-cta-text">
+                {t('home.mixedTest')}
+              </h3>
+              <IconArrowRight
+                size={22}
+                stroke={2}
                 aria-hidden="true"
-              >
-                <IconBolt size={22} stroke={1.75} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-base leading-snug text-cta-text">
-                  {t('home.mixedTest')}
-                </h3>
-                <p className="text-xs text-cta-text-secondary leading-snug line-clamp-2">
-                  {t('home.mixedTestSubtitle')}
-                </p>
-              </div>
-              <div
-                className="w-8 h-8 rounded-full bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0 clay-hover-nudge transition-transform duration-150"
-                aria-hidden="true"
-              >
-                <IconArrowRight size={16} stroke={2} />
-              </div>
+                className="shrink-0 clay-hover-nudge transition-transform duration-150"
+              />
             </button>
           </section>
         </div>

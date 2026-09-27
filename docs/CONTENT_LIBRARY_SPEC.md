@@ -124,28 +124,31 @@ Every card or button on the Home study area leads toward **browsing, reading, or
 
 Home mirrors the content hierarchy **Study Book → Category → Lesson → StudyItem**: books first and visually dominant, then category shortcuts, then the Mixed Test.
 
+**Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Mixed Test = concise action label. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. No visible section labels or greeting. Theme controls remain Settings-only.
+
 ```text
 ┌────────────────────────────────────────────────────────┐
 │ TANGO                                   [IconSettings] │
 │                                                        │
 │ ┌────────────────────────┐ ┌─────────────────────────┐ │
 │ │ ┌──────┐ 中級へ行こう  │ │ ┌──────┐ 耳から覚える  │ │
-│ │ │Cover │ 8 bài · 164   │ │ │Cover │ 1 bài · 10    │ │
-│ │ └──────┘ [━━━━░░] 65%  │ │ └──────┘ [━░░░░] 30%   │ │
+│ │ │Cover │ 日本語の文型… │ │ │Cover │ 文法トレーニ… │ │
+│ │ └──────┘ [━━━━░░] 45%  │ │ └──────┘ [━░░░░] 30%   │ │
 │ └────────────────────────┘ └─────────────────────────┘ │
 │ ┌────────────────────────┐ ┌─────────────────────────┐ │
-│ │ [IconBook] Từ vựng     │ │ [IconWriting] Hán tự    │ │
+│ │ 語彙                   │ │ 漢字                    │ │
+│ │ Từ vựng                │ │ Hán tự                  │ │
 │ └────────────────────────┘ └─────────────────────────┘ │
 │ ┌────────────────────────────────────────────────────┐ │
-│ │ [IconBolt] Kiểm tra tổng hợp (Mixed Test)      (→) │ │
+│ │ Kiểm tra tổng hợp                               →  │ │
 │ └────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────┘
 ```
 
 - **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only (`IconSettings` opens Settings; Content Management is accessed from the Study Content section inside Settings). No theme status or theme control on Home.
-- **GIÁO TRÌNH (primary):** Large tactile book cards with 3:4 covers, stacked on mobile and in a 2-column grid on tablet/desktop (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). The section label is screen-reader only. Tapping a card opens the **Book Study View**.
-- **HỌC THEO LOẠI (secondary):** Compact Vocabulary / Kanji shortcuts to browse lessons by category across all books. The section label is screen-reader only.
-- **Kiểm tra tổng hợp:** Compact CTA for global multi-lesson quiz selection.
+- **GIÁO TRÌNH (primary):** Large tactile book cards with 3:4 covers, title, and Study Coverage, stacked on mobile and in a 2-column grid on tablet/desktop (see [`docs/screens/STUDY_SCREENS.md`](./screens/STUDY_SCREENS.md#screen-01-home--study-hub)). Lesson/item counts appear in the Book Study View, not on Home. The section label is screen-reader only. Tapping a card opens the **Book Study View**.
+- **HỌC THEO LOẠI (secondary):** `語彙 Từ vựng` / `漢字 Hán tự` shortcuts to browse lessons by category across all books. Counts appear in Learn by Type, not on Home. The section label is screen-reader only.
+- **Kiểm tra tổng hợp →:** Concise CTA for global multi-lesson quiz selection.
 
 ### 4.1 Safe Empty States (Zero Management Clutter on Study Screens)
 Because the Home screen intentionally excludes `+ Add Book` or `Import` buttons, Tango provides helpful, calming empty states that direct learners to Settings:

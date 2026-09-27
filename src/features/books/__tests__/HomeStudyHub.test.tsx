@@ -113,7 +113,11 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     );
   };
 
-  it('renders Vietnamese Home with correct titles and metrics', () => {
+  // Inventory statistics (lesson/item counts) belong on detail screens, never on Home.
+  // Matches rendered text only (between tags), so CSS classes like `items-center` are ignored.
+  const COUNT_PATTERN = />[^<]*\d+\s*(?:bài|mục|lessons?|items?)(?![\p{L}-])[^<]*</u;
+
+  it('renders Vietnamese Home with book title, Study Coverage, shortcuts, and Mixed Test only', () => {
     const html = renderHome(populatedState);
 
     // 1. No visible greeting
@@ -124,34 +128,24 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('min-h-touch');
     expect(html).toContain('aria-label="Cài đặt"');
 
-    // 3. Book titles and (screen-reader) section heading
-    expect(html).toContain('Giáo trình');
+    // 3. Book title and Study Coverage (3 studied out of 4 items = 75%)
     expect(html).toContain('Chūkyū e Ikō');
-
-    // 4. Book metrics: 2 lessons, 4 items
-    expect(html).toContain('2 bài');
-    expect(html).toContain('4 mục');
-
-    // 5. Book Study Coverage is strictly 75% (3 studied out of 4 items)
     expect(html).toContain('75%');
     expect(html).toContain('role="progressbar"');
     expect(html).toContain('aria-valuenow="75"');
 
-    // 6. Global Learn by Type counts:
-    // Vocabulary: mockLesson1 (2 items) + mockUnassignedLesson (3 items) = 2 lessons, 5 items
-    expect(html).toContain('Học theo loại');
+    // 4. Category shortcuts: Japanese glyph + localized name
+    expect(html).toContain('語彙');
     expect(html).toContain('Từ vựng');
-    expect(html).toContain('2 bài');
-    expect(html).toContain('5 mục');
-
-    // Kanji: mockLesson2 (2 items) = 1 lesson, 2 items
+    expect(html).toContain('漢字');
     expect(html).toContain('Hán tự');
-    expect(html).toContain('1 bài');
-    expect(html).toContain('2 mục');
 
-    // 7. Mixed Test Action
+    // 5. Mixed Test action without its explanatory subtitle
     expect(html).toContain('Kiểm tra tổng hợp');
-    expect(html).toContain('Tùy chọn nhiều bài học trên tất cả giáo trình để kiểm tra');
+    expect(html).not.toContain('Tùy chọn nhiều bài học trên tất cả giáo trình để kiểm tra');
+
+    // 6. No lesson/item counts anywhere on Home
+    expect(html).not.toMatch(COUNT_PATTERN);
   });
 
   it('preserves an interactive TANGO wordmark button with 48px minimum touch-target class', () => {
@@ -162,7 +156,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toMatch(/<button[^>]*class="[^"]*min-h-touch[^"]*"[^>]*>[^<]*TANGO[^<]*<\/button>/);
   });
 
-  it('renders English Home with correct singular and plural count labels', () => {
+  it('renders English Home labels without counts or the Mixed Test subtitle', () => {
     const enState: UserStudyState = {
       ...populatedState,
       preferences: {
@@ -174,65 +168,22 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
 
     const html = renderHome(enState);
 
-    // 1. No visible greeting and no theme status in the TopBar
+    // No visible greeting and no theme status in the TopBar
     expect(html).not.toContain('What would you like to learn today?');
     expect(html).not.toContain('Current theme');
     expect(html).toContain('aria-label="Settings"');
 
-    // 3. English section headers
+    // Screen-reader section headings and localized labels
     expect(html).toContain('Study Books');
     expect(html).toContain('Learn by Type');
     expect(html).toContain('Mixed Test');
-    expect(html).toContain('Select multiple lessons across all study books to test');
-
-    // 4. English Category titles
     expect(html).toContain('Vocabulary');
     expect(html).toContain('Kanji');
+    expect(html).toContain('aria-label="Learn by type: Vocabulary"');
+    expect(html).toContain('aria-label="Learn by type: Kanji"');
 
-    // 5. English plural counters
-    expect(html).toContain('2 lessons');
-    expect(html).toContain('4 items');
-    expect(html).toContain('5 items');
-
-    // 6. English singular counter on Kanji card (mockLesson2 is 1 lesson)
-    expect(html).toContain('1 lesson');
-    expect(html).not.toContain('1 lessons');
-  });
-
-  it('renders English singular item count correctly for a single-item lesson', () => {
-    const singleItemState: UserStudyState = {
-      ...populatedState,
-      preferences: {
-        ...populatedState.preferences,
-        language: 'en',
-      },
-      books: {
-        'book-single': {
-          id: 'book-single',
-          title: 'Single Item Book',
-          createdAt: '2026-01-01T00:00:00.000Z',
-          updatedAt: '2026-01-01T00:00:00.000Z',
-        },
-      },
-      lessons: {
-        'lesson-single': {
-          id: 'lesson-single',
-          bookId: 'book-single',
-          category: 'kanji',
-          title: 'Single Kanji Lesson',
-          items: [{ id: 'item-single', japanese: '日', vietnamese: ['ngày'] }],
-        },
-      },
-      progressByItem: {},
-    };
-
-    const html = renderHome(singleItemState);
-
-    // 1 lesson and 1 item in English
-    expect(html).toContain('1 lesson');
-    expect(html).not.toContain('1 lessons');
-    expect(html).toContain('1 item');
-    expect(html).not.toContain('1 items');
+    expect(html).not.toContain('Select multiple lessons across all study books to test');
+    expect(html).not.toMatch(COUNT_PATTERN);
   });
 
   it('renders calm empty state when no books exist, without add/import/delete controls', () => {
@@ -261,29 +212,32 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).not.toContain('Delete');
     expect(html).not.toContain('Edit');
 
-    // 4. Learn by Type remains rendered and unassigned lessons are counted
-    expect(html).toContain('Học theo loại');
+    // 4. Category shortcuts and Mixed Test remain available, still without counts
     expect(html).toContain('Từ vựng');
-    // Only mockUnassignedLesson exists for vocabulary (1 lesson, 3 items)
-    expect(html).toContain('1 bài');
-    expect(html).toContain('3 mục');
-
-    // Mixed test remains available
+    expect(html).toContain('Hán tự');
     expect(html).toContain('Kiểm tra tổng hợp');
+    expect(html).not.toMatch(COUNT_PATTERN);
   });
 
-  it('verifies unassigned category content contributes to global counts but not to any book', () => {
-    // Unassigned lesson has no bookId, so book-01 only has mockLesson1 (1 vocab, 2 items)
-    // Global vocabulary has mockLesson1 (2 items) + mockUnassignedLesson (3 items) = 5 items
-    const html = renderHome(populatedState);
+  it('keeps book Study Coverage scoped to the book when unassigned lessons have progress', () => {
+    const html = renderHome({
+      ...populatedState,
+      progressByItem: {
+        ...populatedState.progressByItem,
+        // Progress on the unassigned lesson must not change book-01 coverage
+        'item-05': {
+          itemId: 'item-05',
+          totalAttempts: 4,
+          correctCount: 4,
+          incorrectCount: 0,
+          lastStudiedAt: '2026-01-02T00:00:00.000Z',
+          isMarkedWeak: false,
+        },
+      },
+    });
 
-    // Book-01 metrics should only show its own 2 lessons and 4 items
-    expect(html).toContain('Chūkyū e Ikō');
-    expect(html).toContain('2 bài');
-    expect(html).toContain('4 mục');
-
-    // Global vocabulary includes the unassigned lesson (2 lessons, 5 items)
-    expect(html).toContain('5 mục');
+    expect(html).toContain('aria-valuenow="75"');
+    expect(html).toContain('75%');
   });
 
   it('renders coverage as exactly 75% for 3 out of 4 attempted items regardless of answer accuracy', () => {
@@ -523,9 +477,21 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
     expect(html).toContain('aria-label="Học theo loại: Từ vựng"');
     expect(html).toContain('aria-label="Học theo loại: Hán tự"');
 
-    // Japanese category names are decorative study-content marks hidden from screen readers
-    expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>語彙<\/span>/);
-    expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>漢字<\/span>/);
+    // The Japanese category name is the visual identity (hidden from screen readers,
+    // which read the localized aria-label), followed by the localized category name
+    expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>語彙<\/span><h3[^>]*>Từ vựng<\/h3>/);
+    expect(html).toMatch(/<span lang="ja" aria-hidden="true"[^>]*>漢字<\/span><h3[^>]*>Hán tự<\/h3>/);
+
+    // No redundant category icon pucks alongside the glyph
+    const tileMarkup = (category: string) => {
+      const start = html.indexOf(`data-category="${category}"`);
+      return html.slice(start, html.indexOf('</button>', start));
+    };
+    for (const category of ['vocabulary', 'kanji']) {
+      const markup = tileMarkup(category);
+      expect(markup).not.toContain('<svg');
+      expect(markup).not.toMatch(COUNT_PATTERN);
+    }
 
     // Study action order for arrow-key navigation: books, Vocabulary, Kanji, then Mixed Test
     const cardOrder = Array.from(
@@ -539,6 +505,29 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       }
     );
     expect(cardOrder).toEqual(['book', 'vocabulary', 'kanji', 'mixed']);
+  });
+
+  it('renders Mixed Test as a concise action: title plus a single trailing arrow', () => {
+    const html = renderHome(populatedState);
+    const start = html.indexOf('id="home-mixed-test-heading"');
+    const markup = html.slice(start, html.indexOf('</button>', start));
+
+    expect(markup).toContain('Kiểm tra tổng hợp');
+    expect(markup).not.toMatch(/<p[\s>]/);
+    expect(markup.match(/<svg/g)).toHaveLength(1);
+    expect(markup).toContain('tabler-icon-arrow-right');
+    expect(markup).not.toContain('tabler-icon-bolt');
+  });
+
+  it('renders book cards with title and coverage but no lesson/item counts', () => {
+    const html = renderHome(populatedState);
+    const start = html.indexOf('aria-label="Mở giáo trình Chūkyū e Ikō"');
+    const markup = html.slice(start, html.indexOf('</button>', start));
+
+    expect(markup).toContain('Chūkyū e Ikō');
+    expect(markup).toContain('role="progressbar"');
+    expect(markup).toContain('75%');
+    expect(markup).not.toMatch(COUNT_PATTERN);
   });
 
   it('renders a single Study Coverage progress bar per book card', () => {

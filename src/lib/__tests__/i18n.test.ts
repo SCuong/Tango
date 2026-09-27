@@ -50,6 +50,18 @@ describe('src/lib/i18n.ts (Localization Foundation)', () => {
       expect(translate('en', 'state.notFound')).toBe('Page not found');
     });
 
+    it('keeps singular/plural lesson and item count labels for detail screens', () => {
+      expect(translate('en', 'metrics.lessonCount.one', { count: 1 })).toBe('1 lesson');
+      expect(translate('en', 'metrics.lessonCount.other', { count: 2 })).toBe('2 lessons');
+      expect(translate('en', 'metrics.itemCount.one', { count: 1 })).toBe('1 item');
+      expect(translate('en', 'metrics.itemCount.other', { count: 2 })).toBe('2 items');
+
+      expect(translate('vi', 'metrics.lessonCount.one', { count: 1 })).toBe('1 bài');
+      expect(translate('vi', 'metrics.lessonCount.other', { count: 2 })).toBe('2 bài');
+      expect(translate('vi', 'metrics.itemCount.one', { count: 1 })).toBe('1 mục');
+      expect(translate('vi', 'metrics.itemCount.other', { count: 2 })).toBe('2 mục');
+    });
+
     it('supports alias `t` for `translate`', () => {
       expect(t('vi', 'action.save')).toBe('Lưu');
       expect(t('en', 'action.save')).toBe('Save');

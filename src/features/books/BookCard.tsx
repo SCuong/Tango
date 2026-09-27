@@ -41,33 +41,10 @@ export const BookCard: React.FC<BookCardProps> = ({
       </div>
 
       {/* Book information */}
-      <div className="flex-1 min-w-0 flex flex-col justify-between gap-3 py-0.5">
-        <div className="space-y-1.5">
-          <h3 className="font-study-title font-bold text-text-primary text-base sm:text-lg leading-snug line-clamp-3 break-words">
-            {book.title}
-          </h3>
-
-          {/* Metadata row */}
-          <div className="text-xs sm:text-sm text-text-secondary flex items-center gap-1.5 flex-wrap">
-            <span>
-              {t(
-                metrics.lessonCount === 1
-                  ? 'metrics.lessonCount.one'
-                  : 'metrics.lessonCount.other',
-                { count: metrics.lessonCount }
-              )}
-            </span>
-            <span aria-hidden="true">·</span>
-            <span>
-              {t(
-                metrics.itemCount === 1
-                  ? 'metrics.itemCount.one'
-                  : 'metrics.itemCount.other',
-                { count: metrics.itemCount }
-              )}
-            </span>
-          </div>
-        </div>
+      <div className="flex-1 min-w-0 flex flex-col justify-between gap-4 py-1">
+        <h3 className="font-study-title font-bold text-text-primary text-base sm:text-lg leading-snug line-clamp-3 break-words">
+          {book.title}
+        </h3>
 
         {/* Study Coverage row */}
         <div className="flex items-center gap-2.5">

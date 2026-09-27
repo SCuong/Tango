@@ -59,7 +59,6 @@ export const VI_DICTIONARY = {
   'home.studyBooks': 'Giáo trình',
   'home.learnByType': 'Học theo loại',
   'home.mixedTest': 'Kiểm tra tổng hợp',
-  'home.mixedTestSubtitle': 'Tùy chọn nhiều bài học trên tất cả giáo trình để kiểm tra',
   'home.emptyBooks.title': 'Chưa có giáo trình nào.',
   'home.emptyBooks.description': 'Bạn có thể thêm giáo trình trong: Cài đặt → Quản lý nội dung.',
 
@@ -133,7 +132,6 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'home.studyBooks': 'Study Books',
   'home.learnByType': 'Learn by Type',
   'home.mixedTest': 'Mixed Test',
-  'home.mixedTestSubtitle': 'Select multiple lessons across all study books to test',
   'home.emptyBooks.title': 'No study books yet.',
   'home.emptyBooks.description': 'You can add study books from: Settings → Content Management.',
 
