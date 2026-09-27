@@ -4,7 +4,7 @@
  * - Same-origin assets and Google Fonts: served from cache, refreshed in the background.
  * Study data lives in localStorage / IndexedDB and is never touched here.
  */
-const CACHE = 'tango-shell-v1';
+const CACHE = 'tango-shell-v2';
 const SHELL = ['/', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', (event) => {
@@ -33,6 +33,39 @@ function isCacheable(url) {
   );
 }
 
+// The page reports the assets it loaded before this worker controlled it (first visit), so the
+// built JS/CSS and fonts are cached immediately and the next launch works offline.
+self.addEventListener('message', (event) => {
+  const data = event.data;
+  if (!data || data.type !== 'tango-cache-urls' || !Array.isArray(data.urls)) return;
+  const urls = data.urls.filter((value) => {
+    try {
+      return isCacheable(new URL(value));
+    } catch {
+      return false;
+    }
+  });
+  event.waitUntil(
+    caches.open(CACHE).then((cache) =>
+      Promise.all(
+        urls.map((value) =>
+          cache.match(value, { ignoreVary: true }).then((hit) => {
+            if (hit) return undefined;
+            const url = new URL(value);
+            const init = url.origin === self.location.origin ? {} : { mode: 'no-cors' };
+            return fetch(value, init)
+              .then((response) => {
+                if (response.ok || response.type === 'opaque') return cache.put(value, response);
+                return undefined;
+              })
+              .catch(() => undefined);
+          })
+        )
+      )
+    )
+  );
+});
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
@@ -48,7 +81,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => caches.match('/'))
+        .catch(() => caches.match('/', { ignoreVary: true }))
     );
     return;
   }
@@ -56,7 +89,7 @@ self.addEventListener('fetch', (event) => {
   if (!isCacheable(url)) return;
 
   event.respondWith(
-    caches.match(request).then((cached) => {
+    caches.match(request, { ignoreVary: true }).then((cached) => {
       const network = fetch(request)
         .then((response) => {
           if (response.ok || response.type === 'opaque') {

@@ -41,6 +41,7 @@ export const QuizConfigScreen: React.FC<{ scope: QuizConfigScope }> = ({ scope }
   const startQuiz = useStartQuiz();
 
   const book = scope.kind === 'mixed' ? undefined : state.books[scope.bookId];
+  const scopeKey = JSON.stringify(scope);
 
   // Sections of selectable lessons for this scope (library order)
   const sections: LessonSection[] = useMemo(() => {
@@ -72,7 +73,8 @@ export const QuizConfigScreen: React.FC<{ scope: QuizConfigScope }> = ({ scope }
         lessons: group.lessons.filter((lesson) => lesson.category === category),
       })).filter((sub) => sub.lessons.length > 0),
     }));
-  }, [scope, state.lessons, state.books, t]);
+    // The scope object is recreated by the router on every render; its JSON is the stable identity
+  }, [scopeKey, state.lessons, state.books, t]);
 
   const allLessonIds = useMemo(
     () => sections.flatMap((section) => section.subsections.flatMap((sub) => sub.lessons.map((l) => l.id))),
@@ -85,8 +87,14 @@ export const QuizConfigScreen: React.FC<{ scope: QuizConfigScope }> = ({ scope }
   const [count, setCount] = useState<number | 'all'>(10);
 
   // Keep selection in library order and drop lessons that no longer exist
-  const selectedIds = allLessonIds.filter((id) => selected.includes(id));
-  const eligibility = getQuizEligibility(selectedIds, state.lessons, types);
+  const selectedIds = useMemo(
+    () => allLessonIds.filter((id) => selected.includes(id)),
+    [allLessonIds, selected]
+  );
+  const eligibility = useMemo(
+    () => getQuizEligibility(selectedIds, state.lessons, types),
+    [selectedIds, state.lessons, types]
+  );
   const n = eligibility.eligibleCount;
   const countOptions = getAvailableQuestionCounts(n);
   const effectiveCount: number | 'all' =
@@ -171,7 +179,23 @@ export const QuizConfigScreen: React.FC<{ scope: QuizConfigScope }> = ({ scope }
           <SectionLabel id="quiz-count-heading" className="mb-2">
             {t('quizConfig.count')}
           </SectionLabel>
-          <div role="radiogroup" aria-labelledby="quiz-count-heading" className="flex flex-wrap gap-2">
+          <div
+            role="radiogroup"
+            aria-labelledby="quiz-count-heading"
+            className="flex flex-wrap gap-2"
+            onKeyDown={(e) => {
+              const options: (number | 'all')[] = [...countOptions, 'all'];
+              const index = options.indexOf(effectiveCount);
+              let next = -1;
+              if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % options.length;
+              if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + options.length) % options.length;
+              if (next < 0) return;
+              e.preventDefault();
+              setCount(options[next]);
+              const chips = e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+              chips[next]?.focus();
+            }}
+          >
             {countOptions.map((option) => (
               <CountChip key={option} selected={effectiveCount === option} onSelect={() => setCount(option)}>
                 {option}
@@ -287,6 +311,7 @@ const CountChip: React.FC<{ selected: boolean; onSelect: () => void; children: R
     type="button"
     role="radio"
     aria-checked={selected}
+    tabIndex={selected ? 0 : -1}
     onClick={onSelect}
     className={`min-h-touch min-w-[3.5rem] px-4 rounded-full border text-sm font-semibold transition-colors ${
       selected

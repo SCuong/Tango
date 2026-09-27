@@ -303,10 +303,11 @@ const ActiveQuiz: React.FC<{ session: QuizSessionState }> = ({ session }) => {
       </main>
 
       <ExplanationSheet
-        open={incorrectFeedback && !exitOpen}
+        open={incorrectFeedback && !exitOpen && !exitingRef.current}
         question={question}
         lastAnswer={lastAnswer}
         onContinue={goNext}
+        onDismiss={() => setExitOpen(true)}
       />
 
       <ExitDialog open={exitOpen} onKeep={() => setExitOpen(false)} onExit={confirmExit} />
@@ -449,7 +450,9 @@ const ExplanationSheet: React.FC<{
   question: QuizQuestion;
   lastAnswer: QuizAnswerRecord | null;
   onContinue: () => void;
-}> = ({ open, question, lastAnswer, onContinue }) => {
+  /** Escape / browser Back: ask to exit instead of silently skipping ahead (SCREEN 13). */
+  onDismiss: () => void;
+}> = ({ open, question, lastAnswer, onContinue, onDismiss }) => {
   const { t } = useI18n();
   const titleId = useId();
   const continueRef = useRef<HTMLButtonElement>(null);
@@ -460,7 +463,7 @@ const ExplanationSheet: React.FC<{
   return (
     <Dialog
       open={open}
-      onClose={onContinue}
+      onClose={onDismiss}
       labelledBy={titleId}
       initialFocusRef={continueRef}
       presentation="sheet"

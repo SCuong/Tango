@@ -1,6 +1,29 @@
 import React, { useEffect, useId, useRef } from 'react';
 
 /**
+ * A pending marker pop (history.back() is asynchronous). Pushes of newly opened dialogs wait for
+ * it, so two dialogs swapping in one render (e.g. explanation sheet → exit confirmation) never pop
+ * each other's marker.
+ */
+let pendingPop: Promise<void> | null = null;
+
+function popModalMarker(): Promise<void> {
+  if (pendingPop) return pendingPop;
+  pendingPop = new Promise<void>((resolve) => {
+    const done = () => {
+      window.removeEventListener('popstate', done);
+      clearTimeout(timer);
+      pendingPop = null;
+      resolve();
+    };
+    const timer = setTimeout(done, 400);
+    window.addEventListener('popstate', done);
+    window.history.back();
+  });
+  return pendingPop;
+}
+
+/**
  * Browser Back closes an open dialog before navigating (SCREEN_SPEC §2.1): opening pushes a
  * same-URL history marker; a popstate that leaves the marker closes the dialog. Closing from the
  * UI pops the marker again so the history stays clean.
@@ -16,19 +39,34 @@ function useModalHistory(open: boolean, requestClose: () => void): void {
 
     if (open) {
       wasOpenRef.current = true;
-      if (window.history.state?.tangoModal !== key) {
-        window.history.pushState({ tangoModal: key }, '', window.location.href);
-      }
+      let cancelled = false;
+      let pushed = false;
+      const push = () => {
+        if (cancelled) return;
+        if (window.history.state?.tangoModal !== key) {
+          window.history.pushState({ tangoModal: key }, '', window.location.href);
+        }
+        pushed = true;
+      };
+      // Defer the push until any marker pop scheduled in this same render has settled
+      const timer = setTimeout(() => {
+        if (pendingPop) void pendingPop.then(push);
+        else push();
+      }, 0);
       const onPopState = () => {
-        if (window.history.state?.tangoModal !== key) requestCloseRef.current();
+        if (pushed && window.history.state?.tangoModal !== key) requestCloseRef.current();
       };
       window.addEventListener('popstate', onPopState);
-      return () => window.removeEventListener('popstate', onPopState);
+      return () => {
+        cancelled = true;
+        clearTimeout(timer);
+        window.removeEventListener('popstate', onPopState);
+      };
     }
 
     if (wasOpenRef.current) {
       wasOpenRef.current = false;
-      if (window.history.state?.tangoModal === key) window.history.back();
+      if (window.history.state?.tangoModal === key) void popModalMarker();
     }
     return undefined;
   }, [open, key]);
@@ -39,19 +77,11 @@ function useModalHistory(open: boolean, requestClose: () => void): void {
  * Await it before navigating away from a dialog action (e.g. after a confirmed delete).
  */
 export function dismissModalHistory(): Promise<void> {
+  if (pendingPop) return pendingPop;
   if (typeof window === 'undefined' || !window.history?.state?.tangoModal) {
     return Promise.resolve();
   }
-  return new Promise((resolve) => {
-    const done = () => {
-      window.removeEventListener('popstate', done);
-      clearTimeout(timer);
-      resolve();
-    };
-    const timer = setTimeout(done, 400);
-    window.addEventListener('popstate', done);
-    window.history.back();
-  });
+  return popModalMarker();
 }
 
 const FOCUSABLE =

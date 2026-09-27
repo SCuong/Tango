@@ -72,14 +72,14 @@ export const ContentManagement: React.FC = () => {
           </Button>
         </section>
 
-        <div className="space-y-8">
-          <section aria-labelledby="cm-lessons-heading" className="space-y-3">
+        <div className="flex flex-col gap-8">
+          <section aria-labelledby="cm-lessons-heading" className="space-y-3 order-2 sm:order-1">
             <SectionLabel id="cm-lessons-heading">{t('content.lessonTools')}</SectionLabel>
             <ImportCard onOpen={() => navigate({ type: 'import' })} />
           </section>
 
           {unassigned.length > 0 && (
-            <section aria-labelledby="cm-unassigned-heading" className="space-y-3">
+            <section aria-labelledby="cm-unassigned-heading" className="space-y-3 order-1 sm:order-2">
               <SectionLabel id="cm-unassigned-heading">{t('common.unassigned')}</SectionLabel>
               <ul className="bg-surface border border-border-subtle rounded-xl divide-y divide-border-subtle overflow-hidden">
                 {unassigned.map((lesson) => (

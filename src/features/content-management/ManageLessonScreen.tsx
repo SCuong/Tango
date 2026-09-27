@@ -41,11 +41,14 @@ export const ManageLessonScreen: React.FC<{ lessonId: string }> = ({ lessonId })
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleted, setDeleted] = useState(false);
 
   const parentRoute: AppRoute = initialBookId
     ? { type: 'manage_book', bookId: initialBookId }
     : { type: 'content_management' };
   const goParent = () => goBack(parentRoute);
+
+  if (deleted) return null;
 
   if (!lesson) {
     return <NotFoundScreen message={t('common.notFound.lesson')} onBack={() => goUp({ type: 'content_management' })} />;
@@ -85,6 +88,7 @@ export const ManageLessonScreen: React.FC<{ lessonId: string }> = ({ lessonId })
     try {
       deleteLessonCascade(lesson.id, (scope) => clearLessonReferences([scope.targetLessonId]));
       await dismissModalHistory();
+      setDeleted(true);
       reloadState();
       goUp(destination);
     } catch (error) {

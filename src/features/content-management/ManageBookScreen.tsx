@@ -46,7 +46,10 @@ export const ManageBookScreen: React.FC<{ bookId: string }> = ({ bookId }) => {
   const [dialog, setDialog] = useState<'none' | 'deleteBook' | 'removeCover'>('none');
   const [dialogBusy, setDialogBusy] = useState(false);
   const [dialogError, setDialogError] = useState<string | null>(null);
+  const [deleted, setDeleted] = useState(false);
   const goToContent = () => goUp({ type: 'content_management' });
+
+  if (deleted) return null;
 
   if (!book) {
     return <NotFoundScreen message={t('common.notFound.book')} onBack={goToContent} />;
@@ -115,6 +118,7 @@ export const ManageBookScreen: React.FC<{ bookId: string }> = ({ bookId }) => {
     try {
       await deleteBookCascade(bookId, (scope) => clearLessonReferences(scope.affectedLessonIds));
       await dismissModalHistory();
+      setDeleted(true);
       reloadState();
       goToContent();
     } catch (error) {

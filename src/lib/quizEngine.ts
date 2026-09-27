@@ -144,12 +144,15 @@ function findTargetItemForType(
 /**
  * Gathers all distinct candidate distractor strings from OTHER lexical groups in the pool.
  * Does not use unselected lessons, fake answers, or the target group itself.
+ * `limit` stops the scan early once enough distinct candidates exist (compatibility checks only
+ * need 3); question generation always gathers the full candidate list.
  */
 function getDistractorCandidates(
   targetGroup: LexicalGroup,
   targetItem: StudyItem,
   type: QuestionType,
-  allGroups: LexicalGroup[]
+  allGroups: LexicalGroup[],
+  limit: number = Infinity
 ): string[] {
   const distractors = new Set<string>();
 
@@ -158,6 +161,7 @@ function getDistractorCandidates(
     const normalizedCorrect = normalizeJapanese(correctAnswer);
 
     for (const otherGroup of allGroups) {
+      if (distractors.size >= limit) break;
       if (otherGroup.key === targetGroup.key) continue;
       const candidate = otherGroup.items[0].japanese;
       if (
@@ -172,6 +176,7 @@ function getDistractorCandidates(
     const normalizedCorrect = normalizeVietnamese(correctAnswer);
 
     for (const otherGroup of allGroups) {
+      if (distractors.size >= limit) break;
       if (otherGroup.key === targetGroup.key) continue;
       const candidate = getGroupPrimaryVietnamese(otherGroup.items);
       if (
@@ -205,7 +210,7 @@ function isGroupCompatibleWithType(
     return true; // Written answer requires no options/distractors
   }
 
-  const distractorCandidates = getDistractorCandidates(group, targetItem, type, allGroups);
+  const distractorCandidates = getDistractorCandidates(group, targetItem, type, allGroups, 3);
   return distractorCandidates.length >= 3;
 }
 

@@ -177,6 +177,8 @@ src/data/
 └── index.ts                   # Seed registry exporting getSeedLessons()
 ```
 
+*Current state: the seed registry (`getSeedLessons()`) is intentionally empty until approved curriculum datasets are added, so a fresh install starts with no content and learners add books and lessons through Content Management and the importer. No demo or sample data ships with the app. When seed files are added they must follow the layout above.*
+
 *Both `vocabulary/` and `kanji/` directories strictly conform to the identical `Lesson` and `StudyItem` schemas. These bundled files serve strictly as initial seed data on first initialization; runtime queries, edits, and deletions take place exclusively within `tango_v1_lessons`.*
 
 ### 7.2 Source Code Organization

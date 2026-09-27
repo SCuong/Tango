@@ -101,14 +101,36 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({
   }, []);
 
   const commitStudyData = useCallback((patch: StudyDataPatch) => {
-    if (patch.books) saveBooks(patch.books);
-    if (patch.lessons) saveLessons(patch.lessons);
-    if (patch.progressByItem) saveProgress(patch.progressByItem);
-    if (patch.recentResults) saveHistory(patch.recentResults);
-
-    const nextState: UserStudyState = { ...stateRef.current, ...patch };
-    stateRef.current = nextState;
-    setState(nextState);
+    // Partitions are written one by one; if a later write fails, in-memory state still reflects
+    // the partitions that were persisted, so a stale copy never overwrites stored data later.
+    const persisted: StudyDataPatch = {};
+    const commit = () => {
+      const nextState: UserStudyState = { ...stateRef.current, ...persisted };
+      stateRef.current = nextState;
+      setState(nextState);
+    };
+    try {
+      if (patch.books) {
+        saveBooks(patch.books);
+        persisted.books = patch.books;
+      }
+      if (patch.lessons) {
+        saveLessons(patch.lessons);
+        persisted.lessons = patch.lessons;
+      }
+      if (patch.progressByItem) {
+        saveProgress(patch.progressByItem);
+        persisted.progressByItem = patch.progressByItem;
+      }
+      if (patch.recentResults) {
+        saveHistory(patch.recentResults);
+        persisted.recentResults = patch.recentResults;
+      }
+    } catch (error) {
+      if (Object.keys(persisted).length > 0) commit();
+      throw error;
+    }
+    commit();
   }, []);
 
   const contextValue = useMemo<AppStateContextValue>(

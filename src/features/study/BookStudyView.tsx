@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { IconBolt, IconBooks, IconChevronRight } from '@tabler/icons-react';
 import { StudyCategory } from '../../types';
 import { useAppState } from '../../hooks/useAppState';
@@ -8,7 +8,7 @@ import { useCounts } from '../../hooks/useCounts';
 import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeedback';
 import { getBookStudyMetrics, getCategoryStudyMetrics } from '../../lib/studyMetrics';
 import { STUDY_CATEGORIES } from '../../lib/studySelectors';
-import { Screen, ScreenHeader, SectionLabel, StickyBottomBar } from '../../components/Screen';
+import { Screen, ScreenHeader, SectionLabel, StickyBottomBar, isDialogOpen } from '../../components/Screen';
 import { Button, FOCUS_RING } from '../../components/Button';
 import { ProgressBar } from '../../components/ProgressBar';
 import { BookCover } from '../books/BookCover';
@@ -27,6 +27,23 @@ export const BookStudyView: React.FC<{ bookId: string }> = ({ bookId }) => {
   const counts = useCounts();
   const book = state.books[bookId];
   const goHome = () => goUp({ type: 'home' });
+
+  const hasBookLessons = !!book && Object.values(state.lessons).some((lesson) => lesson.bookId === bookId);
+  const startTestRef = useRef(() => {});
+  startTestRef.current = () => {
+    if (hasBookLessons) navigate({ type: 'book_quiz_config', bookId });
+  };
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || isDialogOpen()) return;
+      const target = e.target as HTMLElement | null;
+      if (target && target !== document.body) return;
+      e.preventDefault();
+      startTestRef.current();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   if (!book) {
     return <NotFoundScreen message={t('common.notFound.book')} onBack={goHome} />;

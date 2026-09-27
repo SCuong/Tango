@@ -22,7 +22,7 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
         <button
           type="button"
           onClick={() => navigate({ type: 'home' })}
-          className="inline-flex items-center min-h-touch px-2 font-bold text-xl tracking-wider text-text-primary hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page rounded-xl"
+          className="inline-flex items-center min-h-touch px-2 font-bold text-xl tracking-wider text-text-primary flat-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page rounded-xl"
           aria-label={t('nav.home')}
         >
           TANGO

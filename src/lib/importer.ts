@@ -150,6 +150,10 @@ export function detectDelimiter(text: string): Delimiter | null {
     if (maxColumns >= 2 && (!fallback || maxColumns > fallback.columns) && delimiter !== ',') {
       fallback = { delimiter, columns: maxColumns };
     }
+    // Ragged comma input (e.g. CSV rows missing trailing empty cells) when nothing else splits
+    if (delimiter === ',' && !fallback && maxColumns >= 2 && counts.filter((c) => c >= 2).length > counts.length / 2) {
+      fallback = { delimiter, columns: maxColumns };
+    }
   }
   return fallback?.delimiter ?? null;
 }

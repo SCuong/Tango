@@ -734,15 +734,12 @@ export function translate(
     return template;
   }
 
-  let result = template;
-  for (const [paramKey, paramValue] of Object.entries(params)) {
-    const val = String(paramValue);
-    result = result
-      .replace(new RegExp(`\\{\\{${paramKey}\\}\\}`, 'g'), val)
-      .replace(new RegExp(`\\{${paramKey}\\}`, 'g'), val);
-  }
-
-  return result;
+  // Single pass with a replacer function: values are inserted literally (no `$&` patterns)
+  // and a value that itself contains `{name}` is never substituted again.
+  return template.replace(/\{\{(\w+)\}\}|\{(\w+)\}/g, (match, double?: string, single?: string) => {
+    const name = double ?? single ?? '';
+    return Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : match;
+  });
 }
 
 /**

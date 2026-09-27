@@ -253,3 +253,15 @@ async function repackWithDeflate(zip: Uint8Array): Promise<Uint8Array> {
   }
   return out;
 }
+
+describe('ragged comma-separated input', () => {
+  it('detects commas when rows omit trailing empty columns', () => {
+    const text = 'Từ vựng,Cách đọc,Âm Hán Việt,Nghĩa tiếng Việt\nファストフード,ふぁすとふーど\n旅行,りょこう,Lữ Hành,"Du lịch, chuyến đi"';
+    expect(detectDelimiter(text)).toBe(',');
+    const rows = parseTextToRows(text, { delimiter: 'auto' });
+    expect(rows[1]).toEqual(['ファストフード', 'ふぁすとふーど']);
+    const detection = detectHeader(rows);
+    expect(detection.hasHeader).toBe(true);
+    expect(buildImportItems(rows, detection.mapping, true).items).toHaveLength(2);
+  });
+});

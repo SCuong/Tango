@@ -117,7 +117,7 @@ export const HomeStudyHub: React.FC = () => {
   // Global keyboard shortcut: Alt+S -> Settings
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey && (e.key === 's' || e.key === 'S')) {
+      if (e.altKey && (e.code === 'KeyS' || e.key === 's' || e.key === 'S')) {
         e.preventDefault();
         navigate({ type: 'settings' });
       }

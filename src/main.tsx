@@ -16,9 +16,23 @@ applyDocumentPreferences(initialAppState.preferences);
 // 3. Offline support: register the service worker in production builds only
 if (import.meta.env.PROD && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.error('Service worker registration failed:', error);
-    });
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then(() => navigator.serviceWorker.ready)
+      .then((registration) => {
+        // Assets loaded before the worker took control (first visit) are handed over for caching
+        const urls = [
+          window.location.origin + '/',
+          ...performance
+            .getEntriesByType('resource')
+            .map((entry) => entry.name)
+            .filter((name) => /\.(js|css|woff2?|svg|webmanifest)(\?|$)|fonts\.googleapis\.com/.test(name)),
+        ];
+        registration.active?.postMessage({ type: 'tango-cache-urls', urls });
+      })
+      .catch((error) => {
+        console.error('Service worker registration failed:', error);
+      });
   });
 }
 

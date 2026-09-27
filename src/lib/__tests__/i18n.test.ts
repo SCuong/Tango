@@ -86,3 +86,17 @@ describe('src/lib/i18n.ts (Localization Foundation)', () => {
     });
   });
 });
+
+describe('translate interpolation safety', () => {
+  it('inserts user text literally, including $ patterns and braces', () => {
+    expect(translate('vi', 'quiz.yourAnswer', { answer: '$&x' })).toBe('Bạn đã trả lời: $&x');
+    expect(translate('en', 'manageBook.title', { title: "N3 $' test" })).toBe("Manage: N3 $' test");
+    expect(
+      translate('en', 'import.done.summary', { count: '{book}', lesson: 'L', category: 'Kanji', book: 'B' })
+    ).toBe('Saved {book} to L (Kanji) in B.');
+  });
+
+  it('leaves unknown placeholders untouched', () => {
+    expect(translate('en', 'quiz.yourAnswer', {})).toBe('Your answer: {answer}');
+  });
+});

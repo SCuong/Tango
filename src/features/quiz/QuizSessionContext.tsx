@@ -36,6 +36,7 @@ import {
   DEFAULT_QUESTION_TYPES,
 } from '../../lib/quizSession';
 import { createId } from '../../lib/ids';
+import { getDeduplicationKey } from '../../lib/textNormalization';
 import { useAppState } from '../../hooks/useAppState';
 
 export interface CompletedQuiz {
@@ -76,8 +77,16 @@ export function buildReviewConfig(
     focusItemIds,
     kind: 'review',
   };
+  // Compare against the number of distinct lexical groups the focus items belong to
+  const focus = new Set(focusItemIds);
+  const focusGroups = new Set<string>();
+  for (const lessonId of lessonIds) {
+    for (const item of lessons[lessonId]?.items ?? []) {
+      if (focus.has(item.id)) focusGroups.add(getDeduplicationKey(item.japanese, item.kana));
+    }
+  }
   const eligibility = getQuizEligibility(base, lessons);
-  if (eligibility.eligibleCount < new Set(focusItemIds).size) {
+  if (eligibility.eligibleCount < focusGroups.size) {
     return { ...base, allowedTypes: ALL_QUESTION_TYPES };
   }
   return base;

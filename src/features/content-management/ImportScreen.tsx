@@ -85,7 +85,7 @@ function downloadFile(name: string, content: BlobPart, type: string): void {
  */
 export const ImportScreen: React.FC = () => {
   const { state, commitStudyData } = useAppState();
-  const { navigate, goBack, goUp } = useNavigation();
+  const { replace, goBack, goUp } = useNavigation();
   const { t } = useI18n();
   const counts = useCounts();
   const titleFieldId = useId();
@@ -117,6 +117,21 @@ export const ImportScreen: React.FC = () => {
   // Each import step starts at the top of the page
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') window.scrollTo(0, 0);
+  }, [step]);
+
+  // Enter on the preview (SCREEN 23) confirms when focus is not on another control
+  const confirmRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    if (step !== 3) return undefined;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter') return;
+      const target = e.target as HTMLElement | null;
+      if (target && target !== document.body) return;
+      e.preventDefault();
+      confirmRef.current();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, [step]);
 
   const exitRoute = bookId && readPreselectedBook() === bookId
@@ -202,6 +217,8 @@ export const ImportScreen: React.FC = () => {
       setSaveError(t('common.saveError'));
     }
   };
+
+  confirmRef.current = confirmImport;
 
   const columnCount = Math.max(0, ...rows.map((row) => row.length));
   const sampleRow = rows[hasHeader ? 1 : 0] ?? rows[0] ?? [];
@@ -582,7 +599,7 @@ export const ImportScreen: React.FC = () => {
           size="lg"
           fullWidth
           trailingIcon={<IconArrowRight size={20} stroke={2} />}
-          onClick={() => navigate({ type: 'lesson_detail', lessonId: createdLesson.id })}
+          onClick={() => replace({ type: 'lesson_detail', lessonId: createdLesson.id })}
           autoFocus
         >
           {t('import.done.study')}

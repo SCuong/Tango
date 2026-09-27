@@ -67,7 +67,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </p>
       )}
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:justify-between sm:gap-6">
-        <Button ref={cancelRef} variant="secondary" onClick={onCancel} disabled={busy} className="sm:min-w-[9rem]" fullWidth>
+        <Button ref={cancelRef} variant="secondary" onClick={onCancel} disabled={busy} className="sm:w-auto sm:min-w-[9rem]" fullWidth>
           {cancelLabel}
         </Button>
         <Button

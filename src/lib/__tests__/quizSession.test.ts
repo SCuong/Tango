@@ -152,3 +152,24 @@ describe('formatDuration', () => {
     expect(formatDuration(3599)).toBe('59:59');
   });
 });
+
+describe('buildReviewConfig', () => {
+  it('keeps multiple-choice types when weak items share one lexical group', async () => {
+    const { buildReviewConfig } = await import('../../features/quiz/QuizSessionContext');
+    const withDuplicate: Lesson = {
+      ...lesson,
+      items: [...lesson.items, { id: 'i1b', japanese: '旅行', kana: 'りょこう', vietnamese: ['du lịch'] }],
+    };
+    const config = buildReviewConfig(['l1'], ['i1', 'i1b'], { l1: withDuplicate });
+    expect(config.allowedTypes).toEqual(DEFAULT_QUESTION_TYPES);
+    expect(config.kind).toBe('review');
+    expect(config.focusItemIds).toEqual(['i1', 'i1b']);
+  });
+
+  it('adds the written type when multiple choice cannot cover a focus item', async () => {
+    const { buildReviewConfig } = await import('../../features/quiz/QuizSessionContext');
+    const tiny: Lesson = { ...lesson, items: lesson.items.slice(0, 2) }; // only 1 possible distractor
+    const config = buildReviewConfig(['l1'], ['i1'], { l1: tiny });
+    expect(config.allowedTypes).toContain('vi_to_text');
+  });
+});

@@ -319,16 +319,16 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .clay-interactive:hover:not([data-pressed="true"]) {
+    .clay-interactive:hover:not([data-pressed="true"]):not(:disabled) {
       transform: translateY(-1px);
       box-shadow: var(--shadow-clay-card-hover);
     }
 
-    .clay-interactive.clay-hover-surface:hover:not([data-pressed="true"]) {
+    .clay-interactive.clay-hover-surface:hover:not([data-pressed="true"]):not(:disabled) {
       background-color: var(--bg-surface-elevated);
     }
 
-    .clay-interactive:hover:not([data-pressed="true"]) .clay-hover-nudge {
+    .clay-interactive:hover:not([data-pressed="true"]):not(:disabled) .clay-hover-nudge {
       transform: translateX(2px);
     }
 
@@ -336,7 +336,7 @@
       background-color: color-mix(in srgb, var(--bg-surface-elevated) 55%, transparent);
     }
 
-    .clay-interactive.cta-raised:hover:not([data-pressed="true"]) {
+    .clay-interactive.cta-raised:hover:not([data-pressed="true"]):not(:disabled) {
       transform: translateY(-1px);
       box-shadow: 0 6px 0 0 var(--cta-depth), var(--shadow-clay-button);
     }
