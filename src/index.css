@@ -298,10 +298,6 @@
   --meo-cream: #FDEED6;
   --meo-outline: #5E270E;
   --meo-blush: #F2A39A;
-  --meo-leaf: #B8B46E;
-  --meo-leaf-dark: #8C8848;
-  --meo-heart: #F4A39B;
-  --meo-yarn: #EE6F7C;
 
   /* Clay Shadows (warm tabby brown lift) */
   --shadow-clay-card: 0 5px 14px rgba(110, 52, 14, 0.14), 0 1px 4px rgba(110, 52, 14, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -673,69 +669,46 @@
 }
 
 /*
- * Meo's World (DESIGN_SYSTEM §9.4): a cozy cat world built around the three Tango mascot
- * artworks. Fixed layer (every screen): far washes, a paw trail, grass, and the peeking and
- * sleeping cats at the edges. Home adds MeoHomeStage in the page flow below the category cards,
- * where the yarn-playing centerpiece (and, below 1280px, the other two cats) always shows whole
- * and is never covered by a card. Only a butterfly and a heart drift, very slowly; reduced motion
- * makes everything static.
+ * Meo's World (DESIGN_SYSTEM §9.4): the owner's finished background artwork, anchored to the bottom
+ * of the canvas behind all content. Phones use the portrait composition at full width, resting on
+ * the bottom navigation so the cat stays visible above it; from `sm` the wide composition keeps
+ * its natural proportions within a capped height (never stretched or cropped), centered, with its
+ * cut side edges feathered by an alpha mask (the artwork itself is untouched).
  */
 @layer components {
   [data-theme="meo"] .ambience-meo {
     display: block;
   }
 
-  .ambience-meo > * {
+  .ambience-meo .meo-world {
     position: absolute;
+    left: 0;
+    right: 0;
+    bottom: max(0px, calc(var(--tango-bottom-nav-space, 0px) - 40px));
     display: block;
   }
 
-  .meo-cat {
+  .meo-world-art {
+    display: block;
+    width: 100%;
     height: auto;
     user-select: none;
   }
 
-  /* Phones (default): washes in opposite corners; sleeper, grass, and trail above the nav */
-  .meo-wash-1 { top: 14%; right: -96px; width: 250px; height: 212px; }
-  .meo-wash-2 { bottom: 8%; left: -110px; width: 280px; height: 237px; }
-  .meo-trail { left: 14px; bottom: calc(var(--tango-bottom-nav-space, 0px) + 22px); width: 128px; height: 45px; opacity: 0.13; }
-  .meo-grass-edge { left: 150px; bottom: calc(var(--tango-bottom-nav-space, 0px) + 4px); width: 48px; height: 32px; opacity: 0.7; }
-  .ambience-meo .meo-cat-peek { display: none; left: -4px; top: 44%; width: 132px; }
-  .meo-cat-sleep { right: 12px; bottom: calc(var(--tango-bottom-nav-space, 0px) + 8px); width: 118px; }
-
   @media (min-width: 640px) {
-    .meo-trail { left: 24px; bottom: 34px; width: 170px; height: 60px; }
-    .meo-grass-edge { left: 200px; bottom: 16px; width: 60px; height: 40px; }
-    .meo-cat-sleep { right: 20px; bottom: 16px; width: 150px; }
-  }
-
-  @media (min-width: 1024px) {
-    .meo-wash-1 { top: 10%; right: -60px; width: 380px; height: 322px; }
-    .meo-wash-2 { bottom: 4%; left: -80px; width: 420px; height: 355px; }
-    .meo-trail { left: 3%; bottom: 60px; width: 210px; height: 74px; opacity: 0.15; }
-  }
-
-  /* Wide margins: the peeking and sleeping cats sit outside the centered study column */
-  @media (min-width: 1280px) {
-    .ambience-meo .meo-cat-peek { display: block; }
-    .meo-cat-sleep { right: 2.5%; bottom: 24px; width: 190px; }
-    .meo-grass-edge { left: auto; right: calc(2.5% + 180px); bottom: 22px; }
-  }
-
-  /*
-   * Home (the full ambience) below 1280px: its stage already holds all three cats and the ground
-   * details, so the fixed layer keeps only the far washes (no duplicates behind the stage).
-   */
-  @media (max-width: 1279px) {
-    .tango-ambience:not(.tango-ambience-subtle):not(.tango-ambience-quiet) .meo-cat,
-    .tango-ambience:not(.tango-ambience-subtle):not(.tango-ambience-quiet) .meo-busy {
-      display: none;
+    .ambience-meo .meo-world {
+      bottom: 0;
     }
-  }
 
-  /* Focused flows (Settings, management, import, quiz): only the washes and the static edge cats */
-  .tango-ambience-quiet .meo-busy {
-    display: none;
+    /* Natural size, scaled down proportionally to fit; centered with softly feathered side edges */
+    .meo-world-art {
+      width: auto;
+      max-width: 100%;
+      max-height: 42vh;
+      margin: 0 auto;
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+      mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+    }
   }
 
   [data-theme="meo"] .tango-ambience-subtle {
@@ -750,81 +723,6 @@
 
   .tango-ambience-quiet .ambience-meo {
     opacity: 0.8;
-  }
-
-  /*
-   * Home stage (Meo's World only), in the page flow below the Vocabulary / Kanji cards. Phones:
-   * full-bleed row with the peeking cat at the left edge, the yarn cat centered, the sleeping cat
-   * at the right; a soft hill hides the peeking cat's flat lower edge.
-   */
-  .meo-stage {
-    position: relative;
-    height: 184px;
-    margin: 0 -16px;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .meo-stage > * {
-    position: absolute;
-    display: block;
-  }
-
-  .meo-stage img {
-    height: auto;
-  }
-
-  .meo-stage-peek { left: -4px; bottom: 14px; width: 92px; }
-  .meo-stage-hill { left: 0; right: 0; bottom: 0; width: 100%; height: 44px; }
-  .meo-stage-thread { left: calc(50% - 116px); bottom: 4px; width: 84px; height: 20px; }
-  .meo-stage-grass-1 { left: calc(50% - 96px); bottom: 6px; width: 40px; height: 27px; }
-  .meo-stage-grass-2 { left: calc(50% + 40px); bottom: 4px; width: 36px; height: 24px; }
-  .meo-stage-flowers { left: 62px; bottom: 2px; width: 46px; height: 20px; }
-  .meo-stage-yarn { left: 50%; bottom: 10px; width: 126px; transform: translateX(-50%); }
-  .meo-stage-sleep { right: 2px; bottom: 6px; width: 112px; }
-  .meo-stage-heart-1 { left: calc(50% - 92px); top: 22px; width: 15px; height: 14px; }
-  .meo-stage-heart-2 { left: calc(50% + 76px); top: 52px; width: 11px; height: 10px; }
-  .meo-stage-butterfly { left: calc(50% + 46px); top: 4px; width: 26px; height: 21px; }
-
-  @media (min-width: 640px) {
-    .meo-stage { height: 240px; }
-    .meo-stage-peek { bottom: 18px; width: 124px; }
-    .meo-stage-hill { height: 58px; }
-    .meo-stage-thread { left: calc(50% - 170px); width: 120px; height: 26px; }
-    .meo-stage-grass-1 { left: calc(50% - 140px); width: 54px; height: 36px; }
-    .meo-stage-grass-2 { left: calc(50% + 64px); width: 48px; height: 32px; }
-    .meo-stage-flowers { left: 110px; width: 60px; height: 26px; }
-    .meo-stage-yarn { width: 172px; }
-    .meo-stage-sleep { right: 12px; width: 160px; }
-    .meo-stage-heart-1 { left: calc(50% - 128px); top: 28px; width: 18px; height: 17px; }
-    .meo-stage-heart-2 { left: calc(50% + 108px); top: 70px; width: 13px; height: 12px; }
-    .meo-stage-butterfly { left: calc(50% + 64px); top: 6px; width: 32px; height: 26px; }
-  }
-
-  /* Wide screens: only the yarn cat stays in the stage, slightly right of center */
-  @media (min-width: 1280px) {
-    .meo-stage { height: 206px; margin: 0; }
-    .meo-stage-peek,
-    .meo-stage-sleep {
-      display: none;
-    }
-    .meo-stage-hill { left: 18%; right: 6%; width: auto; }
-    .meo-stage-yarn { left: 58%; bottom: 8px; width: 168px; }
-    .meo-stage-thread { left: calc(58% - 190px); }
-    .meo-stage-grass-1 { left: calc(58% - 150px); }
-    .meo-stage-grass-2 { left: calc(58% + 76px); }
-    .meo-stage-flowers { left: calc(58% + 128px); }
-    .meo-stage-heart-1 { left: calc(58% - 140px); top: 12px; }
-    .meo-stage-heart-2 { left: calc(58% + 118px); top: 50px; }
-    .meo-stage-butterfly { left: calc(58% + 72px); top: 0; }
-  }
-
-  .meo-butterfly {
-    animation: meo-butterfly-drift 10s ease-in-out infinite alternate;
-  }
-
-  .meo-heart-float {
-    animation: meo-heart-float 12s ease-in-out infinite alternate;
   }
 
   /* Mobile full-screen route panels let the cat world show around their content */
@@ -925,16 +823,6 @@
 :root {
   /* Paw print used as a CSS mask for Meo's World icon accents */
   --meo-paw-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-14 -17 28 31'%3E%3Cpath d='M-9 8C-9-1-4-4 0-4S9-1 9 8C9 12 5 13 0 11C-5 13-9 12-9 8Z'/%3E%3Cellipse cx='-10' cy='-7' rx='3.4' ry='4.2'/%3E%3Cellipse cx='-3.6' cy='-12' rx='3.4' ry='4.2'/%3E%3Cellipse cx='3.6' cy='-12' rx='3.4' ry='4.2'/%3E%3Cellipse cx='10' cy='-7' rx='3.4' ry='4.2'/%3E%3C/svg%3E");
-}
-
-@keyframes meo-butterfly-drift {
-  0% { transform: translate(0, 0) rotate(-6deg); }
-  100% { transform: translate(-10px, 6px) rotate(4deg); }
-}
-
-@keyframes meo-heart-float {
-  0% { transform: translateY(0); opacity: 0.85; }
-  100% { transform: translateY(-6px); opacity: 1; }
 }
 
 @keyframes tango-fade-in {

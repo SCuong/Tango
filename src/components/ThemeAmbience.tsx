@@ -1,8 +1,7 @@
 import React from 'react';
 import { useAppState } from '../hooks/useAppState';
-import meoPeekArt from '../assets/meo/meo-peek.webp';
-import meoSleepArt from '../assets/meo/meo-sleep.webp';
-import meoYarnArt from '../assets/meo/meo-yarn.webp';
+import meoWorldMobile from '../assets/meo/meo-world-mobile.png';
+import meoWorldDesktop from '../assets/meo/meo-world-desktop.png';
 
 /**
  * Restrained Japanese ambience behind Home content (see DESIGN_SYSTEM §8.2), plus the Meo's World
@@ -170,7 +169,7 @@ const Petal: React.FC<{ className: string }> = ({ className }) => (
 /**
  * Meo's World cat environment on screens without a regular ambience (focused flows: Settings,
  * management, import, active quiz, results). Only in Meo's World, and only its quiet edge layer:
- * the static mascot cats at the page edges, nothing behind prompts, answers, or dense content.
+ * the same background artwork, softened, never behind prompts or answers on phones.
  * `wideOnly` (Active Quiz) renders them only on laptop/desktop widths, in the outer margins.
  */
 export const MeoEdgeAmbience: React.FC<{ wideOnly?: boolean }> = ({ wideOnly = false }) => {
@@ -184,209 +183,26 @@ export const MeoEdgeAmbience: React.FC<{ wideOnly?: boolean }> = ({ wideOnly = f
 };
 
 /*
- * Meo's World cat world, built around the three Tango mascot artworks (src/assets/meo): a cat
- * peeking over an edge, a curled sleeping cat, and the yarn-playing cat (the centerpiece, shown
- * whole on Home by MeoHomeStage). Three depth layers:
- *   far        soft organic fur washes with faint tabby bands and whisker curves
- *   midground  hand-drawn paw trail, grass tufts, leaves, tiny flowers, hearts, a butterfly
- *   characters the mascot artworks, at the edges here and whole in the Home stage
- * Images load lazily, so other themes (scene hidden) never download them. Positions and the
- * per-breakpoint composition live in src/index.css (.meo-*).
+ * Meo's World background: the owner's finished artwork, used as-is (src/assets/meo). Phones get
+ * the portrait composition, and from `sm` up the wide one; <picture> makes the browser download
+ * only the composition it shows, and lazy loading keeps other themes from downloading either.
+ * Sizing and placement live in src/index.css (.meo-world); the artwork is never stretched.
  */
 const MeoWorldScene: React.FC = () => (
   <div className="ambience-scene ambience-meo">
-    <MeoWash className="meo-wash meo-wash-1" />
-    <MeoWash className="meo-wash meo-wash-2" flip />
-    <MeoPawTrail className="meo-trail meo-busy" />
-    <MeoGrass className="meo-grass-edge meo-busy" />
-    <MeoCat kind="peek" className="meo-cat meo-cat-peek" />
-    <MeoCat kind="sleep" className="meo-cat meo-cat-sleep" />
+    <picture className="meo-world">
+      <source media="(min-width: 640px)" srcSet={meoWorldDesktop} width={1048} height={594} />
+      <img
+        src={meoWorldMobile}
+        alt=""
+        width={483}
+        height={845}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        data-meo-world=""
+        className="meo-world-art"
+      />
+    </picture>
   </div>
-);
-
-const MEO_CAT_ART = {
-  peek: { src: meoPeekArt, width: 440, height: 349 },
-  sleep: { src: meoSleepArt, width: 560, height: 316 },
-  yarn: { src: meoYarnArt, width: 520, height: 566 },
-} as const;
-
-/** One mascot artwork: decorative, never interactive, intrinsic size kept to avoid layout shift. */
-const MeoCat: React.FC<{ kind: keyof typeof MEO_CAT_ART; className: string }> = ({ kind, className }) => {
-  const art = MEO_CAT_ART[kind];
-  return (
-    <img
-      src={art.src}
-      alt=""
-      width={art.width}
-      height={art.height}
-      loading="lazy"
-      decoding="async"
-      draggable={false}
-      data-meo-cat={kind}
-      className={className}
-    />
-  );
-};
-
-/**
- * Home's centerpiece stage (Meo's World only): the yarn-playing cat sits whole in the open canvas
- * below the Vocabulary / Kanji cards, on a soft hill with grass, flowers, hearts, a butterfly, and
- * a loose yarn thread. On phones and tablets the peeking and sleeping cats join it here, so no
- * artwork ever sits behind a card; from 1280px they move to the outer margins instead. It is part
- * of the page flow (never covered by cards), decorative, and hidden from assistive technology.
- */
-export const MeoHomeStage: React.FC = () => {
-  const { state } = useAppState();
-  if (state.preferences.theme !== 'meo') return null;
-  return (
-    <div aria-hidden="true" className="meo-stage">
-      <MeoCat kind="peek" className="meo-stage-peek" />
-      <MeoHill className="meo-stage-hill" />
-      <MeoYarnThread className="meo-stage-thread" />
-      <MeoGrass className="meo-stage-grass meo-stage-grass-1" />
-      <MeoGrass className="meo-stage-grass meo-stage-grass-2" flip />
-      <MeoFlowers className="meo-stage-flowers" />
-      <MeoCat kind="yarn" className="meo-stage-yarn" />
-      <MeoCat kind="sleep" className="meo-stage-sleep" />
-      <MeoHeart className="meo-stage-heart meo-stage-heart-1 meo-heart-float ambience-animated" />
-      <MeoHeart className="meo-stage-heart meo-stage-heart-2" />
-      <MeoButterfly className="meo-stage-butterfly meo-butterfly ambience-animated" />
-    </div>
-  );
-};
-
-const OUTLINE = 'var(--meo-outline)';
-
-/** Far layer: an organic fur-colored wash with a few faint tabby bands and whisker curves. */
-const MeoWash: React.FC<{ className: string; flip?: boolean }> = ({ className, flip = false }) => (
-  <svg className={className} viewBox="0 0 260 220" focusable="false">
-    <g transform={flip ? 'translate(260 0) scale(-1 1)' : undefined}>
-      <path
-        d="M18 118 C8 76 36 34 86 22 C130 12 176 20 208 48 C240 76 252 122 232 158 C212 194 162 208 114 204 C64 200 28 164 18 118 Z"
-        fill="var(--meo-fur)"
-        opacity="0.2"
-      />
-      <path
-        d="M70 40 C82 60 84 80 76 100 M112 30 C124 54 126 80 116 104 M154 34 C166 58 166 84 156 108"
-        stroke="var(--meo-stripe)"
-        strokeWidth="14"
-        strokeLinecap="round"
-        fill="none"
-        opacity="0.07"
-      />
-      <path
-        d="M150 150 C176 144 200 146 222 154 M146 164 C172 164 196 170 214 180"
-        stroke={OUTLINE}
-        strokeWidth="2"
-        strokeLinecap="round"
-        fill="none"
-        opacity="0.1"
-      />
-    </g>
-  </svg>
-);
-
-/** Soft rolling ground the stage cats rest on; it also hides the peeking cat's flat lower edge. */
-const MeoHill: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 400 60" preserveAspectRatio="none" focusable="false">
-    <path d="M0 30 C40 14 86 12 130 22 C170 31 214 30 256 20 C300 10 350 12 400 26 V60 H0 Z" fill="var(--meo-cream)" opacity="0.9" />
-    <path d="M0 38 C48 26 92 26 136 34 C178 41 220 40 262 32 C306 24 354 26 400 36" stroke="var(--meo-fur)" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.55" />
-  </svg>
-);
-
-/** A loose pink yarn thread wandering along the ground from the yarn ball. */
-const MeoYarnThread: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 160 40" preserveAspectRatio="none" focusable="false">
-    <path d="M4 10 C22 30 44 34 64 22 C82 11 100 12 116 24 C128 33 142 34 156 28" stroke="var(--meo-yarn)" strokeWidth="2.6" strokeLinecap="round" fill="none" opacity="0.8" />
-  </svg>
-);
-
-/** Midground: a small grass tuft with a leafy sprig, drawn with soft uneven blades. */
-const MeoGrass: React.FC<{ className: string; flip?: boolean }> = ({ className, flip = false }) => (
-  <svg className={className} viewBox="0 0 60 40" focusable="false">
-    <g transform={flip ? 'translate(60 0) scale(-1 1)' : undefined} strokeLinecap="round" fill="none">
-      <path d="M14 38 C13 30 10 24 6 20 M20 38 C20 28 22 20 26 14 M27 38 C28 31 32 26 36 23" stroke="var(--meo-leaf)" strokeWidth="2.6" />
-      <path d="M40 38 C40 30 42 24 47 19" stroke="var(--meo-leaf-dark)" strokeWidth="2.2" />
-      <path d="M47 19 C52 17 55 13 55 9 C50 10 47 14 47 19 Z M43 27 C38 25 35 21 35 17 C40 18 43 22 43 27 Z" fill="var(--meo-leaf)" stroke="var(--meo-leaf-dark)" strokeWidth="1.2" />
-    </g>
-  </svg>
-);
-
-/** Two tiny cream flowers with honey centers. */
-const MeoFlowers: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 70 30" focusable="false">
-    {[
-      [14, 14, 1],
-      [50, 18, 0.8],
-    ].map(([x, y, s]) => (
-      <g key={x} transform={`translate(${x} ${y}) scale(${s})`}>
-        <path d="M0 16 V26" stroke="var(--meo-leaf-dark)" strokeWidth="1.8" strokeLinecap="round" />
-        <g fill="var(--meo-cream)" stroke="var(--meo-fur)" strokeWidth="1">
-          {[0, 72, 144, 216, 288].map((angle) => (
-            <ellipse key={angle} cx="0" cy="-5" rx="3.6" ry="5" transform={`rotate(${angle})`} />
-          ))}
-        </g>
-        <circle r="2.8" fill="var(--meo-stripe)" />
-      </g>
-    ))}
-  </svg>
-);
-
-/** A small hand-drawn heart. */
-const MeoHeart: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 22" focusable="false">
-    <path
-      d="M12 20 C6 15.5 2.5 12 2.5 7.6 C2.5 4.6 4.8 2.5 7.5 2.5 C9.4 2.5 11 3.6 12 5.2 C13 3.6 14.6 2.5 16.5 2.5 C19.2 2.5 21.5 4.6 21.5 7.6 C21.5 12 18 15.5 12 20 Z"
-      fill="var(--meo-heart)"
-      stroke={OUTLINE}
-      strokeWidth="1.4"
-      strokeLinejoin="round"
-      opacity="0.85"
-    />
-  </svg>
-);
-
-/** A small warm butterfly with rounded wings. */
-const MeoButterfly: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 32 26" focusable="false">
-    <g stroke={OUTLINE} strokeWidth="1.3" strokeLinejoin="round">
-      <path d="M16 13 C12 4 4 2 3 7 C2 12 8 15 16 13 Z" fill="var(--meo-fur)" />
-      <path d="M16 13 C20 4 28 2 29 7 C30 12 24 15 16 13 Z" fill="var(--meo-fur)" />
-      <path d="M16 13 C12 16 7 21 9 23 C11 25 15 20 16 13 Z" fill="var(--meo-cream)" />
-      <path d="M16 13 C20 16 25 21 23 23 C21 25 17 20 16 13 Z" fill="var(--meo-cream)" />
-    </g>
-    <path d="M16 8 V19" stroke={OUTLINE} strokeWidth="1.8" strokeLinecap="round" />
-    <path d="M15.5 8 C14 5 12.5 4 11 4 M16.5 8 C18 5 19.5 4 21 4" stroke={OUTLINE} strokeWidth="1" strokeLinecap="round" fill="none" />
-    <circle cx="8" cy="8" r="1.6" fill="var(--meo-stripe)" />
-    <circle cx="24" cy="8" r="1.6" fill="var(--meo-stripe)" />
-  </svg>
-);
-
-/** One small paw print: main pad and four toe beans. */
-const MeoPaw: React.FC<{ x: number; y: number; angle: number }> = ({ x, y, angle }) => (
-  <g transform={`translate(${x} ${y}) rotate(${angle}) scale(0.62)`}>
-    <path d="M-9 8 C-9 -1 -4 -4 0 -4 C4 -4 9 -1 9 8 C9 12 5 13 0 11 C-5 13 -9 12 -9 8 Z" />
-    <ellipse cx="-10" cy="-7" rx="3.4" ry="4.2" />
-    <ellipse cx="-3.6" cy="-12" rx="3.4" ry="4.2" />
-    <ellipse cx="3.6" cy="-12" rx="3.4" ry="4.2" />
-    <ellipse cx="10" cy="-7" rx="3.4" ry="4.2" />
-  </g>
-);
-
-/** Midground: a short, gentle paw trail. */
-const MeoPawTrail: React.FC<{ className: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 170 60" focusable="false">
-    <g fill={OUTLINE}>
-      {[
-        [12, 46, 70],
-        [36, 34, 84],
-        [62, 42, 78],
-        [88, 28, 90],
-        [114, 34, 84],
-        [140, 22, 96],
-      ].map(([x, y, angle]) => (
-        <MeoPaw key={`${x}-${y}`} x={x} y={y} angle={angle} />
-      ))}
-    </g>
-  </svg>
 );
