@@ -827,6 +827,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Vietnamese definition.
   - Hán Việt reading (if present; section hidden cleanly if absent).
 - Dismiss CTA: Full-width button `[ Đã hiểu — Tiếp tục ]` (triggers on `Enter`/`Space`).
+- **Inline style** (Settings "Hiển thị lời giải khi sai" = `Dưới đáp án` / `Inline`): the same content, in the normal page flow directly below the whole answer area (after the 2×2 grid or the last stacked answer, or after the written-answer input), spanning the full answer width and never a grid cell. Dashed `--error-border` edge on `--error-surface`, `rounded-2xl`, comfortable padding, no modal shadow. No dialog, backdrop, blur, history marker, or focus trap; announced through a polite live region. Continue takes focus without scrolling, and the box scrolls into view only when needed (`block: 'nearest'`, instant under reduced motion). Wrong answers never auto-advance; correct answers keep the 750ms auto-advance.
 
 ### 16.5 Settings Screen
 - On mobile a **root destination** (§16.0): full-screen, no back arrow, bottom navigation visible with Settings active. Centered modal card (`max-w-lg`) with a close button on tablet and desktop (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)).
@@ -851,7 +852,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Two compact preview cards in a radio group, same treatment as the answer layout cards: `Cửa sổ` / `Popup` (default) and `Dưới đáp án` / `Inline`.
   - Popup preview: the answer tiles dimmed behind a small floating explanation panel (solid border, surface fill, soft clay shadow), a separate layer. Inline preview: the answer tiles stay as they are with a **dashed** explanation box directly below them; the dashed edge keeps the explanation visually distinct from answer buttons. Both panels show a short error-colored heading line and two text lines. Semantic tokens only, so the previews read in Light, Dark, Sakura, and Meo's World.
   - Persisted in local storage (`tango_v1_preferences.incorrectFeedback`: `'popup' | 'inline'`, default `popup`; missing or unknown stored values load as `popup`).
-  - **Status:** the Settings selector only. The quiz runner does not read this preference yet and always shows the explanation sheet (§16.4, the Popup style); the Inline runtime is not implemented.
+  - The quiz runner applies it to every wrong answer (multiple choice and written): Popup opens the explanation sheet (§16.4); Inline shows the same content below the answers (§16.4).
 - **Nội dung học Section (Study Content):**
   - Row button linking to Content Management (`Quản lý giáo trình và bài học`).
 

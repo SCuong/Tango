@@ -306,7 +306,7 @@ export interface UserPreferences {
   language: AppLanguage;         // 'vi' (default) | 'en'
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
   answerLayout: AnswerLayout;    // 'grid' (default) | 'stacked'; missing/invalid stored values load as 'grid'
-  incorrectFeedback: IncorrectFeedback; // 'popup' (default) | 'inline'; missing/invalid load as 'popup' (Settings only for now)
+  incorrectFeedback: IncorrectFeedback; // 'popup' (default) | 'inline'; missing/invalid load as 'popup'
 }
 
 /**

@@ -130,9 +130,13 @@ DESKTOP (> 1024px - max-w-xl Centered Study Canvas)
   - Selected wrong choice: Red ring (`--error`, `#DC2626`) and `[IconX]`.
   - True correct choice: Simultaneously highlighted with Emerald Green ring and `[IconCheck]`.
 - **Sound Effects:** Gentle low-frequency tone (<200ms) if sound enabled.
-- **Explanation Container:**
-  - **Mobile (< 640px):** Slides in from the bottom as an interactive `BottomSheet`.
-  - **Desktop (> 1024px):** Renders as an overlay card centered directly below the prompt.
+- **Explanation Container** — chosen in Settings ("Hiển thị lời giải khi sai", `tango_v1_preferences.incorrectFeedback`):
+  - **Popup (`Cửa sổ`, default):**
+    - **Mobile (< 640px):** Slides in from the bottom as an interactive `BottomSheet`.
+    - **Desktop (> 1024px):** Renders as an overlay card centered directly below the prompt.
+    - Modal dialog: backdrop, focus trap, Continue focused, and a history marker so browser Back asks to exit (SCREEN 13).
+  - **Inline (`Dưới đáp án`):** the same content directly below the whole answer area (after the 2×2 grid, the last stacked answer, or the written-answer input), full answer width, never a grid cell. A dashed error-surface box in the normal page flow: no dialog, backdrop, blur, history marker, or focus trap; announced politely; Continue takes focus and the box scrolls into view only when needed (`block: 'nearest'`, instant under reduced motion). The answer highlights (red wrong, green correct, muted others) and the answer layout stay as they are.
+  - Both styles share one content block and the same `Đã hiểu — Tiếp tục` action; wrong answers never auto-advance.
 - **Content:**
   - Status: `[IconX] Chưa chính xác`
   - Word: `旅行` (Japanese)
@@ -156,6 +160,17 @@ MOBILE BOTTOM SHEET
 │                                               │
 │ [ [IconArrowRight] Đã hiểu — Tiếp tục ]       │
 └───────────────────────────────────────────────┘
+
+INLINE (below the answers)
+│ [ 旅行 ✕ ]              [ 実際 ]              │
+│ [ 礼儀 ✓ ]              [ 景観 ]              │
+│ ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ │
+│ ┆ [IconX] Chưa chính xác                    ┆ │
+│ ┆ 礼儀                                      ┆ │
+│ ┆ れいぎ                                    ┆ │
+│ ┆ Nghĩa: lễ nghi                            ┆ │
+│ ┆ [ Đã hiểu — Tiếp tục ]                    ┆ │
+│ └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ │
 ```
 
 ---

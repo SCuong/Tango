@@ -154,6 +154,8 @@ const ActiveQuiz: React.FC<{ session: QuizSessionState }> = ({ session }) => {
   const lastAnswer = session.lastAnswer;
   const correctFeedback = inFeedback && lastAnswer?.isCorrect === true;
   const incorrectFeedback = inFeedback && lastAnswer?.isCorrect === false;
+  // Settings: explain a wrong answer in the popup sheet (default) or inline below the answers
+  const feedbackStyle = state.preferences.incorrectFeedback;
 
   // Correct: auto-advance after 750ms (never delayed by sound)
   useEffect(() => {
@@ -300,11 +302,19 @@ const ActiveQuiz: React.FC<{ session: QuizSessionState }> = ({ session }) => {
               onSubmit={submit}
             />
           )}
+          {/* Inline style: the explanation follows the whole answer area, never inside the grid */}
+          {feedbackStyle === 'inline' && (
+            <div aria-live="polite" data-inline-explanation-region="">
+              {incorrectFeedback && (
+                <InlineExplanation key={question.id} question={question} lastAnswer={lastAnswer} onContinue={goNext} />
+              )}
+            </div>
+          )}
         </section>
       </main>
 
       <ExplanationSheet
-        open={incorrectFeedback && !exitOpen && !exitingRef.current}
+        open={incorrectFeedback && feedbackStyle === 'popup' && !exitOpen && !exitingRef.current}
         question={question}
         lastAnswer={lastAnswer}
         onContinue={goNext}
@@ -449,31 +459,26 @@ const QuizTimer: React.FC<{ session: QuizSessionState }> = ({ session }) => {
   );
 };
 
-/** SCREEN 12 — explanation: bottom sheet on mobile, centered card from `sm` up. */
-const ExplanationSheet: React.FC<{
-  open: boolean;
-  question: QuizQuestion;
-  lastAnswer: QuizAnswerRecord | null;
-  onContinue: () => void;
-  /** Escape / browser Back: ask to exit instead of silently skipping ahead (SCREEN 13). */
-  onDismiss: () => void;
-}> = ({ open, question, lastAnswer, onContinue, onDismiss }) => {
+/**
+ * SCREEN 12 content shared by both presentations (popup sheet and inline): the "incorrect" title,
+ * the item with its reading, Hán Việt, meaning, the written answer when relevant, and Continue.
+ */
+const ExplanationContent = React.forwardRef<
+  HTMLButtonElement,
+  {
+    titleId: string;
+    question: QuizQuestion;
+    lastAnswer: QuizAnswerRecord | null;
+    onContinue: () => void;
+  }
+>(function ExplanationContent({ titleId, question, lastAnswer, onContinue }, continueRef) {
   const { t } = useI18n();
-  const titleId = useId();
-  const continueRef = useRef<HTMLButtonElement>(null);
   const item = question.targetItem;
   const kana = item.kana?.trim();
   const hanViet = item.hanViet?.trim();
   const meanings = formatMeanings(item);
   return (
-    <Dialog
-      open={open}
-      onClose={onDismiss}
-      labelledBy={titleId}
-      initialFocusRef={continueRef}
-      presentation="sheet"
-      dismissOnBackdrop={false}
-    >
+    <>
       <p id={titleId} className="inline-flex items-center gap-2 text-base font-bold text-error-text">
         <IconX size={20} stroke={2.5} aria-hidden="true" />
         {t('quiz.incorrect')}
@@ -518,7 +523,66 @@ const ExplanationSheet: React.FC<{
       >
         {t('quiz.continueAfterMistake')}
       </Button>
+    </>
+  );
+});
+
+/** SCREEN 12 — explanation popup: bottom sheet on mobile, centered card from `sm` up. */
+const ExplanationSheet: React.FC<{
+  open: boolean;
+  question: QuizQuestion;
+  lastAnswer: QuizAnswerRecord | null;
+  onContinue: () => void;
+  /** Escape / browser Back: ask to exit instead of silently skipping ahead (SCREEN 13). */
+  onDismiss: () => void;
+}> = ({ open, question, lastAnswer, onContinue, onDismiss }) => {
+  const titleId = useId();
+  const continueRef = useRef<HTMLButtonElement>(null);
+  return (
+    <Dialog
+      open={open}
+      onClose={onDismiss}
+      labelledBy={titleId}
+      initialFocusRef={continueRef}
+      presentation="sheet"
+      dismissOnBackdrop={false}
+    >
+      <ExplanationContent ref={continueRef} titleId={titleId} question={question} lastAnswer={lastAnswer} onContinue={onContinue} />
     </Dialog>
+  );
+};
+
+/**
+ * SCREEN 12 — inline explanation (Settings: "Dưới đáp án" / Inline): the same content in the normal
+ * page flow, directly below the whole answer area, in a dashed error-surface box. No dialog,
+ * backdrop, history marker, or focus trap. When it appears, Continue takes focus (without
+ * scrolling) and the box scrolls into view only if it is not already visible.
+ */
+export const InlineExplanation: React.FC<{
+  question: QuizQuestion;
+  lastAnswer: QuizAnswerRecord | null;
+  onContinue: () => void;
+}> = ({ question, lastAnswer, onContinue }) => {
+  const titleId = useId();
+  const sectionRef = useRef<HTMLElement>(null);
+  const continueRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    continueRef.current?.focus({ preventScroll: true });
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    section.scrollIntoView?.({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+  }, []);
+  return (
+    <section
+      ref={sectionRef}
+      aria-labelledby={titleId}
+      data-inline-explanation=""
+      onClick={(e) => e.stopPropagation()}
+      className="mt-4 rounded-2xl border border-dashed border-error-border bg-error-surface px-4 py-4 sm:px-5 sm:py-5"
+    >
+      <ExplanationContent ref={continueRef} titleId={titleId} question={question} lastAnswer={lastAnswer} onContinue={onContinue} />
+    </section>
   );
 };
 
