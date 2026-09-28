@@ -12,6 +12,7 @@ describe('src/hooks/useI18n.ts', () => {
       language: 'vi',
       soundEnabled: false,
       answerLayout: 'grid',
+      incorrectFeedback: 'popup',
     },
     books: {},
     lessons: {},

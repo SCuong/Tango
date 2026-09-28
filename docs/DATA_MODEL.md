@@ -299,12 +299,14 @@ export interface ItemProgress {
 export type AppTheme = 'light' | 'dark' | 'sakura' | 'meo'; // 'meo' = Meo's World (special theme)
 export type AppLanguage = 'vi' | 'en';
 export type AnswerLayout = 'grid' | 'stacked'; // 4-option multiple-choice layout (DESIGN_SYSTEM §12.4)
+export type IncorrectFeedback = 'popup' | 'inline'; // explanation style for a wrong answer (DESIGN_SYSTEM §16.5)
 
 export interface UserPreferences {
   theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura' | 'meo'
   language: AppLanguage;         // 'vi' (default) | 'en'
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
   answerLayout: AnswerLayout;    // 'grid' (default) | 'stacked'; missing/invalid stored values load as 'grid'
+  incorrectFeedback: IncorrectFeedback; // 'popup' (default) | 'inline'; missing/invalid load as 'popup' (Settings only for now)
 }
 
 /**

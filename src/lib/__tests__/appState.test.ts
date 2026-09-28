@@ -106,6 +106,7 @@ describe('src/lib/appState.ts (Bootstrap & State Aggregation Layer)', () => {
           language: 'vi',
           soundEnabled: false,
           answerLayout: 'grid',
+          incorrectFeedback: 'popup',
         },
         books: {},
         lessons: {},
@@ -162,6 +163,7 @@ describe('src/lib/appState.ts (Bootstrap & State Aggregation Layer)', () => {
         language: 'en',
         soundEnabled: true,
         answerLayout: 'grid',
+        incorrectFeedback: 'popup',
       };
 
       saveBooks(books);
@@ -203,6 +205,7 @@ describe('src/lib/appState.ts (Bootstrap & State Aggregation Layer)', () => {
         language: 'vi',
         soundEnabled: false,
         answerLayout: 'grid',
+        incorrectFeedback: 'popup',
       });
 
       consoleErrorSpy.mockRestore();
@@ -266,6 +269,7 @@ describe('src/lib/appState.ts (Bootstrap & State Aggregation Layer)', () => {
       language: 'vi',
       soundEnabled: false,
       answerLayout: 'grid',
+      incorrectFeedback: 'popup',
     };
 
     it('merges the answer layout and ignores invalid values', () => {
@@ -276,12 +280,20 @@ describe('src/lib/appState.ts (Bootstrap & State Aggregation Layer)', () => {
       expect(mergePreferences(stacked, { theme: 'dark' }).answerLayout).toBe('stacked');
     });
 
+    it('merges the incorrect-answer feedback style and ignores invalid values', () => {
+      expect(mergePreferences(base, { incorrectFeedback: 'inline' }).incorrectFeedback).toBe('inline');
+      const inline = { ...base, incorrectFeedback: 'inline' as const };
+      expect(mergePreferences(inline, { incorrectFeedback: 'sheet' as never }).incorrectFeedback).toBe('inline');
+      expect(mergePreferences(inline, { answerLayout: 'stacked' }).incorrectFeedback).toBe('inline');
+    });
+
     it('merges partial preference changes cleanly', () => {
       expect(mergePreferences(base, { theme: 'dark' })).toEqual({
         theme: 'dark',
         language: 'vi',
         soundEnabled: false,
         answerLayout: 'grid',
+        incorrectFeedback: 'popup',
       });
 
       expect(mergePreferences(base, { language: 'en', soundEnabled: true })).toEqual({
@@ -289,6 +301,7 @@ describe('src/lib/appState.ts (Bootstrap & State Aggregation Layer)', () => {
         language: 'en',
         soundEnabled: true,
         answerLayout: 'grid',
+        incorrectFeedback: 'popup',
       });
     });
 

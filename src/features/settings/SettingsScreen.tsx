@@ -9,7 +9,14 @@ import {
   IconVolume,
   IconVolumeOff,
 } from '@tabler/icons-react';
-import { ANSWER_LAYOUTS, AnswerLayout, AppTheme, UserPreferences } from '../../types';
+import {
+  ANSWER_LAYOUTS,
+  AnswerLayout,
+  AppTheme,
+  INCORRECT_FEEDBACK_STYLES,
+  IncorrectFeedback,
+  UserPreferences,
+} from '../../types';
 import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
@@ -115,6 +122,11 @@ export const SettingsScreen: React.FC = () => {
           </div>
 
           <AnswerLayoutPicker value={preferences.answerLayout} onChange={(answerLayout) => safeUpdate({ answerLayout })} />
+
+          <IncorrectFeedbackPicker
+            value={preferences.incorrectFeedback}
+            onChange={(incorrectFeedback) => safeUpdate({ incorrectFeedback })}
+          />
         </section>
 
         <section aria-labelledby="settings-content" className="space-y-2">
@@ -155,27 +167,14 @@ const ANSWER_LAYOUT_LABELS: Record<AnswerLayout, TranslationKey> = {
 };
 
 /**
- * Answer layout for 4-option quiz questions: two small preview cards (a 2×2 grid, stacked rows) in
- * a radio group. Lighter than the theme picker: one row of compact cards. The helper line explains
- * the automatic per-question fallback of the grid.
+ * Answer layout for 4-option quiz questions: two small preview cards (a 2×2 grid, stacked rows).
+ * The helper line explains the automatic per-question fallback of the grid.
  */
 export const AnswerLayoutPicker: React.FC<{ value: AnswerLayout; onChange: (layout: AnswerLayout) => void }> = ({
   value,
   onChange,
 }) => {
   const { t } = useI18n();
-  const refs = useRef<Partial<Record<AnswerLayout, HTMLButtonElement | null>>>({});
-  const onKeyDown = (e: React.KeyboardEvent, layout: AnswerLayout) => {
-    const index = ANSWER_LAYOUTS.indexOf(layout);
-    let next = -1;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % ANSWER_LAYOUTS.length;
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + ANSWER_LAYOUTS.length) % ANSWER_LAYOUTS.length;
-    if (next >= 0) {
-      e.preventDefault();
-      onChange(ANSWER_LAYOUTS[next]);
-      refs.current[ANSWER_LAYOUTS[next]]?.focus();
-    }
-  };
   return (
     <div>
       <p id="settings-answer-layout" className="text-sm font-semibold text-text-primary">
@@ -184,37 +183,128 @@ export const AnswerLayoutPicker: React.FC<{ value: AnswerLayout; onChange: (layo
       <p id="settings-answer-layout-desc" className="text-xs text-text-muted mt-0.5 mb-2 leading-relaxed">
         {t('settings.answerLayoutDesc')}
       </p>
-      <div role="radiogroup" aria-labelledby="settings-answer-layout" className="grid grid-cols-2 gap-2.5 sm:gap-3">
-        {ANSWER_LAYOUTS.map((layout) => (
-          <AnswerLayoutCard
-            key={layout}
-            ref={(el) => {
-              refs.current[layout] = el;
-            }}
-            layout={layout}
-            label={t(ANSWER_LAYOUT_LABELS[layout])}
-            describedBy={layout === 'grid' ? 'settings-answer-layout-desc' : undefined}
-            selected={value === layout}
-            onSelect={() => onChange(layout)}
-            onKeyDown={(e) => onKeyDown(e, layout)}
-          />
-        ))}
-      </div>
+      <PreviewRadioGroup
+        labelledBy="settings-answer-layout"
+        optionAttribute="data-answer-layout-option"
+        value={value}
+        onChange={onChange}
+        options={ANSWER_LAYOUTS.map((layout) => ({
+          value: layout,
+          label: t(ANSWER_LAYOUT_LABELS[layout]),
+          describedBy: layout === 'grid' ? 'settings-answer-layout-desc' : undefined,
+          preview: <AnswerLayoutMiniature layout={layout} />,
+        }))}
+      />
     </div>
   );
 };
 
-const AnswerLayoutCard = React.forwardRef<
+const INCORRECT_FEEDBACK_LABELS: Record<IncorrectFeedback, TranslationKey> = {
+  popup: 'preferences.incorrectFeedback.popup',
+  inline: 'preferences.incorrectFeedback.inline',
+};
+
+/**
+ * How the explanation of a wrong answer is shown: a popup layer over the answers, or inline in a
+ * dashed box below them. Two small preview cards, same treatment as the answer layout picker.
+ */
+export const IncorrectFeedbackPicker: React.FC<{
+  value: IncorrectFeedback;
+  onChange: (style: IncorrectFeedback) => void;
+}> = ({ value, onChange }) => {
+  const { t } = useI18n();
+  return (
+    <div>
+      <p id="settings-incorrect-feedback" className="text-sm font-semibold text-text-primary mb-2">
+        {t('settings.incorrectFeedback')}
+      </p>
+      <PreviewRadioGroup
+        labelledBy="settings-incorrect-feedback"
+        optionAttribute="data-incorrect-feedback-option"
+        value={value}
+        onChange={onChange}
+        options={INCORRECT_FEEDBACK_STYLES.map((style) => ({
+          value: style,
+          label: t(INCORRECT_FEEDBACK_LABELS[style]),
+          preview: <IncorrectFeedbackMiniature style={style} />,
+        }))}
+      />
+    </div>
+  );
+};
+
+interface PreviewOption<T extends string> {
+  value: T;
+  label: string;
+  describedBy?: string;
+  preview: React.ReactNode;
+}
+
+/**
+ * A compact radio group of preview cards (miniature + label) for a Settings preference: one tab
+ * stop, arrow keys move the selection, and the selected card gets the primary border and ring.
+ */
+export function PreviewRadioGroup<T extends string>({
+  labelledBy,
+  optionAttribute,
+  value,
+  onChange,
+  options,
+}: {
+  labelledBy: string;
+  /** Data attribute naming each card's value (e.g. `data-answer-layout-option`). */
+  optionAttribute: `data-${string}`;
+  value: T;
+  onChange: (value: T) => void;
+  options: PreviewOption<T>[];
+}) {
+  const refs = useRef<Partial<Record<T, HTMLButtonElement | null>>>({});
+  const onKeyDown = (e: React.KeyboardEvent, current: T) => {
+    const index = options.findIndex((option) => option.value === current);
+    let next = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % options.length;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + options.length) % options.length;
+    if (next >= 0) {
+      e.preventDefault();
+      onChange(options[next].value);
+      refs.current[options[next].value]?.focus();
+    }
+  };
+  return (
+    <div role="radiogroup" aria-labelledby={labelledBy} className="grid grid-cols-2 gap-2.5 sm:gap-3">
+      {options.map((option) => (
+        <PreviewCard
+          key={option.value}
+          ref={(el) => {
+            refs.current[option.value] = el;
+          }}
+          value={option.value}
+          label={option.label}
+          describedBy={option.describedBy}
+          dataAttributes={{ [optionAttribute]: option.value }}
+          preview={option.preview}
+          selected={value === option.value}
+          onSelect={() => onChange(option.value)}
+          onKeyDown={(e) => onKeyDown(e, option.value)}
+        />
+      ))}
+    </div>
+  );
+}
+
+const PreviewCard = React.forwardRef<
   HTMLButtonElement,
   {
-    layout: AnswerLayout;
+    value: string;
     label: string;
     describedBy?: string;
+    dataAttributes: Record<string, string>;
+    preview: React.ReactNode;
     selected: boolean;
     onSelect: () => void;
     onKeyDown: (e: React.KeyboardEvent) => void;
   }
->(function AnswerLayoutCard({ layout, label, describedBy, selected, onSelect, onKeyDown }, ref) {
+>(function PreviewCard({ label, describedBy, dataAttributes, preview, selected, onSelect, onKeyDown }, ref) {
   const { isPressed, pressHandlers } = usePressFeedback();
   return (
     <button
@@ -224,7 +314,7 @@ const AnswerLayoutCard = React.forwardRef<
       aria-checked={selected}
       aria-label={label}
       aria-describedby={describedBy}
-      data-answer-layout-option={layout}
+      {...dataAttributes}
       tabIndex={selected ? 0 : -1}
       {...pressHandlers}
       onKeyDown={(e) => {
@@ -236,7 +326,7 @@ const AnswerLayoutCard = React.forwardRef<
         selected ? 'border-primary ring-2 ring-primary' : 'border-border-subtle'
       } ${isPressed ? 'translate-y-px shadow-clay-pressed' : 'shadow-clay-card'} ${FOCUS_RING}`}
     >
-      <AnswerLayoutMiniature layout={layout} />
+      {preview}
       <span className="min-w-0 text-[13px] sm:text-sm font-semibold text-text-primary leading-snug break-words">{label}</span>
     </button>
   );
@@ -255,6 +345,51 @@ const AnswerLayoutMiniature: React.FC<{ layout: AnswerLayout }> = ({ layout }) =
     <span className="rounded-[3px] border bg-answer-2-bg border-answer-2-border" />
     <span className="rounded-[3px] border bg-answer-3-bg border-answer-3-border" />
     <span className="rounded-[3px] border bg-answer-4-bg border-answer-4-border" />
+  </span>
+);
+
+/**
+ * Popup: dimmed answers behind a small floating explanation panel (a separate layer).
+ * Inline: the answers stay as they are, and a dashed explanation box sits directly below them.
+ * The panel / box shows a tiny error-colored heading line and two text lines.
+ */
+const IncorrectFeedbackMiniature: React.FC<{ style: IncorrectFeedback }> = ({ style }) => (
+  <span
+    aria-hidden="true"
+    data-mini-feedback={style}
+    className="relative shrink-0 w-12 h-12 rounded-lg border border-border-subtle bg-page p-1.5 flex flex-col gap-1 overflow-hidden"
+  >
+    {style === 'popup' ? (
+      <>
+        <span className="h-[5px] rounded-[2px] border bg-answer-1-bg border-answer-1-border opacity-50" />
+        <span className="h-[5px] rounded-[2px] border bg-answer-2-bg border-answer-2-border opacity-50" />
+        <span className="h-[5px] rounded-[2px] border bg-answer-3-bg border-answer-3-border opacity-50" />
+        <span className="h-[5px] rounded-[2px] border bg-answer-4-bg border-answer-4-border opacity-50" />
+        {/* The explanation as its own floating layer */}
+        <span
+          data-mini-part="popup-panel"
+          className="absolute left-2 right-2 top-1/2 -translate-y-1/2 rounded-[4px] border border-text-muted bg-surface shadow-clay-card px-1 py-1 flex flex-col gap-[3px]"
+        >
+          <span className="h-[3px] w-3/5 rounded-full bg-error" />
+          <span className="h-[2px] w-full rounded-full bg-text-muted opacity-70" />
+          <span className="h-[2px] w-4/5 rounded-full bg-text-muted opacity-70" />
+        </span>
+      </>
+    ) : (
+      <>
+        <span className="h-[5px] shrink-0 rounded-[2px] border bg-answer-1-bg border-answer-1-border" />
+        <span className="h-[5px] shrink-0 rounded-[2px] border bg-answer-2-bg border-answer-2-border" />
+        {/* The explanation directly below the answers, in a dashed box */}
+        <span
+          data-mini-part="inline-box"
+          className="flex-1 min-h-0 rounded-[3px] border border-dashed border-text-muted px-1 py-[3px] flex flex-col gap-[3px]"
+        >
+          <span className="h-[3px] w-3/5 rounded-full bg-error" />
+          <span className="h-[2px] w-full rounded-full bg-text-muted opacity-70" />
+          <span className="h-[2px] w-4/5 rounded-full bg-text-muted opacity-70" />
+        </span>
+      </>
+    )}
   </span>
 );
 

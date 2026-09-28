@@ -64,6 +64,7 @@ describe('SCREEN 01 — Home / Study Hub (SSR)', () => {
       language: 'vi',
       soundEnabled: false,
       answerLayout: 'grid',
+      incorrectFeedback: 'popup',
     },
     books: {
       'book-01': mockBook1,

@@ -217,6 +217,9 @@ export const VI_DICTIONARY = {
   'settings.answerLayoutDesc': 'Tự chuyển sang danh sách khi đáp án quá dài.',
   'preferences.answerLayout.grid': 'Lưới 2×2',
   'preferences.answerLayout.stacked': 'Danh sách',
+  'settings.incorrectFeedback': 'Hiển thị lời giải khi sai',
+  'preferences.incorrectFeedback.popup': 'Cửa sổ',
+  'preferences.incorrectFeedback.inline': 'Dưới đáp án',
   'settings.studyContent': 'Nội dung học',
   'settings.manageContent': 'Quản lý giáo trình và bài học',
 
@@ -579,6 +582,9 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'settings.answerLayoutDesc': 'Long answers automatically switch to the stacked layout.',
   'preferences.answerLayout.grid': '2×2 Grid',
   'preferences.answerLayout.stacked': 'Stacked',
+  'settings.incorrectFeedback': 'Incorrect answer feedback',
+  'preferences.incorrectFeedback.popup': 'Popup',
+  'preferences.incorrectFeedback.inline': 'Inline',
   'settings.studyContent': 'Study Content',
   'settings.manageContent': 'Manage books and lessons',
 

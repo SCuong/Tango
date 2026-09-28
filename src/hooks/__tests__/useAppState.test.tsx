@@ -11,6 +11,7 @@ describe('src/hooks/useAppState.tsx', () => {
       language: 'vi',
       soundEnabled: false,
       answerLayout: 'grid',
+      incorrectFeedback: 'popup',
     },
     books: {},
     lessons: {},
@@ -119,6 +120,7 @@ describe('src/hooks/useAppState.tsx', () => {
         language: 'en',
         soundEnabled: false,
         answerLayout: 'grid',
+        incorrectFeedback: 'popup',
       });
 
       // Verifies document synchronization succeeded
@@ -206,6 +208,7 @@ describe('src/hooks/useAppState.tsx', () => {
         language: 'en',
         soundEnabled: false,
         answerLayout: 'grid',
+        incorrectFeedback: 'popup',
       });
 
       // Verifies document root was sequentially updated
@@ -248,6 +251,7 @@ describe('src/hooks/useAppState.tsx', () => {
           language: 'vi',
           soundEnabled: true,
           answerLayout: 'grid',
+          incorrectFeedback: 'popup',
         })
       );
 
@@ -263,6 +267,7 @@ describe('src/hooks/useAppState.tsx', () => {
         language: 'en',
         soundEnabled: true,
         answerLayout: 'grid',
+        incorrectFeedback: 'popup',
       });
 
       expect(mockDocumentElement.dataset.theme).toBe('sakura');

@@ -847,6 +847,11 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
 - **Answer Layout Section (Bố cục đáp án):**
   - Two compact preview cards in a radio group: `Lưới 2×2` / `2×2 Grid` (default) and `Danh sách` / `Stacked`, with the helper line `Tự chuyển sang danh sách khi đáp án quá dài.` / `Long answers automatically switch to the stacked layout.`
   - Persisted in local storage (`tango_v1_preferences.answerLayout`); behavior and fallback in §12.4.
+- **Incorrect Answer Feedback Section (Hiển thị lời giải khi sai / Incorrect answer feedback):**
+  - Two compact preview cards in a radio group, same treatment as the answer layout cards: `Cửa sổ` / `Popup` (default) and `Dưới đáp án` / `Inline`.
+  - Popup preview: the answer tiles dimmed behind a small floating explanation panel (solid border, surface fill, soft clay shadow), a separate layer. Inline preview: the answer tiles stay as they are with a **dashed** explanation box directly below them; the dashed edge keeps the explanation visually distinct from answer buttons. Both panels show a short error-colored heading line and two text lines. Semantic tokens only, so the previews read in Light, Dark, Sakura, and Meo's World.
+  - Persisted in local storage (`tango_v1_preferences.incorrectFeedback`: `'popup' | 'inline'`, default `popup`; missing or unknown stored values load as `popup`).
+  - **Status:** the Settings selector only. The quiz runner does not read this preference yet and always shows the explanation sheet (§16.4, the Popup style); the Inline runtime is not implemented.
 - **Nội dung học Section (Study Content):**
   - Row button linking to Content Management (`Quản lý giáo trình và bài học`).
 

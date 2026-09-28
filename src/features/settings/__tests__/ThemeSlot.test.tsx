@@ -10,7 +10,7 @@ import { SettingsScreen, ThemePicker, initialMeoRevealed, slotThemes } from '../
 function makeState(theme: AppTheme, language: AppLanguage): UserStudyState {
   return {
     version: 1,
-    preferences: { theme, language, soundEnabled: false, answerLayout: 'grid' },
+    preferences: { theme, language, soundEnabled: false, answerLayout: 'grid', incorrectFeedback: 'popup' },
     books: {},
     lessons: {},
     progressByItem: {},

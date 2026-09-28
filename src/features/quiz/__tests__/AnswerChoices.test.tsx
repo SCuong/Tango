@@ -32,7 +32,7 @@ function session(q: QuizQuestion): QuizSessionState {
 function renderQuiz(answerLayout: AnswerLayout, quiz: QuizSessionState): string {
   const state: UserStudyState = {
     version: 1,
-    preferences: { theme: 'light', language: 'vi', soundEnabled: false, answerLayout },
+    preferences: { theme: 'light', language: 'vi', soundEnabled: false, answerLayout, incorrectFeedback: 'popup' },
     books: {},
     lessons: {},
     progressByItem: {},

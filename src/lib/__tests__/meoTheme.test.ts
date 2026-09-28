@@ -33,9 +33,9 @@ describe("Meo's World theme contract", () => {
   });
 
   it('persists and reloads meo under the existing preferences key', () => {
-    savePreferences({ theme: 'meo', language: 'en', soundEnabled: false, answerLayout: 'grid' });
+    savePreferences({ theme: 'meo', language: 'en', soundEnabled: false, answerLayout: 'grid', incorrectFeedback: 'popup' });
     expect(JSON.parse(localStorage.getItem(STORAGE_KEYS.PREFERENCES)!).theme).toBe('meo');
-    expect(loadPreferences()).toEqual({ theme: 'meo', language: 'en', soundEnabled: false, answerLayout: 'grid' });
+    expect(loadPreferences()).toEqual({ theme: 'meo', language: 'en', soundEnabled: false, answerLayout: 'grid', incorrectFeedback: 'popup' });
   });
 
   it('still falls back to Light for an invalid stored theme', () => {
@@ -44,7 +44,7 @@ describe("Meo's World theme contract", () => {
   });
 
   it('merges a meo selection and ignores unknown themes', () => {
-    const current = { theme: 'sakura' as const, language: 'vi' as const, soundEnabled: false, answerLayout: 'grid' as const };
+    const current = { theme: 'sakura' as const, language: 'vi' as const, soundEnabled: false, answerLayout: 'grid' as const, incorrectFeedback: 'popup' as const };
     expect(mergePreferences(current, { theme: 'meo' }).theme).toBe('meo');
     // @ts-expect-error Testing invalid runtime values
     expect(mergePreferences(current, { theme: 'tiger' }).theme).toBe('sakura');

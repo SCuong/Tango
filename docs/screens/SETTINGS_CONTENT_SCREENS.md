@@ -52,6 +52,11 @@ App preferences management and intentional gateway to administrative content ope
      - Helper line: `Tự chuyển sang danh sách khi đáp án quá dài.` / `Long answers automatically switch to the stacked layout.`
      - Persists immediately to `tango_v1_preferences.answerLayout`. A failed save shows the localized Settings save error and keeps the previous selection.
      - Applies only to 4-option multiple-choice questions; Grid falls back to Stacked per question when an answer is too long or the screen too narrow, without changing the saved preference ([`DESIGN_SYSTEM.md` §12.4](../DESIGN_SYSTEM.md#124-answer-layout-preference-grid-22--stacked-14)).
+   - **Incorrect answer feedback (Hiển thị lời giải khi sai):** two compact preview cards in a radio group after Answer layout (arrow keys move the selection; touch targets of at least 48px):
+     - `Cửa sổ` / `Popup` (default): dimmed answers behind a small floating explanation panel.
+     - `Dưới đáp án` / `Inline`: answers stay visible, with a dashed explanation box directly below them.
+     - Selected = primary border + 2px primary ring. Persists immediately to `tango_v1_preferences.incorrectFeedback`; a failed save shows the localized Settings save error and keeps the previous selection.
+     - The quiz runner does not read this preference yet (it always uses the explanation sheet, i.e. Popup); see [`DESIGN_SYSTEM.md` §16.5](../DESIGN_SYSTEM.md#165-settings-screen).
 2. **Nội dung học (Study Content):**
    - Clickable row: `Quản lý giáo trình và bài học` $\rightarrow$ navigates to [SCREEN 17: Content Management](#screen-17-content-management-quản-lý-nội-dung).
 
@@ -82,6 +87,12 @@ SETTINGS PANEL
 │ ┌───────────────────┐  ┌───────────────────┐  │
 │ │ ▣▣  Lưới 2×2      │  │ ▤   Danh sách     │  │
 │ │ ▣▣  (selected)    │  │ ▤                 │  │
+│ └───────────────────┘  └───────────────────┘  │
+│                                               │
+│ Hiển thị lời giải khi sai                     │
+│ ┌───────────────────┐  ┌───────────────────┐  │
+│ │ ▤▣  Cửa sổ        │  │ ▤   Dưới đáp án   │  │
+│ │ (selected)        │  │ ┆╌╌┆               │  │
 │ └───────────────────┘  └───────────────────┘  │
 │                                               │
 │ NỘI DUNG HỌC                                  │

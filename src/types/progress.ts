@@ -41,11 +41,26 @@ export function isAnswerLayout(value: unknown): value is AnswerLayout {
   return typeof value === 'string' && (ANSWER_LAYOUTS as readonly string[]).includes(value);
 }
 
+/**
+ * How the explanation of an incorrect answer is shown: a separate popup layer (the current quiz
+ * behavior, default) or inline below the answers.
+ */
+export type IncorrectFeedback = 'popup' | 'inline';
+
+/** Every accepted incorrect-answer feedback style, in Settings order. */
+export const INCORRECT_FEEDBACK_STYLES: readonly IncorrectFeedback[] = ['popup', 'inline'];
+
+/** True for a supported feedback style (missing or unknown stored values fall back to 'popup'). */
+export function isIncorrectFeedback(value: unknown): value is IncorrectFeedback {
+  return typeof value === 'string' && (INCORRECT_FEEDBACK_STYLES as readonly string[]).includes(value);
+}
+
 export interface UserPreferences {
   theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura' | 'meo'
   language: AppLanguage;         // 'vi' (default) | 'en'
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
   answerLayout: AnswerLayout;    // 'grid' (default) | 'stacked'
+  incorrectFeedback: IncorrectFeedback; // 'popup' (default) | 'inline'
 }
 
 /**

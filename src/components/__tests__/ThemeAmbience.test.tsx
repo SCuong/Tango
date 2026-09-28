@@ -9,7 +9,7 @@ import { MeoEdgeAmbience, ThemeAmbience } from '../ThemeAmbience';
 function withTheme(theme: AppTheme, node: React.ReactNode): string {
   const state: UserStudyState = {
     version: 1,
-    preferences: { theme, language: 'vi', soundEnabled: false, answerLayout: 'grid' },
+    preferences: { theme, language: 'vi', soundEnabled: false, answerLayout: 'grid', incorrectFeedback: 'popup' },
     books: {},
     lessons: {},
     progressByItem: {},

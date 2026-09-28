@@ -15,6 +15,7 @@ import {
   UserPreferences,
   isAnswerLayout,
   isAppTheme,
+  isIncorrectFeedback,
 } from '../types';
 
 /**
@@ -46,6 +47,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   language: 'vi',
   soundEnabled: false,
   answerLayout: 'grid',
+  incorrectFeedback: 'popup',
 };
 
 /**
@@ -197,6 +199,9 @@ export function loadPreferences(): UserPreferences {
     answerLayout: isAnswerLayout(data.answerLayout)
       ? data.answerLayout
       : DEFAULT_PREFERENCES.answerLayout,
+    incorrectFeedback: isIncorrectFeedback(data.incorrectFeedback)
+      ? data.incorrectFeedback
+      : DEFAULT_PREFERENCES.incorrectFeedback,
   };
 }
 

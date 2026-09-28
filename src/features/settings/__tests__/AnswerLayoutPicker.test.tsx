@@ -1,15 +1,15 @@
-import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { AppStateProvider, AppStateContextValue, useAppState } from '../../../hooks/useAppState';
 import { NavigationProvider } from '../../../hooks/useNavigation';
 import { AnswerLayout, AppLanguage, UserStudyState } from '../../../types';
 import { AnswerLayoutPicker, SettingsScreen, applyPreferenceChange } from '../SettingsScreen';
+import { previewPickerCards } from './previewPickerHarness';
 
 function makeState(language: AppLanguage = 'vi', answerLayout: AnswerLayout = 'grid'): UserStudyState {
   return {
     version: 1,
-    preferences: { theme: 'light', language, soundEnabled: false, answerLayout },
+    preferences: { theme: 'light', language, soundEnabled: false, answerLayout, incorrectFeedback: 'popup' },
     books: {},
     lessons: {},
     progressByItem: {},
@@ -29,36 +29,6 @@ function renderSettings(language: AppLanguage = 'vi', answerLayout: AnswerLayout
 
 function optionTag(html: string, layout: AnswerLayout): string {
   return html.match(new RegExp(`<button[^>]*data-answer-layout-option="${layout}"[^>]*>`))![0];
-}
-
-interface CardProps {
-  layout: AnswerLayout;
-  onSelect: () => void;
-  onKeyDown: (e: Partial<React.KeyboardEvent>) => void;
-}
-
-/** Renders the picker and returns the props of its two preview cards (no DOM in this test env). */
-function pickerCards(value: AnswerLayout, onChange: (layout: AnswerLayout) => void): CardProps[] {
-  let tree: React.ReactElement | null = null;
-  const Capture = () => {
-    tree = AnswerLayoutPicker({ value, onChange }) as React.ReactElement;
-    return tree;
-  };
-  renderToString(
-    <AppStateProvider initialState={makeState()}>
-      <Capture />
-    </AppStateProvider>
-  );
-  const cards: CardProps[] = [];
-  const walk = (node: unknown) => {
-    if (Array.isArray(node)) return node.forEach(walk);
-    if (!node || typeof node !== 'object' || !('props' in node)) return;
-    const props = (node as React.ReactElement).props as Record<string, unknown>;
-    if (typeof props.onSelect === 'function' && typeof props.layout === 'string') cards.push(props as unknown as CardProps);
-    walk(props.children);
-  };
-  walk(tree);
-  return cards;
 }
 
 afterEach(() => {
@@ -110,8 +80,8 @@ describe('Settings answer layout preference', () => {
 
   it('selecting a card or using the arrow keys changes the layout', () => {
     const onChange = vi.fn();
-    const cards = pickerCards('grid', onChange);
-    expect(cards.map((card) => card.layout)).toEqual(['grid', 'stacked']);
+    const cards = previewPickerCards(makeState(), () => AnswerLayoutPicker({ value: 'grid', onChange }));
+    expect(cards.map((card) => card.value)).toEqual(['grid', 'stacked']);
     cards[1].onSelect();
     expect(onChange).toHaveBeenLastCalledWith('stacked');
     cards[0].onSelect();
@@ -142,7 +112,7 @@ describe('Settings answer layout preference', () => {
       </AppStateProvider>
     );
     expect(applyPreferenceChange(ctx!.updatePreferences, { answerLayout: 'stacked' })).toBe(true);
-    expect(saved[0]).toBe('tango_v1_preferences={"theme":"light","language":"vi","soundEnabled":false,"answerLayout":"stacked"}');
+    expect(saved[0]).toBe('tango_v1_preferences={"theme":"light","language":"vi","soundEnabled":false,"answerLayout":"stacked","incorrectFeedback":"popup"}');
     expect(applyPreferenceChange(ctx!.updatePreferences, { answerLayout: 'grid' })).toBe(true);
     expect(JSON.parse(saved[1].split('=')[1]).answerLayout).toBe('grid');
   });

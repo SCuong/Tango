@@ -51,7 +51,7 @@ function completed(config: Partial<QuizSessionConfig>): CompletedQuiz {
 function state(language: AppLanguage): UserStudyState {
   return {
     version: 1,
-    preferences: { theme: 'light', language, soundEnabled: false, answerLayout: 'grid' },
+    preferences: { theme: 'light', language, soundEnabled: false, answerLayout: 'grid', incorrectFeedback: 'popup' },
     books: {},
     lessons: { l1: lesson },
     progressByItem: {},
