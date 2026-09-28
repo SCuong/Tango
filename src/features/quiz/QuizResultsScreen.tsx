@@ -171,6 +171,7 @@ export const QuizResultsScreen: React.FC = () => {
           size="lg"
           icon={RETURN_ICONS[returnAction.icon]}
           onClick={returnToOrigin}
+          className="tango-canvas-secondary tango-canvas-secondary-outline"
           data-return-target={returnAction.route.type}
         >
           {formatQuizReturnLabel(returnAction, t)}

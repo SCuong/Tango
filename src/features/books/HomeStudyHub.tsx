@@ -218,7 +218,7 @@ export const HomeStudyHub: React.FC = () => {
                       onClick={() => setShowAllBooks((value) => !value)}
                       aria-expanded={showAllBooks}
                       aria-controls="home-more-books"
-                      className={`inline-flex items-center justify-center gap-1.5 w-[62%] sm:w-auto sm:px-10 min-h-touch rounded-2xl border border-dashed border-border-strong text-sm font-semibold text-text-secondary ${FOCUS_RING}`}
+                      className={`tango-canvas-secondary inline-flex items-center justify-center gap-1.5 w-[62%] sm:w-auto sm:px-10 min-h-touch rounded-2xl border border-dashed border-border-strong text-sm font-semibold text-text-secondary ${FOCUS_RING}`}
                     >
                       {t(showAllBooks ? 'home.showFewerBooks' : 'home.viewAllBooks')}
                       {showAllBooks ? (

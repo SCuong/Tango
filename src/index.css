@@ -545,6 +545,10 @@
       background-color: color-mix(in srgb, var(--bg-surface-elevated) 55%, transparent);
     }
 
+    [data-theme="meo"] .tango-canvas-secondary:hover:not([data-pressed="true"]):not(:disabled) {
+      background-color: color-mix(in srgb, var(--bg-surface-elevated) 70%, var(--bg-surface));
+    }
+
     .tango-nav-tab:hover:not([data-pressed="true"]):not([aria-current="page"]) .tango-nav-puck {
       background-color: color-mix(in srgb, var(--bg-surface-elevated) 55%, transparent);
     }
@@ -803,6 +807,27 @@
 
   .tango-showcase-hold-done {
     animation: showcase-hold-pop 240ms ease-out forwards;
+  }
+
+  /*
+   * Meo's World secondary actions on the illustrated canvas (DESIGN_SYSTEM §9.4): lightweight
+   * controls that sit directly on the artwork (Home "Xem tất cả / Thu gọn", the Results return
+   * action) get a real cream surface and warm strong text so the cat artwork never shows through
+   * their label. They stay flat (no clay depth), below the clay secondary and primary actions.
+   * Other themes keep their transparent style.
+   */
+  [data-theme="meo"] .tango-canvas-secondary {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+  }
+
+  /* Borderless actions (the quiet Results return button) gain a subtle outline */
+  [data-theme="meo"] .tango-canvas-secondary-outline {
+    border-color: var(--border-strong);
+  }
+
+  [data-theme="meo"] .tango-canvas-secondary[data-pressed="true"] {
+    background-color: var(--bg-surface-elevated);
   }
 
   /* Inline incorrect-answer explanation: a subtle entrance below the unchanged quiz stage */
