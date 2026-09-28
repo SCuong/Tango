@@ -36,6 +36,13 @@ export interface NavigationContextValue {
    */
   goBack: (fallback: AppRoute) => void;
   /**
+   * Returns to an earlier screen of the current flow (e.g. Quiz Results back to the quiz's
+   * origin). When that screen is an earlier in-app history entry, the browser history goes back
+   * to it, so Back never bounces into the screens left behind; otherwise (deep link, reload) the
+   * current entry is replaced by the target.
+   */
+  returnTo: (target: AppRoute) => void;
+  /**
    * Registers a guard for browser Back/Forward (e.g. an active quiz). When the guard returns
    * true for the destination pathname, the navigation is undone (the current URL is restored)
    * and the screen stays mounted so it can ask for confirmation. Pass null to remove it.
@@ -71,6 +78,16 @@ export function reconcileHistoryStack(
   const found = stack.lastIndexOf(path, index);
   if (found >= 0) return { stack, index: found };
   return { stack: [path], index: 0 };
+}
+
+/**
+ * History steps (negative) from the current entry back to the nearest earlier entry with
+ * `path`, or null when the path is not an earlier entry of the in-app stack.
+ */
+export function historyStepsBackTo(stack: string[], index: number, path: string): number | null {
+  if (index <= 0) return null;
+  const found = stack.lastIndexOf(path, index - 1);
+  return found >= 0 ? found - index : null;
 }
 
 function currentWindowPath(): string | null {
@@ -184,6 +201,18 @@ export const NavigationProvider: FC<NavigationProviderProps> = ({
     [back, replace]
   );
 
+  const returnTo = useCallback(
+    (target: AppRoute) => {
+      const steps = historyStepsBackTo(stackRef.current, indexRef.current, buildPath(target));
+      if (steps !== null && typeof window !== 'undefined' && window.history) {
+        window.history.go(steps);
+      } else {
+        replace(target);
+      }
+    },
+    [replace]
+  );
+
   const setNavigationBlocker = useCallback(
     (blocker: ((destinationPath: string) => boolean) | null) => {
       blockerRef.current = blocker;
@@ -199,9 +228,10 @@ export const NavigationProvider: FC<NavigationProviderProps> = ({
       back,
       goUp,
       goBack,
+      returnTo,
       setNavigationBlocker,
     }),
-    [route, navigate, replace, back, goUp, goBack, setNavigationBlocker]
+    [route, navigate, replace, back, goUp, goBack, returnTo, setNavigationBlocker]
   );
 
   return (

@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import {
   IconAlertTriangle,
+  IconArrowLeft,
+  IconCards,
   IconClock,
   IconFlame,
   IconHome,
@@ -14,6 +16,7 @@ import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
 import { formatDuration } from '../../lib/quizSession';
+import { QuizReturnIcon, formatQuizReturnLabel, getQuizReturnAction } from '../../lib/quizReturn';
 import { Screen, ScreenHeader, SectionLabel, isDialogOpen } from '../../components/Screen';
 import { Button } from '../../components/Button';
 import { InlineNotice } from '../study/StudyParts';
@@ -22,17 +25,36 @@ import { buildReviewConfig, useQuizSession } from './QuizSessionContext';
 import { QuizMessageScreen } from './QuizRunnerScreen';
 import { useStartQuiz } from './useStartQuiz';
 
+const RETURN_ICONS: Record<QuizReturnIcon, React.ReactNode> = {
+  back: <IconArrowLeft size={20} stroke={2} />,
+  test: <IconCards size={20} stroke={2} />,
+  home: <IconHome size={20} stroke={2} />,
+};
+
+/**
+ * Results keyboard: Enter on the page (not on a control) starts Review Missed; Escape takes the
+ * same contextual return action as the return button.
+ */
+export function resultsKeyAction(key: string, onPage: boolean): 'review' | 'return' | null {
+  if (key === 'Enter' && onPage) return 'review';
+  if (key === 'Escape') return 'return';
+  return null;
+}
+
 /**
  * SCREEN 14 — Quiz Results (`/quiz/results`).
- * Score, accuracy, best streak, time; the missed words; and Review / Retake / Home actions.
+ * Score, accuracy, best streak, time; the missed words; and Review / Retake / return actions. The
+ * return action (and Escape) goes back to the quiz's originating study context, or Home.
  */
 export const QuizResultsScreen: React.FC = () => {
   const { state } = useAppState();
   const { lastCompleted, saveError } = useQuizSession();
-  const { navigate } = useNavigation();
+  const { navigate, returnTo } = useNavigation();
   const { t } = useI18n();
   const startQuiz = useStartQuiz();
   const goHome = () => navigate({ type: 'home' });
+  const returnAction = getQuizReturnAction(lastCompleted?.config.returnTarget);
+  const returnToOrigin = () => returnTo(returnAction.route);
 
   const itemsById = new Map<string, StudyItem>();
   for (const lesson of Object.values(state.lessons)) {
@@ -48,7 +70,8 @@ export const QuizResultsScreen: React.FC = () => {
       buildReviewConfig(
         lastCompleted.config.lessonIds,
         missedItems.map((item) => item.id),
-        state.lessons
+        state.lessons,
+        lastCompleted.config.returnTarget
       )
     );
   };
@@ -57,20 +80,18 @@ export const QuizResultsScreen: React.FC = () => {
     if (lastCompleted) startQuiz(lastCompleted.config);
   };
 
-  // Enter starts the review (when there are mistakes); Escape returns Home
-  const keyRef = useRef({ reviewMissed, goHome });
-  keyRef.current = { reviewMissed, goHome };
+  // Enter starts the review (when there are mistakes); Escape returns to the quiz's origin
+  const keyRef = useRef({ reviewMissed, returnToOrigin });
+  keyRef.current = { reviewMissed, returnToOrigin };
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (isDialogOpen()) return;
       const target = e.target as HTMLElement | null;
-      if (e.key === 'Enter' && (!target || target === document.body)) {
-        e.preventDefault();
-        keyRef.current.reviewMissed();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        keyRef.current.goHome();
-      }
+      const action = resultsKeyAction(e.key, !target || target === document.body);
+      if (!action) return;
+      e.preventDefault();
+      if (action === 'review') keyRef.current.reviewMissed();
+      else keyRef.current.returnToOrigin();
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -145,8 +166,14 @@ export const QuizResultsScreen: React.FC = () => {
         >
           {t('results.retry')}
         </Button>
-        <Button variant="quiet" size="lg" icon={<IconHome size={20} stroke={2} />} onClick={goHome}>
-          {t('results.home')}
+        <Button
+          variant="quiet"
+          size="lg"
+          icon={RETURN_ICONS[returnAction.icon]}
+          onClick={returnToOrigin}
+          data-return-target={returnAction.route.type}
+        >
+          {formatQuizReturnLabel(returnAction, t)}
         </Button>
       </div>
 

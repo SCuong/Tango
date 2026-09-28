@@ -225,7 +225,7 @@ Nghĩa:
 - **Action Buttons:**
   1. **"Ôn lại các từ đã sai (3 từ)"** (High-emphasis primary button).
   2. **"Làm lại bài kiểm tra"** (Secondary button).
-  3. **"Về trang chủ"** (Tertiary button).
+  3. **Contextual return** (Tertiary button): back to where the quiz started, e.g. **"Về Hán tự"**, **"Về giáo trình"**, **"Về bài học"**, **"Về Kiểm tra"**; **"Về trang chủ"** only when the origin is unknown (see [QUIZ_SESSION_SCREENS SCREEN 14](./screens/QUIZ_SESSION_SCREENS.md#screen-14-quiz-results-summary)).
 
 ---
 

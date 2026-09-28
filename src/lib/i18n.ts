@@ -189,6 +189,9 @@ export const VI_DICTIONARY = {
   'results.reviewMissed': 'Ôn lại các từ đã sai ({count} từ)',
   'results.retry': 'Làm lại bài kiểm tra',
   'results.home': 'Về trang chủ',
+  'results.returnTo': 'Về {place}',
+  'results.returnBook': 'Về giáo trình',
+  'results.returnLesson': 'Về bài học',
   'results.perfect': 'Không có từ nào sai. Tuyệt vời!',
   'results.none': 'Chưa có kết quả nào để hiển thị.',
 
@@ -548,6 +551,9 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'results.reviewMissed': 'Review missed words ({count})',
   'results.retry': 'Retake quiz',
   'results.home': 'Back to Home',
+  'results.returnTo': 'Back to {place}',
+  'results.returnBook': 'Back to book',
+  'results.returnLesson': 'Back to lesson',
   'results.perfect': 'No mistakes. Excellent!',
   'results.none': 'There are no results to show yet.',
 

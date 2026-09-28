@@ -230,7 +230,7 @@ src/
 
 ### Directory Responsibilities
 - `src/features/books/` and `src/features/study/`: study-only screens. They contain no add, edit, import, or delete controls.
-- `src/features/quiz/`: the **single, reusable quiz system** powering Practice, Quick Test, Category/Book/Mixed tests, and Review Missed Words. Every entry point builds a `QuizSessionConfig` (`lessonIds`, mode, count, types, optional review focus) and questions always come from `lib/quizEngine.ts`.
+- `src/features/quiz/`: the **single, reusable quiz system** powering Practice, Quick Test, Category/Book/Mixed tests, and Review Missed Words. Every entry point builds a `QuizSessionConfig` (`lessonIds`, mode, count, types, optional review focus, and the runtime-only `returnTarget` that Quiz Results returns to) and questions always come from `lib/quizEngine.ts`.
 - `src/features/content-management/`: the protected management hub reached through Settings: books, covers, lesson metadata and reassignment, the importer, and Danger Zone dialogs.
 - `src/lib/contentActions.ts`: ordered, idempotent hard-delete cascades (§4.3) and metadata-only lesson updates.
 - `src/lib/quizSession.ts`: pure runtime state for the shared runner; progress (`tango_v1_progress`) and history (`tango_v1_history`) are written once, when a session completes.

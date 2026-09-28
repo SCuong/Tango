@@ -5,6 +5,7 @@ import {
   useNavigation,
   NavigationContextValue,
   reconcileHistoryStack,
+  historyStepsBackTo,
 } from '../useNavigation';
 
 describe('src/hooks/useNavigation.tsx', () => {
@@ -65,22 +66,25 @@ describe('src/hooks/useNavigation.tsx', () => {
     let pushStateSpy: ReturnType<typeof vi.fn>;
     let replaceStateSpy: ReturnType<typeof vi.fn>;
     let backSpy: ReturnType<typeof vi.fn>;
+    let goSpy: ReturnType<typeof vi.fn>;
+    let location: { pathname: string };
     let eventListeners: Record<string, ((e: Event) => void)[]> = {};
 
     beforeEach(() => {
       pushStateSpy = vi.fn();
       replaceStateSpy = vi.fn();
       backSpy = vi.fn();
+      goSpy = vi.fn();
       eventListeners = {};
+      location = { pathname: '/settings' };
 
       vi.stubGlobal('window', {
-        location: {
-          pathname: '/settings',
-        },
+        location,
         history: {
           pushState: pushStateSpy,
           replaceState: replaceStateSpy,
           back: backSpy,
+          go: goSpy,
         },
         addEventListener: (event: string, listener: (e: Event) => void) => {
           if (!eventListeners[event]) eventListeners[event] = [];
@@ -244,6 +248,99 @@ describe('src/hooks/useNavigation.tsx', () => {
       ctx!.navigate('/settings/content-management');
       ctx!.goBack({ type: 'home' });
       expect(backSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('returnTo (Quiz Results back to the quiz origin)', () => {
+    let pushStateSpy: ReturnType<typeof vi.fn>;
+    let replaceStateSpy: ReturnType<typeof vi.fn>;
+    let backSpy: ReturnType<typeof vi.fn>;
+    let goSpy: ReturnType<typeof vi.fn>;
+    let location: { pathname: string };
+
+    beforeEach(() => {
+      pushStateSpy = vi.fn((_state: unknown, _title: string, path: string) => {
+        location.pathname = path;
+      });
+      replaceStateSpy = vi.fn((_state: unknown, _title: string, path: string) => {
+        location.pathname = path;
+      });
+      backSpy = vi.fn();
+      goSpy = vi.fn();
+      location = { pathname: '/' };
+      vi.stubGlobal('window', {
+        location,
+        history: { pushState: pushStateSpy, replaceState: replaceStateSpy, back: backSpy, go: goSpy },
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      });
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    function mount(initialPath: string) {
+      let ctx: NavigationContextValue | null = null;
+      const Consumer = () => {
+        ctx = useNavigation();
+        return null;
+      };
+      renderToString(
+        <NavigationProvider initialPath={initialPath}>
+          <Consumer />
+        </NavigationProvider>
+      );
+      return () => ctx!;
+    }
+
+    it('goes back through history to the origin entry, so Back never bounces into Results', () => {
+      const nav = mount('/');
+      const kanji = { type: 'category_inside_book', bookId: 'b1', category: 'kanji' } as const;
+      nav().navigate({ type: 'book_study', bookId: 'b1' });
+      nav().navigate(kanji);
+      nav().navigate({ type: 'category_quiz_config', bookId: 'b1', category: 'kanji' });
+      nav().navigate({ type: 'quiz_session' });
+      nav().goUp({ type: 'quiz_results' }); // the runner replaces the session with Results
+      pushStateSpy.mockClear();
+      replaceStateSpy.mockClear();
+
+      nav().returnTo(kanji);
+      // Kanji is 2 entries back (config and Results are left behind as forward entries)
+      expect(goSpy).toHaveBeenCalledWith(-2);
+      expect(pushStateSpy).not.toHaveBeenCalled();
+      expect(replaceStateSpy).not.toHaveBeenCalled();
+    });
+
+    it('replaces Results with the origin when it is not in the in-app history (deep link / reload)', () => {
+      const nav = mount('/quiz/results');
+      nav().returnTo({ type: 'category_inside_book', bookId: 'b1', category: 'kanji' });
+      expect(goSpy).not.toHaveBeenCalled();
+      expect(pushStateSpy).not.toHaveBeenCalled();
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/book/b1/category/kanji');
+    });
+
+    it('lands on the origin entry after the history jump, so Back continues from there', () => {
+      const stack = ['/', '/book/b1', '/book/b1/category/kanji', '/book/b1/category/kanji/quiz-config', '/quiz/results'];
+      const steps = historyStepsBackTo(stack, 4, '/book/b1/category/kanji');
+      expect(steps).toBe(-2);
+      // The popstate for that jump reconciles the in-app stack onto the origin entry
+      const next = reconcileHistoryStack(stack, 4, '/book/b1/category/kanji');
+      expect(next).toEqual({ stack, index: 2 });
+      // Back from the category is the book, not the Results or the quiz session
+      expect(next.stack[next.index - 1]).toBe('/book/b1');
+    });
+  });
+
+  describe('historyStepsBackTo', () => {
+    it('finds the nearest earlier entry', () => {
+      expect(historyStepsBackTo(['/', '/a', '/b', '/results'], 3, '/a')).toBe(-2);
+      expect(historyStepsBackTo(['/', '/a', '/x', '/a', '/results'], 4, '/a')).toBe(-1);
+    });
+    it('ignores the current and later entries', () => {
+      expect(historyStepsBackTo(['/', '/results', '/a'], 1, '/a')).toBeNull();
+      expect(historyStepsBackTo(['/a'], 0, '/a')).toBeNull();
+      expect(historyStepsBackTo(['/', '/results'], 1, '/missing')).toBeNull();
     });
   });
 

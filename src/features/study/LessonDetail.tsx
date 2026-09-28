@@ -15,7 +15,8 @@ import { useCounts } from '../../hooks/useCounts';
 import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeedback';
 import { getLessonStudyMetrics } from '../../lib/studyMetrics';
 import { getAvailableQuestionCounts, getQuizEligibility } from '../../lib/quizEngine';
-import { DEFAULT_QUESTION_TYPES } from '../../lib/quizSession';
+import { DEFAULT_QUESTION_TYPES, QuizSessionConfig } from '../../lib/quizSession';
+import { lessonReturnTarget } from '../../lib/quizReturn';
 import { getWeakItemIds } from '../../lib/studySelectors';
 import { Screen, ScreenHeader, SectionLabel, isDialogOpen } from '../../components/Screen';
 import { Button, FOCUS_RING } from '../../components/Button';
@@ -23,6 +24,22 @@ import { NotFoundScreen } from '../../components/NotFoundScreen';
 import { buildReviewConfig } from '../quiz/QuizSessionContext';
 import { useStartQuiz } from '../quiz/useStartQuiz';
 import { CATEGORY_LABEL_KEYS, InlineNotice } from './StudyParts';
+
+/** Practice (all items) or Quick Test config for one lesson; Results returns to the lesson. */
+export function buildLessonQuizConfig(
+  lessonId: string,
+  mode: QuizSessionConfig['mode'],
+  questionCount: number | 'all' = 'all'
+): QuizSessionConfig {
+  return {
+    lessonIds: [lessonId],
+    mode,
+    questionCount: mode === 'practice' ? 'all' : questionCount,
+    allowedTypes: DEFAULT_QUESTION_TYPES,
+    kind: 'standard',
+    returnTarget: lessonReturnTarget(lessonId),
+  };
+}
 
 /**
  * SCREEN 05 — Lesson Detail (`/lesson/:lessonId`).
@@ -54,24 +71,12 @@ export const LessonDetail: React.FC<{ lessonId: string }> = ({ lessonId }) => {
 
   const startPractice = () => {
     if (!lesson || n === 0) return;
-    startQuiz({
-      lessonIds: [lesson.id],
-      mode: 'practice',
-      questionCount: 'all',
-      allowedTypes: DEFAULT_QUESTION_TYPES,
-      kind: 'standard',
-    });
+    startQuiz(buildLessonQuizConfig(lesson.id, 'practice'));
   };
 
   const startQuickTest = (questionCount: number | 'all') => {
     if (!lesson || n === 0) return;
-    startQuiz({
-      lessonIds: [lesson.id],
-      mode: 'test',
-      questionCount,
-      allowedTypes: DEFAULT_QUESTION_TYPES,
-      kind: 'standard',
-    });
+    startQuiz(buildLessonQuizConfig(lesson.id, 'test', questionCount));
   };
 
   const openItems = () => lesson && navigate({ type: 'lesson_items', lessonId: lesson.id });
@@ -80,7 +85,7 @@ export const LessonDetail: React.FC<{ lessonId: string }> = ({ lessonId }) => {
     if (!lesson) return;
     const started =
       weakItemIds.length > 0 &&
-      startQuiz(buildReviewConfig([lesson.id], weakItemIds, state.lessons));
+      startQuiz(buildReviewConfig([lesson.id], weakItemIds, state.lessons, lessonReturnTarget(lesson.id)));
     if (!started) navigate({ type: 'quiz_review' });
   };
 

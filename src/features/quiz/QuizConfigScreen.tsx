@@ -9,6 +9,7 @@ import { getAvailableQuestionCounts, getQuizEligibility } from '../../lib/quizEn
 import { ALL_QUESTION_TYPES, DEFAULT_QUESTION_TYPES } from '../../lib/quizSession';
 import { STUDY_CATEGORIES, getBookLessons, groupLessonsByBook } from '../../lib/studySelectors';
 import { AppRoute } from '../../lib/routes';
+import { QuizReturnTarget } from '../../lib/quizReturn';
 import { Screen, ScreenHeader, SectionLabel, StickyBottomBar, isDialogOpen } from '../../components/Screen';
 import { Button, FOCUS_RING } from '../../components/Button';
 import { CheckboxRow } from '../../components/FormControls';
@@ -20,6 +21,13 @@ export type QuizConfigScope =
   | { kind: 'category'; bookId: string; category: StudyCategory }
   | { kind: 'book'; bookId: string }
   | { kind: 'mixed' };
+
+/** Where Results returns for a test started here: the category, the book, or the Test root. */
+export function quizConfigReturnTarget(scope: QuizConfigScope): QuizReturnTarget {
+  if (scope.kind === 'category') return { type: 'category_inside_book', bookId: scope.bookId, category: scope.category };
+  if (scope.kind === 'book') return { type: 'book_study', bookId: scope.bookId };
+  return { type: 'mixed_quiz_config' };
+}
 
 interface LessonSection {
   key: string;
@@ -116,6 +124,7 @@ export const QuizConfigScreen: React.FC<{ scope: QuizConfigScope }> = ({ scope }
       questionCount: effectiveCount,
       allowedTypes: ALL_QUESTION_TYPES.filter((type) => types.includes(type)),
       kind: 'standard',
+      returnTarget: quizConfigReturnTarget(scope),
     });
   };
 

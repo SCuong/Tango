@@ -13,6 +13,7 @@
 
 import { ItemProgress, QuestionType, QuizMode, QuizQuestion, QuizSessionResult } from '../types';
 import { evaluateQuizAnswer } from './quizEngine';
+import type { QuizReturnTarget } from './quizReturn';
 
 /** Every quiz entry point (lesson, category, book, mixed, review) runs through this config. */
 export interface QuizSessionConfig {
@@ -24,6 +25,11 @@ export interface QuizSessionConfig {
   focusItemIds?: string[];
   /** Review sessions clear the weak flag of items answered correctly (DATA_MODEL §4.3). */
   kind: 'standard' | 'review';
+  /**
+   * Runtime navigation metadata: the study context Quiz Results returns to. Set by each entry
+   * point, carried through Retry and Review Missed, never persisted; missing means Home.
+   */
+  returnTarget?: QuizReturnTarget;
 }
 
 export interface QuizAnswerRecord {

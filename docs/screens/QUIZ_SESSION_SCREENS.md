@@ -191,7 +191,24 @@ Post-quiz assessment metrics and mistake review triggers.
 #### Actions:
 1. `[IconRefresh] Ôn lại các từ đã sai (3 từ)` — High-emphasis primary button (only rendered if mistakes exist).
 2. `[IconRotateClockwise] Làm lại bài kiểm tra` — Secondary button.
-3. `[IconHome] Về trang chủ` — Tertiary button.
+3. **Contextual return** — quiet tertiary button: returns to the study context the quiz started from (see *Return context* below), e.g. `[IconArrowLeft] Về Hán tự`.
+
+#### Return context:
+Quiz Results returns to the quiz's originating study context, not always Home.
+
+| Quiz started from | Returns to | VI | EN | Icon |
+|---|---|---|---|---|
+| Category Quiz Config (SCREEN 07) | `/book/:bookId/category/:category` | `Về Từ vựng` / `Về Hán tự` | `Back to Vocabulary` / `Back to Kanji` | `IconArrowLeft` |
+| Book Quiz Config (SCREEN 08) | `/book/:bookId` | `Về giáo trình` | `Back to book` | `IconArrowLeft` |
+| Lesson Practice / Quick Test / lesson Review (SCREEN 05) | `/lesson/:lessonId` | `Về bài học` | `Back to lesson` | `IconArrowLeft` |
+| Mixed Quiz Config, the Test root (SCREEN 09) | `/quiz/mixed-config` | `Về Kiểm tra` | `Back to Test` | `IconCards` |
+| Unknown (no metadata) | `/` | `Về trang chủ` | `Back to Home` | `IconHome` |
+
+- **Explicit runtime metadata:** each entry point sets `QuizSessionConfig.returnTarget` (a typed, restricted subset of the app routes) when the session starts. It is never inferred from question types, answers, or lessons, never passed to the quiz engine, and never written to `tango_v1_history`.
+- **Preserved across Retry and Review Missed:** Retry reuses the same config; Review Missed launched from Results carries the ORIGINAL return target (Kanji → Test → Results → Review Missed → Results → `Về Hán tự`), never the previous Results screen.
+- **Fallback = Home** when the metadata is missing (an old or test-created session).
+- **History:** the return action goes back through browser history to the existing origin entry when it is an earlier in-app screen, so browser Back from the origin never bounces into Results or the quiz session; after a deep link or reload it replaces Results with the origin instead.
+- **Keyboard:** `Escape` takes the same contextual return; `Enter` (focus on the page) still starts Review Missed.
 
 #### Responsive Adaptation:
 - **Mobile (< 640px):** 2x2 metric cards, stacked action buttons.
@@ -205,5 +222,5 @@ Post-quiz assessment metrics and mistake review triggers.
 Launches a targeted review session containing only items failed in the recent quiz or marked weak in history.
 - Reuses SCREEN 10 (Quiz Runner) scoped strictly to `missedItemIds` (from Results) or to the lesson's weak items (from Lesson Detail), using the engine's review focus (see [`docs/DATA_MODEL.md` §4.3](../DATA_MODEL.md)).
 - A correct answer in a review session clears the item's weak flag.
-- Once all weak items are answered correctly, returns gracefully to SCREEN 14 or Home.
+- Once all weak items are answered correctly, returns gracefully to SCREEN 14, whose return action still leads to the original quiz's study context (or Home when there is none).
 - **Empty State:** If launched when 0 items are weak, displays: *"Tuyệt vời! Bạn không có từ nào cần ôn lại."*.

@@ -38,6 +38,7 @@ import {
 import { createId } from '../../lib/ids';
 import { getDeduplicationKey } from '../../lib/textNormalization';
 import { useAppState } from '../../hooks/useAppState';
+import { QuizReturnTarget } from '../../lib/quizReturn';
 
 export interface CompletedQuiz {
   config: QuizSessionConfig;
@@ -63,11 +64,14 @@ const QuizSessionContext = createContext<QuizSessionContextValue | null>(null);
 /**
  * Review config for a set of missed items. Distractors come from the lessons the items belong to;
  * if the multiple-choice types cannot form 4 options, the written type is added as a fallback.
+ * `returnTarget` is the ORIGINAL quiz origin (a review started from Results returns where the
+ * reviewed quiz came from, never to the previous Results screen).
  */
 export function buildReviewConfig(
   lessonIds: string[],
   focusItemIds: string[],
-  lessons: Parameters<typeof getQuizEligibility>[1]
+  lessons: Parameters<typeof getQuizEligibility>[1],
+  returnTarget?: QuizReturnTarget
 ): QuizSessionConfig {
   const base: QuizSessionConfig = {
     lessonIds,
@@ -76,6 +80,7 @@ export function buildReviewConfig(
     allowedTypes: DEFAULT_QUESTION_TYPES,
     focusItemIds,
     kind: 'review',
+    ...(returnTarget ? { returnTarget } : {}),
   };
   // Compare against the number of distinct lexical groups the focus items belong to
   const focus = new Set(focusItemIds);
