@@ -4,8 +4,8 @@
  * - Same-origin assets and Google Fonts: served from cache, refreshed in the background.
  * Study data lives in localStorage / IndexedDB and is never touched here.
  */
-const CACHE = 'tango-shell-v2';
-const SHELL = ['/', '/manifest.webmanifest', '/icon.svg'];
+const CACHE = 'tango-shell-v3';
+const SHELL = ['/', '/manifest.webmanifest', '/favicon-32.png', '/icon-192.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

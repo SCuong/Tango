@@ -137,8 +137,9 @@ Tango is designed to be installed on mobile phones and tablets:
   - `orientation`: `portrait-primary`
   - `theme_color`: `#4f46e5`
   - `background_color`: `#f8fafc`
+  - `icons`: the official Tango cat icon (`public/`): `icon-192.png` and `icon-512.png` (`any`), and `icon-maskable-512.png` (`maskable`: full-bleed cream with the whole cat inside the 80% safe circle, so Android masks never crop the ears or whiskers). `index.html` links `favicon-32.png` / `favicon-16.png` and the opaque `apple-touch-icon.png` (180×180). All are generated from the owner's artwork without redrawing it.
 - **Caching Strategy (`public/sw.js`):**
-  - **App shell:** `/`, the manifest, and the icon are cached on install.
+  - **App shell:** `/`, the manifest, the favicon, and the 192px app icon are cached on install.
   - **Navigations:** Network first; offline, the cached app shell is served for every route (client-side routing takes over).
   - **Static Assets & Fonts:** Same-origin assets and Google Fonts are served from cache and refreshed in the background (stale-while-revalidate).
   - **First visit:** resources loaded before the worker took control (built JS/CSS, fonts, the manifest, and bundled images such as the `.webp` brand wordmark; see `src/lib/offlineAssets.ts`) are posted to the worker and cached right away.
