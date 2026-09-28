@@ -1,19 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
-import {
-  IconBooks,
-  IconChevronDown,
-  IconChevronUp,
-  IconPlus,
-  IconSettings,
-} from '@tabler/icons-react';
+import { IconBooks, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
-import {
-  CLAY_PRESSED_CLASSES,
-  MIN_PRESS_FEEDBACK_MS,
-  usePressFeedback,
-} from '../../hooks/usePressFeedback';
+import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../../hooks/usePressFeedback';
 import { TranslationKey } from '../../lib/i18n';
 import { StudyCategory } from '../../types';
 import { TopBar } from '../../components/TopBar';
@@ -23,6 +13,8 @@ import { VocabularyIllustration } from '../../components/illustrations/Vocabular
 import { KanjiIllustration } from '../../components/illustrations/KanjiIllustration';
 import { IllustrationProps } from '../../components/illustrations/StudyCardIllustration';
 import { BookCard } from './BookCard';
+import { useMeoShowcase } from '../../hooks/useMeoShowcase';
+import { MeoHoldIndicator, MeoShowcaseExitLayer } from '../../components/MeoShowcase';
 
 // Home previews only the first books; the rest are revealed in place by "View all".
 // Reordering belongs to the future full Books list / management view, never to Home.
@@ -104,12 +96,10 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ category, onClick }) => {
 
 export const HomeStudyHub: React.FC = () => {
   const { state } = useAppState();
+  // Meo's World easter egg: long-press empty Home canvas to show the background artwork alone
+  const showcase = useMeoShowcase(state.preferences.theme === 'meo');
   const { navigate } = useNavigation();
   const { t } = useI18n();
-  // Primary CTA keeps its pressed state visible for a minimum time before navigating
-  const { pressHandlers: testPressHandlers, runAfterPress: runAfterTestPress } = usePressFeedback({
-    minPressMs: MIN_PRESS_FEEDBACK_MS,
-  });
   const [showAllBooks, setShowAllBooks] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -117,7 +107,7 @@ export const HomeStudyHub: React.FC = () => {
   // Global keyboard shortcut: Alt+S -> Settings
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey && (e.key === 's' || e.key === 'S')) {
+      if (e.altKey && (e.code === 'KeyS' || e.key === 's' || e.key === 'S')) {
         e.preventDefault();
         navigate({ type: 'settings' });
       }
@@ -181,14 +171,15 @@ export const HomeStudyHub: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-page text-text-primary flex flex-col">
+    <div className="min-h-screen bg-page text-text-primary flex flex-col" {...showcase.zoneHandlers}>
       {/* Restrained per-theme Japanese ambience, behind all content */}
       <ThemeAmbience />
 
-      {/* Top Bar: TANGO wordmark and Settings only */}
+      {/* Top Bar: TANGO wordmark; primary navigation from sm up (mobile uses the bottom nav) */}
       <TopBar />
 
-      {/* Main Home study canvas: Study Books first, then category shortcuts, then Mixed Test */}
+      {/* Main Home study canvas: Study Books first, then the Vocabulary / Kanji shortcuts.
+          Test and Settings are primary destinations (bottom nav on mobile, top bar from sm). */}
       <main
         ref={containerRef}
         onKeyDown={handleKeyDown}
@@ -207,11 +198,6 @@ export const HomeStudyHub: React.FC = () => {
               icon={<IconBooks size={22} stroke={1.75} />}
               title={t('home.emptyBooks.title')}
               description={t('home.emptyBooks.description')}
-              action={{
-                label: t('nav.settings'),
-                icon: <IconSettings size={18} stroke={2} aria-hidden="true" />,
-                onClick: () => navigate({ type: 'settings' }),
-              }}
             />
           ) : (
             <>
@@ -232,7 +218,7 @@ export const HomeStudyHub: React.FC = () => {
                       onClick={() => setShowAllBooks((value) => !value)}
                       aria-expanded={showAllBooks}
                       aria-controls="home-more-books"
-                      className={`inline-flex items-center justify-center gap-1.5 w-[62%] sm:w-auto sm:px-10 min-h-touch rounded-2xl border border-dashed border-border-strong text-sm font-semibold text-text-secondary ${FOCUS_RING}`}
+                      className={`tango-canvas-secondary inline-flex items-center justify-center gap-1.5 w-[62%] sm:w-auto sm:px-10 min-h-touch rounded-2xl border border-dashed border-border-strong text-sm font-semibold text-text-secondary ${FOCUS_RING}`}
                     >
                       {t(showAllBooks ? 'home.showFewerBooks' : 'home.viewAllBooks')}
                       {showAllBooks ? (
@@ -248,60 +234,37 @@ export const HomeStudyHub: React.FC = () => {
           )}
         </section>
 
-        {/* Secondary shortcuts: Vocabulary / Kanji, then Mixed Test */}
-        <div className="grid gap-3 sm:gap-4 lg:grid-cols-[3fr_2fr]">
-          <section aria-labelledby="home-learn-by-type-heading">
-            <h2 id="home-learn-by-type-heading" className="sr-only">
-              {t('home.learnByType')}
-            </h2>
+        {/* Secondary shortcuts: Vocabulary / Kanji */}
+        <section aria-labelledby="home-learn-by-type-heading">
+          <h2 id="home-learn-by-type-heading" className="sr-only">
+            {t('home.learnByType')}
+          </h2>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 h-full">
-              <CategoryTile
-                category="vocabulary"
-                onClick={() =>
-                  navigate({
-                    type: 'learn_by_type',
-                    category: 'vocabulary',
-                  })
-                }
-              />
-              <CategoryTile
-                category="kanji"
-                onClick={() =>
-                  navigate({
-                    type: 'learn_by_type',
-                    category: 'kanji',
-                  })
-                }
-              />
-            </div>
-          </section>
-
-          {/* Test CTA: raised primary action (solid depth lip, visibly pressed before navigating),
-              short label plus a "+" affordance (creates/configures a test) */}
-          <section aria-labelledby="home-mixed-test-heading">
-            <button
-              type="button"
-              id="home-mixed-test-heading"
-              data-study-card="true"
-              {...testPressHandlers}
-              onClick={() => runAfterTestPress(() => navigate({ type: 'mixed_quiz_config' }))}
-              aria-label={t('aria.createTest')}
-              className={`clay-interactive cta-raised w-full h-full text-left bg-cta-surface border border-cta-border text-cta-text rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 min-h-[72px] flex items-center justify-between gap-3 ${FOCUS_RING}`}
-            >
-              <h3 className="font-bold text-base sm:text-lg leading-snug text-cta-text">
-                {t('home.test')}
-              </h3>
-              <span
-                className="w-10 h-10 rounded-full bg-cta-puck-surface border border-cta-puck-border flex items-center justify-center shrink-0"
-                aria-hidden="true"
-              >
-                <IconPlus size={22} stroke={2.25} />
-              </span>
-            </button>
-          </section>
-        </div>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 h-full">
+            <CategoryTile
+              category="vocabulary"
+              onClick={() =>
+                navigate({
+                  type: 'learn_by_type',
+                  category: 'vocabulary',
+                })
+              }
+            />
+            <CategoryTile
+              category="kanji"
+              onClick={() =>
+                navigate({
+                  type: 'learn_by_type',
+                  category: 'kanji',
+                })
+              }
+            />
+          </div>
+        </section>
       </main>
+
+      {showcase.hold && <MeoHoldIndicator key={showcase.hold.key} hold={showcase.hold} />}
+      {showcase.active && <MeoShowcaseExitLayer onExit={showcase.exit} />}
     </div>
   );
 };

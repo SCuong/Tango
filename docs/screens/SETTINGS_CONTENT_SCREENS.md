@@ -25,26 +25,38 @@ App preferences management and intentional gateway to administrative content ope
 
 #### Routes & Navigation:
 - **Route:** `/settings`
-- **Entry:** Top bar `[IconSettings]` button from Home or other main screens.
+- **Entry:** the **Cài đặt / Settings** primary destination (mobile bottom bar, Home header from `sm` up, or `Alt+S` on Home); see [`DESIGN_SYSTEM.md` §16.0](../DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings).
 - **Exit:**
-  - Mobile: `[IconArrowLeft]` Back $\rightarrow$ Previous screen.
+  - Mobile: Settings is a root destination; leave through the Home / Test tabs of the bottom navigation (no back arrow).
   - Tablet/Desktop: `[IconX]` Close or `Escape` $\rightarrow$ Closes modal.
 
 #### Canonical Responsive Presentation:
-- **Mobile (< 640px):** **Full-screen route** (`/settings`) with `[IconArrowLeft]` top back button.
+- **Mobile (< 640px):** **Full-screen root screen** (`/settings`): title only (no back arrow) and the floating primary navigation with Settings active. Opening Content Management hides the bottom navigation; its back arrow returns to Settings.
 - **Tablet / Desktop (>= 640px):** **Centered modal dialog** (`max-w-lg`) with backdrop blur and `[IconX]` top-right close button.
 
 #### Content Sections:
 1. **Giao diện & Tùy chọn (Appearance & Preferences):**
    - **Language:** Segmented control `[ Tiếng Việt ]` | `[ English ]`
    - **Theme (Chủ đề màu sắc):**
-     - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
-     - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
-     - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
+     - Exactly three card slots, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, and a third slot that normally shows `Sakura` (the standard themes). Light and Dark never move, resize, fade, reflow, or animate.
+     - **Easter-egg reveal:** a small round icon toggle on the right of the section title row (a smirking Tango cat drawn as SVG; accessible name and tooltip `Xem thêm chủ đề` / `More themes`) swaps **only the third slot** from Sakura to `Mèo mập 😺` / `Meo's World` with a vertical casino-reel transition: Sakura exits downward while Meo's World drops in from above (≈320ms, `cubic-bezier(0.22, 1, 0.36, 1)`, about 104% of the slot height, with a light fade). The toggle icon then becomes a pink sakura blossom (`Quay lại Sakura` / `Back to Sakura`) and pressing it reverses the reel: Meo's World rises out and Sakura comes back up from below. Both cards share the slot's cell (stable size) and the travel is clipped to the slot, so nothing else on the page moves. It is a vertical slot transition, not a horizontal carousel; the hidden card is `aria-hidden` and not focusable. The toggle is a real button: 48px touch target around a 36px clay puck, explicit pressed depth (`usePressFeedback`, drag-out cancels), a hover lift on fine pointers only, a focus-visible ring, and a small pop when its icon swaps (only after a press). Reduced motion swaps instantly with no vertical travel and no icon pop.
+     - **Revealing never selects:** the toggle only changes which card the third slot shows; the user taps the Meo's World card to choose it. The reveal state is not persisted. If the persisted theme is `meo`, Settings opens with Meo's World revealed and the sakura toggle showing; pressing Back then keeps Meo's World active while its card is temporarily hidden. Arrow keys move the radio selection among the three visible cards only.
+     - Each card renders a miniature of the **current** Tango shell in its own theme's tokens: a tiny top bar with the cat wordmark, the Vocabulary (`語`) / Kanji (`漢`) category cards, and a 3-item Home / Test / Settings navigation with Home active, plus the localized theme name. Simple shapes only (no stale Home CTA bar, no text paragraphs); the canvas motif hints at the ambience, and Meo's World adds only the mini navigation's brown outline and cat ears.
+     - Selected state: primary border plus a 2px primary ring (a shape cue, never a color change alone), no check badge; the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
      - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
      - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control; do not add a theme toggle to any TopBar.
-     - The previews use the canonical palettes and ambience identities (Light — Cool Pearl, Dark — Midnight Ink, Sakura — Warm Blossom Paper) defined in [`docs/DESIGN_SYSTEM.md` §9 / §16.5](../DESIGN_SYSTEM.md#9-theme-palette-specifications).
+     - The previews use the canonical palettes and ambience identities (Light — Cool Pearl, Dark — Midnight Ink, Sakura — Warm Blossom Paper, Meo's World — the special cat theme of §9.4) defined in [`docs/DESIGN_SYSTEM.md` §9 / §16.5](../DESIGN_SYSTEM.md#9-theme-palette-specifications).
    - **Sound Effects:** Segmented control `[ Off / Tắt ]` | `[ On / Bật ]` (Default: **Off**)
+   - **Answer layout (Bố cục đáp án):** two compact preview cards in a radio group after Sound Effects (arrow keys move the selection; touch targets of at least 48px):
+     - `Lưới 2×2` / `2×2 Grid` (default) and `Danh sách` / `Stacked`; selected = primary border + 2px primary ring.
+     - Helper line: `Tự chuyển sang danh sách khi đáp án quá dài.` / `Long answers automatically switch to the stacked layout.`
+     - Persists immediately to `tango_v1_preferences.answerLayout`. A failed save shows the localized Settings save error and keeps the previous selection.
+     - Applies only to 4-option multiple-choice questions; Grid falls back to Stacked per question when an answer is too long or the screen too narrow, without changing the saved preference ([`DESIGN_SYSTEM.md` §12.4](../DESIGN_SYSTEM.md#124-answer-layout-preference-grid-22--stacked-14)).
+   - **Incorrect answer feedback (Hiển thị lời giải khi sai):** two compact preview cards in a radio group after Answer layout (arrow keys move the selection; touch targets of at least 48px):
+     - `Cửa sổ` / `Popup` (default): dimmed answers behind a small floating explanation panel.
+     - `Dưới đáp án` / `Inline`: answers stay visible, with a dashed explanation box directly below them.
+     - Selected = primary border + 2px primary ring. Persists immediately to `tango_v1_preferences.incorrectFeedback`; a failed save shows the localized Settings save error and keeps the previous selection.
+     - The quiz runner applies it to every wrong answer ([SCREEN 12](./QUIZ_SESSION_SCREENS.md#screen-12-incorrect-answer-feedback--explanation)).
 2. **Nội dung học (Study Content):**
    - Clickable row: `Quản lý giáo trình và bài học` $\rightarrow$ navigates to [SCREEN 17: Content Management](#screen-17-content-management-quản-lý-nội-dung).
 
@@ -70,10 +82,22 @@ SETTINGS PANEL
 │ Âm thanh hiệu ứng                             │
 │ [ (•) Tắt (Off) ]      [ ( ) Bật (On) ]       │
 │                                               │
+│ Bố cục đáp án                                 │
+│ Tự chuyển sang danh sách khi đáp án quá dài.  │
+│ ┌───────────────────┐  ┌───────────────────┐  │
+│ │ ▣▣  Lưới 2×2      │  │ ▤   Danh sách     │  │
+│ │ ▣▣  (selected)    │  │ ▤                 │  │
+│ └───────────────────┘  └───────────────────┘  │
+│                                               │
+│ Hiển thị lời giải khi sai                     │
+│ ┌───────────────────┐  ┌───────────────────┐  │
+│ │ ▤▣  Cửa sổ        │  │ ▤   Dưới đáp án   │  │
+│ │ (selected)        │  │ ┆╌╌┆               │  │
+│ └───────────────────┘  └───────────────────┘  │
+│                                               │
 │ NỘI DUNG HỌC                                  │
 │ ┌───────────────────────────────────────────┐ │
 │ │ Quản lý giáo trình và bài học   [IconChevronRight] │
-│ │ Thêm, sửa, nhập và phân loại nội dung     │ │
 │ └───────────────────────────────────────────┘ │
 └───────────────────────────────────────────────┘
 ```
@@ -90,9 +114,9 @@ The single protected administrative hub for adding, editing, and managing textbo
 - **Entry:** Settings row "Quản lý giáo trình và bài học".
 - **Exit:** `[IconArrowLeft]` Back $\rightarrow$ [SCREEN 16: Settings](#screen-16-settings-cài-đặt).
 - **Actions:**
-  - `[IconPlus] Thêm giáo trình mới` $\rightarrow$ [SCREEN 18: Add Study Book](#screen-18-add-study-book-thêm-giáo-trình).
+  - `Thêm giáo trình (+)` $\rightarrow$ [SCREEN 18: Add Study Book](#screen-18-add-study-book-thêm-giáo-trình).
   - `[ Quản lý ]` beside a book $\rightarrow$ [SCREEN 19: Manage Study Book](#screen-19-manage-study-book-quản-lý-giáo-trình).
-  - `[IconFileImport] Thêm / Nhập bài học mới` $\rightarrow$ [SCREEN 21: Import Input](./IMPORT_SCREENS.md#screen-21-add--import-lesson-input-stage-bước-1).
+  - `[IconFileImport] Thêm bài học mới` $\rightarrow$ [SCREEN 21: Import Input](./IMPORT_SCREENS.md#screen-21-add--import-lesson-input-stage-bước-1).
   - `[ Quản lý ]` beside an unassigned lesson $\rightarrow$ [SCREEN 20: Manage Lesson](#screen-20-manage-lesson-quản-lý-bài-học).
 
 #### Management Paths & Unassigned Lessons Rules:
@@ -114,8 +138,8 @@ The single protected administrative hub for adding, editing, and managing textbo
 #### Responsive Layout:
 - **Mobile (< 640px):** Full-screen stacked list. Study Books roster listed first, followed by Unassigned Lessons (if any exist), followed by lesson creation CTA.
 - **Tablet / Desktop (>= 640px):** **Structured 2-column management dashboard** (`max-w-4xl`):
-  - Left Column (60%): Study Books list with `[ Quản lý ]` actions and `+ Thêm giáo trình mới` CTA.
-  - Right Column (40%): Lessons & Import quick tools (`[IconFileImport] Thêm / Nhập bài học mới`), plus the Unassigned Lessons roster (if any exist) with `[ Quản lý ]` buttons.
+  - Left Column (60%): Study Books list with `[ Quản lý ]` actions and `Thêm giáo trình (+)` action.
+  - Right Column (40%): Lessons & Import quick tools (`[IconFileImport] Thêm bài học mới`), plus the Unassigned Lessons roster (if any exist) with `[ Quản lý ]` buttons.
 
 #### Wireframes:
 ```text
@@ -132,7 +156,7 @@ MOBILE (< 640px)
 │ │         5 bài · 110 mục                   │ │
 │ └───────────────────────────────────────────┘ │
 │                                               │
-│ [ [IconPlus] Thêm giáo trình mới ]            │
+│ [ Thêm giáo trình (+) ]                       │
 │                                               │
 │ KHÔNG THUỘC GIÁO TRÌNH (khi có bài lẻ)        │
 │ ┌───────────────────────────────────────────┐ │
@@ -144,8 +168,7 @@ MOBILE (< 640px)
 │ THAO TÁC BÀI HỌC (LESSONS)                    │
 │ ┌───────────────────────────────────────────┐ │
 │ │ [IconFileImport]                          │ │
-│ │ Thêm / Nhập bài học mới                   │ │
-│ │ Tạo thủ công hoặc nhập từ tệp/văn bản     │ │
+│ │ Thêm bài học mới                          │ │
 │ └───────────────────────────────────────────┘ │
 └───────────────────────────────────────────────┘
 
@@ -156,13 +179,13 @@ DESKTOP (> 1024px - max-w-4xl Centered)
 │ GIÁO TRÌNH (STUDY BOOKS)               BÀI HỌC & NHẬP LIỆU             │
 │ ┌────────────────────────────────────┐ ┌─────────────────────────────┐ │
 │ │ [Thumb] 中級へ行こう    [ Quản lý ]│ │ [IconFileImport]            │ │
-│ │         8 bài · 164 mục            │ │ Thêm / Nhập bài học mới     │ │
-│ ├────────────────────────────────────┤ │ Tạo bài học mới bằng cách   │ │
-│ │ [Thumb] Mimikara        [ Quản lý ]│ │ dán văn bản hoặc tải file.  │ │
-│ │         5 bài · 110 mục            │ └─────────────────────────────┘ │
+│ │         8 bài · 164 mục            │ │ Thêm bài học mới            │ │
+│ ├────────────────────────────────────┤ └─────────────────────────────┘ │
+│ │ [Thumb] Mimikara        [ Quản lý ]│                                 │
+│ │         5 bài · 110 mục            │                                 │
 │ └────────────────────────────────────┘                                 │
 │                                        KHÔNG THUỘC GIÁO TRÌNH          │
-│ [ [IconPlus] Thêm giáo trình mới ]     ┌─────────────────────────────┐ │
+│ [ Thêm giáo trình (+) ]                ┌─────────────────────────────┐ │
 │                                        │ • 20 từ N3      [ Quản lý ] │ │
 │                                        │ • Chữ Hán N4    [ Quản lý ] │ │
 │                                        └─────────────────────────────┘ │

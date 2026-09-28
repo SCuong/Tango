@@ -296,13 +296,17 @@ export interface ItemProgress {
   isMarkedWeak: boolean;          // Persisted weak/review flag; read selectors consume it as-is
 }
 
-export type AppTheme = 'light' | 'dark' | 'sakura';
+export type AppTheme = 'light' | 'dark' | 'sakura' | 'meo'; // 'meo' = Meo's World (special theme)
 export type AppLanguage = 'vi' | 'en';
+export type AnswerLayout = 'grid' | 'stacked'; // 4-option multiple-choice layout (DESIGN_SYSTEM §12.4)
+export type IncorrectFeedback = 'popup' | 'inline'; // explanation style for a wrong answer (DESIGN_SYSTEM §16.5)
 
 export interface UserPreferences {
-  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura'
+  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura' | 'meo'
   language: AppLanguage;         // 'vi' (default) | 'en'
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
+  answerLayout: AnswerLayout;    // 'grid' (default) | 'stacked'; missing/invalid stored values load as 'grid'
+  incorrectFeedback: IncorrectFeedback; // 'popup' (default) | 'inline'; missing/invalid load as 'popup'
 }
 
 /**
@@ -337,9 +341,15 @@ export interface UserStudyState {
 Any affected history session is **deleted entirely** rather than partially rewritten (preserving partial summaries with missing lesson context would corrupt score and accuracy records). Unaffected quiz histories remain untouched.
 
 ### 4.3 Mistake Review Lifecycle
-1. When any question is answered incorrectly, `targetItem.id` is added to `QuizSessionResult.missedItemIds`.
-2. Clicking **"Ôn lại từ sai" (Review Missed Words)** gathers the corresponding `StudyItem` records across all tested lessons and launches a focused practice session exclusively for those items.
-3. Once an item is answered correctly in subsequent review sessions, `isMarkedWeak` is cleared.
+1. When any question is answered incorrectly, `targetItem.id` is added to `QuizSessionResult.missedItemIds` and the item's `ItemProgress.isMarkedWeak` is set to `true`.
+2. Clicking **"Ôn lại từ sai" (Review Missed Words)** gathers the corresponding `StudyItem` records across all tested lessons and launches a focused practice session exclusively for those items. The session keeps the original lessons as its pool (`lessonIds`) and passes the missed items as `focusItemIds`: only lexical groups containing a focus item are eligible and the focus item is always the `targetItem`, while multiple-choice distractors still come from the other lexical groups of those lessons. If the multiple-choice types cannot form 4 distinct options for every focus item, `vi_to_text` is added as a fallback type.
+3. Once an item is answered correctly in subsequent review sessions, `isMarkedWeak` is cleared. Correct answers in ordinary sessions do not clear it.
+
+### 4.3.1 Session Runtime & Persistence Rules
+- Progress (`tango_v1_progress`) and the `QuizSessionResult` (`tango_v1_history`) are written **once, when a session completes**. An exited session is discarded ("not saved to history").
+- Every answer, including Practice Mode repeats, counts as one attempt in `ItemProgress`.
+- **Practice Mode:** a missed question is re-queued at the end of the session until it is answered correctly. The result's score (`correctCount`, `accuracy`) counts first attempts only, so `totalQuestions` stays the initial `N`-bounded count.
+- `timeSpentSeconds` is measured from the first question to the moment the last question is finished.
 
 ### 4.4 Study Metrics Contract & Read Selectors
 Study browsing and progress visualization are powered by pure read selectors (`src/lib/studyMetrics.ts`) with no React or storage side effects:

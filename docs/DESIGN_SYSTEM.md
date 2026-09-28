@@ -17,6 +17,7 @@ Before building or modifying user-facing components, contributors must consult:
 **Home is a reference implementation of this design language, not a layout template.** Future screens must not copy Home's composition by default. Dense lists, content management, import tables, and quiz screens adapt the same language (tokens, clay hierarchy, interaction contract, typography, ambience rules) to their own purpose: for example, flat rows with 1px dividers for dense lists, and a narrow focused canvas for quizzes.
 
 ### B1. Visual Identity
+- **Brand: the Tango cat wordmark is canonical.** The owner-supplied cat + `TANGO` artwork (`src/assets/brand/tango-wordmark.webp`, its white background removed so no rectangle shows on any theme) is Tango's primary brand in **every** theme (Light, Dark, Sakura, and Meo's World). Never redraw, recolor, crop, or re-proportion it (cat, typography, colors, face, tail, paws) and never tile it as wallpaper. Its main use is the TopBar brand button that returns Home (≈40px tall on mobile, ≈44px from `sm`, natural aspect ratio, decorative `alt=""` because the button carries the accessible name). The wordmark is wide, so favicon and PWA icons are not derived from it.
 - Mature **Soft Claymorphism** (§3): matte, tactile, restrained; never cartoon 3D, glossy plastic, or blurry neumorphism.
 - **Calm does not mean colorless** (§8.1): every theme has its own atmosphere, visible from canvas, surfaces, borders, and elevation, not only from accents.
 - **Japanese personality without generic SaaS appearance** (§2): no dashboards of fake stats, no admin-template look.
@@ -27,6 +28,7 @@ Before building or modifying user-facing components, contributors must consult:
 - **Light — Cool Pearl / Japanese daytime:** shoji window and washi paper feeling, one restrained geometric Japanese motif (seigaiha), cool pearl/indigo accents.
 - **Dark — Midnight Ink / Japanese night:** moonlight, a warmly lit shoji window or paper lantern, a few warm firefly points; never cyberpunk.
 - **Sakura — Warm Blossom Paper:** a restrained blossom branch, a few petals, soft kasumi/washi feeling in rose/plum.
+- **Meo's World (special easter-egg theme):** the one deliberate exception to restraint. The brand mascot takes over the environment with a full cat background (§9.4), while content surfaces stay readable islands.
 - Ambience is **decorative only**: behind all content, `aria-hidden`, `pointer-events: none`, low contrast, and never competing with content.
 - **Deterministic:** fixed positions, never re-randomized per render; objects are never flipped or turned upside-down.
 - **Motion:** only a few very slow translate/fade motions where appropriate; `prefers-reduced-motion` makes the layer fully static.
@@ -47,8 +49,9 @@ Before building or modifying user-facing components, contributors must consult:
 |---|---|---|
 | **Content cards** | Study Books, lesson cards, results cards | Soft clay elevation (`--shadow-clay-card`), neutral or semantic surface |
 | **Secondary controls** | Category shortcuts, icon buttons, segmented controls, secondary buttons | Restrained clay; press = 1px sink with compressed shadow (`CLAY_PRESSED_CLASSES`) |
-| **Primary CTA** | The main action of a screen (Home `Kiểm tra`, `Bắt đầu`, `Tiếp tục`, `Đã hiểu — Tiếp tục`) | Visibly raised physical button: `--cta-*` surface plus a solid depth lip (`--cta-depth`, `.cta-raised`) |
-| **Flat** | Dense lists, dictionary rows, settings lists, import tables, form inputs | Flat surface with 1px dividers; no clay stacking |
+| **Primary CTA** | The main action of a screen (`Bắt đầu kiểm tra`, `Kiểm tra giáo trình`, `Đã hiểu — Tiếp tục`) | Visibly raised physical button: `--cta-*` surface plus a solid depth lip (`--cta-depth`, `.cta-raised`) |
+| **Flat** | Dense lists, dictionary rows, settings lists, import tables, form inputs | Flat surface with 1px dividers; no clay stacking. Interactive flat rows use `.flat-interactive`: pressed = background tint from `usePressFeedback`, hover tint only on fine pointers |
+| **Destructive** | Danger Zone actions, confirm-delete buttons | Restrained `--error-surface` / `--error-border` / `--error-text`; never the raised primary treatment |
 
 - The pressed state must look like the control **physically compressing** (moving down onto its lip or base), not merely gaining or losing a shadow.
 - Quiz answer choices keep their own positional treatment (§10–§12); they are not primary CTAs.
@@ -87,8 +90,9 @@ Before building or modifying user-facing components, contributors must consult:
 - One coherent cultural motif is better than a collage of Japanese clichés.
 - A Study Book cover already provides identity; do not add redundant decoration to book cards.
 
-### B11. TopBar
-- Restrained. Home reference: `TANGO` wordmark + Settings only.
+### B11. TopBar & Primary Navigation
+- Restrained. Home reference: the Tango cat wordmark only on mobile; from `sm` up the same bar carries the compact primary navigation (Home / Test / Settings).
+- **Mobile primary navigation is a root-only floating bottom bar** (Home / Test / Settings); see §16.0 for the canonical rules.
 - No theme switch or theme status on Home or other study screens; **theme selection exists only in Settings** (§16.5).
 - A hard divider is not mandatory. Where scrolling content meets or slides beneath a persistent surface, a soft page-colored feather may replace a hard cut.
 
@@ -185,7 +189,7 @@ All primary interactive clay surfaces (Study Book cards, Learn by Type cards, pr
   - The press starts on pointer down (primary mouse button, touch, or pen) or `Space`. A release on the control (pointer up / `Space` up) completes it. Pointer cancel, pointer leave, pointer moving outside the control bounds, blur, and any pointer/key release outside the control cancel it; a cancelled press never triggers the action.
   - Pointer capture is not used, so native click cancellation on drag-out is unchanged.
   - While pressed, the control swaps its resting shadow for `CLAY_PRESSED_CLASSES` (`translate-y-px shadow-clay-pressed`) and exposes `data-pressed="true"`.
-- **Raised primary CTA (e.g. Home `Kiểm tra`):**
+- **Raised primary CTA (e.g. `Bắt đầu kiểm tra`, `Kiểm tra giáo trình`):**
   - At rest it is clearly raised: a solid depth lip `0 5px 0 0 var(--cta-depth)` under the button plus `--shadow-clay-button` (`.cta-raised`).
   - Pressed (`data-pressed="true"`): it sinks onto the lip (`translateY(4px)`, lip reduced to 1px, `--shadow-clay-pressed`), with a 70ms transition. Hover on fine pointers lifts it 1px with a 6px lip.
   - Minimum visible press: the control uses `usePressFeedback({ minPressMs: MIN_PRESS_FEEDBACK_MS })` (100ms). A quick tap stays pressed until 100ms after pointer down, and the action runs through `runAfterPress`, so navigation happens at that same moment. A press that already lasted 100ms navigates immediately on release. Keyboard `Enter` (no press) acts immediately. Drag-out, pointer cancel, blur, and releases outside the control still cancel the press and never navigate.
@@ -227,6 +231,7 @@ Tango uses **Tabler Icons** (`@tabler/icons-react`) as its exclusive, unified UI
 - **Functional Use Only:** Icons are used to reinforce cognitive recognition (e.g. Back, Settings, Import, Practice, Test). Do not decorate buttons where plain text is clearer.
 - **Accessible Tooltips:** Icon-only buttons (such as header actions) must include accessible `aria-label` attributes and native desktop tooltips.
 - **No Emojis as UI Icons:** Never use emojis as replacements for UI action icons.
+- **Meo's World catified icon language (only under `data-theme="meo"`, §9.4):** the same Tabler glyphs, so every icon keeps its function (a house is still Home, an arrow is still Back, a plus is still Add, a trash can is still Delete), drawn chunkier (stroke ≈2.4, nav icons ≈2.8–3.1) with round caps and joins in warm tones. Shared icon pucks (`.tango-icon-puck`: bottom-nav pucks, round icon buttons, list/row icon pucks) grow small cat ears that inherit the puck's own surface; the active bottom-nav puck carries a paw; the category study-card illustrations wear cat ears and a paw while the Japanese glyph itself is never altered. It is implemented once in shared primitives and CSS, never as per-screen decorations. Light, Dark, and Sakura keep the standard icon language.
 
 ### Core Icon Mapping
 | Context | Tabler Icon Name | Purpose |
@@ -302,10 +307,11 @@ Tango's user interface is fully localized in:
 
 ## 8. Multi-Theme Token Architecture
 
-Tango features three distinct, meticulously tuned appearance themes:
+Tango features three distinct, meticulously tuned **standard** appearance themes, plus one special easter-egg theme (4, below):
 1. **Light (Sáng) — Cool Pearl / Japanese Stationery:** A cool neutral pearl (blue-gray) canvas with porcelain-white cards and pearl-gray raised surfaces. Lavender Vocabulary, peach Kanji, and a strong indigo action color each keep their own hue. Bright and comfortable for long daytime sessions.
 2. **Dark (Tối) — Midnight Ink:** A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards. Violet-indigo Vocabulary, amber-brown Kanji, and a vivid indigo action color stand apart from the neutral surfaces. Never generic black, never an "everything blue" screen.
 3. **Sakura (Sakura) — Warm Blossom Paper:** A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted raised surfaces, and a rose-plum accent. It reads as "Sakura" without any flower decoration.
+4. **Mèo mập 😺 / Meo's World (`meo`) — special theme:** Tango the cat takes over the app: a honey-orange cat-world canvas with a full cat background, milk-white/cream content islands, warm tabby-brown text, and a rich orange CTA on a dark brown depth lip (§9.4). It is revealed in the third Settings theme slot by the round cat toggle and is never one of the three initially visible cards.
 
 ### 8.1 Calm Does Not Mean Colorless
 Tango stays mature and restrained, but it never falls back to near-white or near-black palettes that make every theme feel generic.
@@ -314,12 +320,14 @@ Tango stays mature and restrained, but it never falls back to near-white or near
 - **Identity lives in the material, not only the accents:** Theme identity must be visible from the page canvas, surfaces, borders, and elevation. Cards must separate from the canvas by color before any shadow is considered.
 - **Separate the three color roles:** Canvas creates atmosphere; category surfaces create identity; CTA creates action emphasis. These three roles must not collapse into the same hue family. In practice: keep the canvas and neutral card surfaces low-saturation, give each category surface its own clearly different hue, and reserve the most saturated color on screen for the CTA. Sakura is the reference: blush canvas, lavender/peach categories, plum-rose action.
 - **Personality comes only from:** palette, material contrast, typography, the existing study illustrations, and hierarchy.
-- **Never:** gradient color fills, decorative blobs, neon, glow, glassmorphism, or wallpaper illustrations (alpha-mask feathers on cut edges are allowed, §8.2). Sakura petals and Japanese motifs (shoji, seigaiha, moon, lantern, mist, branch) are allowed **only** inside the restrained ambience layer of §8.2. Sakura petals and Japanese motifs (shoji, moon, lantern, mist) are allowed **only** inside the restrained ambience layer of §8.2.
+- **Never:** gradient color fills, decorative blobs, neon, glow, glassmorphism, or wallpaper illustrations (alpha-mask feathers on cut edges are allowed, §8.2). Meo's World (§9.4) is the single deliberate exception for its cat environment; it still keeps content surfaces opaque and readable. Sakura petals and Japanese motifs (shoji, seigaiha, moon, lantern, mist, branch) are allowed **only** inside the restrained ambience layer of §8.2.
 - **Restraint:** Shadows stay soft and are tinted to each theme's material; never make them heavier to fake personality.
 - **Settings previews:** The palettes in §9 are exactly what the Settings theme preview cards display (§16.5).
 
 ### 8.2 Restrained Japanese Ambience (Explicit Exception)
-Each theme shows a quiet but recognizably Japanese scene behind all content. This is the **only** exception to the "no decorative shapes / no petals / no Japanese patterns" rules in §2 and §8.1, and it applies only to this fixed background layer (`ThemeAmbience`, used on Home). Use a few intentional motifs per theme, never a collage of clichés.
+Each theme shows a quiet but recognizably Japanese scene behind all content. This is the **only** exception to the "no decorative shapes / no petals / no Japanese patterns" rules in §2 and §8.1, and it applies only to this fixed background layer (`ThemeAmbience`).
+
+**Where ambience appears:** Home at full strength; the study browsing screens (Book Study View, Category Inside Book, Learn by Type) and the test configuration screens use a quieter variant (`.tango-ambience-subtle`, half opacity) because their headings sit directly on the canvas. It is intentionally **absent** from focused or administrative screens: Lesson Detail, the dense Lesson Items list, the quiz runner and results, Settings, Content Management, the importer, and dialogs. Quiz screens keep attention on the prompt and answers; management screens prioritize clarity and safety. Use a few intentional motifs per theme, never a collage of clichés.
 
 - **Light — Japanese daytime:** daylight through a washi shoji window (kumiko lattice), a quarter fan of seigaiha waves in cool pearl-indigo, and one soft mist band.
 - **Dark — Japanese night:** a dim moon, a warmly lit shoji window, one paper lantern, four warm firefly points, and a few 3px stars. Warm and quiet, never neon or cyberpunk.
@@ -332,7 +340,8 @@ Rules:
 - **Deterministic:** every element has a fixed position in CSS; nothing is randomized per render.
 - **Motion:** only a few very slow elements per theme (Light: 1 mist band drifting 28px over 56s; Dark: 4 fireflies floating 10–14px and fading over 16–24s; Sakura: 5 petals falling over 64–88s). Motion is translate or fade only; petals keep one fixed tilt and are never flipped, spun, or turned upside-down.
 - **Reduced motion:** under `prefers-reduced-motion: reduce` every ambience animation is removed (`animation: none`) and the scene is fully static.
-- **Theme scoping:** all three scenes are in the DOM; CSS shows only the one matching the active `data-theme`.
+- **Theme scoping:** all four scenes (Light, Dark, Sakura, Meo's World) are in the DOM; CSS shows only the one matching the active `data-theme`.
+- **Meo's World exception:** its cat environment follows §9.4 instead of the restraint above (large cats, stronger presence). On the screens listed above as ambience-free it still appears as a quiet, static edge layer (`MeoEdgeAmbience`), and on the Active Quiz only at laptop/desktop widths in the outer margins.
 - **Feathered cut edges:** any motif that is cut by the viewport edge fades out toward that edge with a `mask-image` gradient (linear toward the cut side, or radial from the motif's visible corner) instead of ending in a hard line. Masks only change alpha; content and cards are never blurred.
 
 ### Semantic Token Strategy
@@ -364,6 +373,8 @@ Components **never** reference raw hex colors. All components consume semantic C
   --error: ...;
   --error-surface: ...;
   --error-border: ...;
+  --success-text: ...;        /* readable text on --success-surface */
+  --error-text: ...;          /* readable text on --error-surface (destructive buttons, errors) */
   --warning: ...;
 
   /* 4 Positional Multiple-Choice Answer Identities */
@@ -391,7 +402,7 @@ Components **never** reference raw hex colors. All components consume semantic C
   --category-kanji-icon: ...;
   --category-kanji-text: ...;
 
-  /* Primary Study CTA (solid clay action, e.g. the Home Test CTA) */
+  /* Primary Study CTA (solid clay action, e.g. "Bắt đầu kiểm tra") */
   --cta-surface: ...;
   --cta-border: ...;
   --cta-text: ...;
@@ -418,7 +429,7 @@ Components **never** reference raw hex colors. All components consume semantic C
 ## 9. Theme Palette Specifications
 
 ### 9.1 Light Theme (Sáng) — Cool Pearl / Japanese Stationery
-A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards before shadows are considered, with pearl-gray raised surfaces and navy-ink typography. Vocabulary is a clearly lavender-violet surface, Kanji a warm apricot-peach surface, and the Test CTA a strong indigo action. Canvas, Vocabulary, and CTA never share the same blue-purple family.
+A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards before shadows are considered, with pearl-gray raised surfaces and navy-ink typography. Vocabulary is a clearly lavender-violet surface, Kanji a warm apricot-peach surface, and the primary CTA a strong indigo action. Canvas, Vocabulary, and CTA never share the same blue-purple family.
 
 | Token | Value | Visual Role |
 |---|---|---|
@@ -458,7 +469,7 @@ A cool neutral pearl (blue-gray) canvas that separates porcelain-white cards bef
 | `--shadow-clay-pressed` | `0 1px 2px rgba(30, 38, 64, 0.10), inset 0 2px 4px rgba(30, 38, 64, 0.08)` | Tactile pressed state |
 
 ### 9.2 Dark Theme (Tối) — Midnight Ink
-A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and soft off-white text. Vocabulary is a violet-indigo clay, Kanji a warm amber-brown clay, and the Test CTA a vivid indigo action, so layers differ by identity and not only by brightness. Never neutral black and never monochrome navy.
+A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and soft off-white text. Vocabulary is a violet-indigo clay, Kanji a warm amber-brown clay, and the primary CTA a vivid indigo action, so layers differ by identity and not only by brightness. Never neutral black and never monochrome navy.
 
 | Token | Value | Visual Role |
 |---|---|---|
@@ -498,7 +509,7 @@ A deep, low-saturation charcoal-navy canvas with lifted neutral navy cards and s
 | `--shadow-clay-pressed` | `0 1px 2px rgba(0, 2, 10, 0.55), inset 0 2px 4px rgba(0, 2, 10, 0.40)` | Night pressed state |
 
 ### 9.3 Sakura Theme (Sakura) — Warm Blossom Paper
-A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted raised surfaces, deep plum-ink text, and a rose-plum primary. Vocabulary stays a compatible wisteria lavender; Kanji stays warm peach/plum. It is the reference for role separation: blush atmosphere, lavender/peach identity, plum-rose action. **No petals, patterns, neon, or candy pink.**
+A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted raised surfaces, deep plum-ink text, and a rose-plum primary. Vocabulary stays a compatible wisteria lavender; Kanji stays warm peach/plum. It is the reference for role separation: blush atmosphere, lavender/peach identity, plum-rose action. **No petals or patterns on surfaces (they live only in the §8.2 ambience layer), no neon, no candy pink.**
 
 | Token | Value | Visual Role |
 |---|---|---|
@@ -536,6 +547,41 @@ A warm blush Japanese-paper canvas with warm porcelain cards, blossom-tinted rai
 | `--shadow-clay-card-hover` | `0 8px 22px rgba(150, 80, 95, 0.18), 0 2px 6px rgba(150, 80, 95, 0.09), inset 0 1px 0 rgba(255, 255, 255, 1)` | Warm blossom hover lift |
 | `--shadow-clay-button` | `0 4px 12px rgba(168, 56, 92, 0.26), 0 1px 3px rgba(150, 80, 95, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.40)` | Plum-rose CTA depth |
 | `--shadow-clay-pressed` | `0 1px 2px rgba(150, 80, 95, 0.18), inset 0 2px 4px rgba(150, 80, 95, 0.12)` | Warm blossom pressed state |
+
+### 9.4 Mèo mập 😺 / Meo's World — Special Easter-Egg Theme
+Internal id `meo` (`data-theme="meo"`). Not a standard theme: Settings reveals it in the third theme slot with the round cat toggle (§16.5). **Brand vs. theme:** the cat wordmark is the brand of every theme (B1); Meo's World is the theme where that brand personality expands into the whole environment. It is not "Sakura in orange": it is a cat universe derived from the wordmark.
+
+**Visual contract**
+- **Palette:** warm orange fur, cream, milk-white, warm brown outline, honey/peach accents, darker tabby stripes. Not every surface is orange.
+- **Role separation still holds:** canvas = honey cat-world atmosphere; content surfaces = opaque milk-white/cream islands; categories = recognizable identity (Vocabulary stays cool lilac, Kanji becomes honey tabby); CTA = the strongest, rich orange with a dark brown physical lip.
+- **Full cat background = the owner's finished artwork, used as-is.** Two compositions extracted from the owner's source artwork, with only the black background removed (no redrawing, recoloring, sharpening, or resizing): `src/assets/meo/meo-world-mobile.png` (portrait, 484×846) and `src/assets/meo/meo-world-desktop.png` (wide, 1049×595). Each shows the yarn-playing Tango cat in a flower meadow with plants, a butterfly, a bee, hearts, petals, paw prints, and dashed flight trails.
+  - **Phones (below `sm`):** the portrait composition at full width, natural proportions, anchored to the bottom of the canvas and resting on the bottom navigation (its lower edge sits 40px below the nav top so the cat stays visible above the bar).
+  - **From `sm` (tablet, laptop, desktop):** the wide composition at its natural proportions, scaled down to fit within 100% width and 42vh height, centered on the bottom edge; its cut left/right edges are feathered with a CSS alpha mask (the artwork file is untouched).
+  - A single `<picture>` serves both, so the browser downloads only the composition it shows, lazily, and never in other themes. The artwork is never stretched, cropped, repeated, or duplicated.
+- **Readable-island rule:** the artwork sits behind everything, anchored to the bottom of the canvas. Cards, study prompts, quiz answers, Settings controls, and management content stay opaque islands; nothing reduces text contrast. Focused flows (Settings, management, import, results) show the same artwork slightly softened; the Active Quiz shows none on phones and the softened artwork only on laptop/desktop; prompt, answers, progress, and feedback always dominate.
+- **Secondary actions on the artwork:** lightweight controls that sit directly on the canvas (Home `Xem tất cả` / `Thu gọn`, the Quiz Results return action such as `Về bài học`) use the scoped `.tango-canvas-secondary` class: in Meo's World only, an opaque cream surface (`--bg-surface`) with warm strong text (`--text-primary`); the Results action also gains a `--border-strong` outline (`.tango-canvas-secondary-outline`). They keep their shape (the Home control keeps its dashed border), stay flat with no clay depth, and rank below the clay secondary and primary actions. Other themes keep their transparent style.
+- **Components:** the existing hierarchy (soft clay content cards, raised primary CTA, restrained secondary controls) becomes rounder (`rounded-xl` → 16px, `rounded-2xl` → 22px), warmer, and slightly chunkier; the raised CTA lip is 6px and presses 5px. Pressing stays physical compression.
+- **Icons:** the catified icon language in §5.
+- **Bottom navigation:** same three destinations, press model, and root transition (§16.0), with a warm cream bar outlined in brown on a brown depth lip, two cat ears on its top edge, cat-eared icon pucks, and a paw on the active puck. The full tab cell still never flashes on press.
+- **Motion:** none. The background artwork is a still image (`pointer-events: none`), so reduced motion has nothing to disable.
+- **Background showcase (easter egg):** on **mobile Home only** (touch/pen, Meo's World only), a long press of about 550ms on empty, non-interactive canvas hides the UI (top bar, cards, bottom nav fade and lift away over about 300ms) and the artwork comes forward (a 1.025 scale; on phones it settles onto the bottom edge). A single tap anywhere, or Escape, restores the UI; that tap lands on a full-screen exit layer, so it never presses a hidden card or nav item. Moving more than about 10px (a scroll), lifting early, or losing focus cancels the hold; presses that start on any interactive element (cards, View all, Vocabulary/Kanji, the logo, the bottom nav, buttons, links, form controls) never start it; the browser long-press callout is suppressed only on the Home canvas during a pending hold. It is never persisted and resets when leaving Home or Meo's World. Reduced motion swaps instantly without lift, scale, or the small paw hold indicator.
+- **Lightweight:** one lazily loaded PNG per breakpoint (about 450 KB on phones, 680 KB from `sm`), no blur/filter stacks, no canvas/WebGL.
+
+| Token | Value | Visual Role |
+|---|---|---|
+| `--bg-page` | `#F8D9AE` | Honey-orange cat-world canvas |
+| `--bg-surface` | `#FFF9F0` | Milk-white content islands |
+| `--bg-surface-elevated` | `#F7E4C8` | Cream raised/recessed panels and progress tracks |
+| `--border-subtle` / `--border-strong` | `#EBCB9E` / `#CF9E68` | Honey hairline / caramel boundary |
+| `--text-primary` / `--text-secondary` / `--text-muted` | `#3A1C0C` / `#653A20` / `#7A4A2A` | Tabby-brown text (muted is AA on canvas and surfaces) |
+| `--primary` / `--primary-hover` | `#B4480B` / `#963B08` | Burnt-orange accent (AA on surfaces) |
+| `--primary-surface` / `--primary-border-subtle` | `#FFE3C2` / `#F2B97C` | Peach selection wash / boundary |
+| `--category-vocabulary-*` | `#E7E1F6` · `#C9BFEA` · `#5445C2` · `#2B2456` | Cool lilac Vocabulary identity |
+| `--category-kanji-*` | `#FFD9A6` · `#EDB066` · `#A3450A` · `#552407` | Honey tabby Kanji identity |
+| `--cta-surface` / `--cta-border` / `--cta-depth` | `#C2560E` / `#A5470B` / `#6E2E0B` | Rich orange CTA (≈4.5:1 white text) on a dark brown lip |
+| `--ambience-line` / `--ambience-glow` / `--ambience-accent` | `#5E270E` / `#FFF6E6` / `#EE8A3A` | Cat-world lines, cream glow, orange accent |
+| `--meo-fur` / `--meo-stripe` / `--meo-cream` / `--meo-outline` / `--meo-blush` | `#F6BA6A` / `#EE7F2F` / `#FDEED6` / `#5E270E` / `#F2A39A` | Mascot palette sampled from the wordmark |
+| `--shadow-clay-*` | warm tabby-brown tints (see `src/index.css`) | Warm lift and pressed states |
 
 ---
 
@@ -593,7 +639,7 @@ The visible quiz button displays **ONLY the answer content**, centered with clea
 └──────────────────────────────────────────────┘
 ```
 
-The four choices are distinguished organically by their physical stacked layout and their subtle positional color identity. They look like a clean, tactile deck of study cards rather than a formal classroom paper exam.
+The four choices are distinguished organically by their physical layout (stacked rows, or the 2×2 grid of §12.4) and their subtle positional color identity. They look like a clean, tactile deck of study cards rather than a formal classroom paper exam.
 
 *Keyboard Accessibility Note:* Desktop keyboard number keys (`1`, `2`, `3`, `4`) continue to function silently in the background for rapid answering, but no visual numbers are stamped on the buttons.
 
@@ -630,6 +676,29 @@ To complement the Soft Claymorphism aesthetic, Tango supports optional, gentle a
   - NO voice clips or speech synthesis.
   - NO repetitive clicks on ordinary navigation or button taps.
 - **Full Visual Parity:** Visual indicators (`IconCheck`, `IconX`, emerald/crimson rings, toast) remain 100% complete and authoritative. The application is fully usable with sound disabled.
+
+### 12.4 Answer Layout Preference (Grid 2×2 / Stacked 1×4)
+A Settings preference (`tango_v1_preferences.answerLayout`: `'grid' | 'stacked'`, default **`grid`**) controls how **4-option multiple-choice** answers are laid out. It never applies to written-answer questions, the explanation sheet, results, or quiz configuration; a question with any other option count uses the stacked layout.
+
+```text
+GRID 2×2 (default)            STACKED 1×4
+┌───────────┬───────────┐     ┌───────────────────────┐
+│  du lịch  │  thực tế  │     │        du lịch        │
+├───────────┼───────────┤     ├───────────────────────┤
+│  lễ nghi  │ cảnh quan │     │        thực tế        │
+└───────────┴───────────┘     ├───────────────────────┤
+                              │        lễ nghi        │
+                              ├───────────────────────┤
+                              │       cảnh quan       │
+                              └───────────────────────┘
+```
+
+- **Grid:** two equal columns, the same 12px gap, and one shared card height for the whole question (`auto-rows-fr`). Every card keeps the 56px minimum answer height, centers its text both ways, and keeps its positional hue in reading order (1 2 / 3 4), so the silent `1`–`4` keys map exactly as before. Feedback icons sit in the card's top-right corner inside the padding, so feedback never moves the text or the layout.
+- **Stacked:** the canonical four full-width rows (§11), unchanged; long answers wrap naturally.
+- **Automatic per-question fallback:** Grid falls back to Stacked for the **entire** question when any answer is too long for a 2×2 card or the answer area is too narrow for a readable grid. The fallback never overwrites the saved preference; the next question (or a wider window) may use the grid again.
+  - The decision is render-aware, not a character count: a hidden, zero-height, `aria-hidden` replica of the grid cards (same fonts, sizes, and padding) is measured in a layout effect, before paint, so the grid never flashes before switching. A width change of the answer area re-measures.
+  - Vietnamese / English answers may take up to **2 lines**; Japanese answers must fit on **1 line** (they are single words without spaces, so a wrap would split the word). An unbreakable word wider than the card, or a card text column narrower than 96px, also means stacked. Readability always outranks forcing the grid.
+- **Settings control:** two compact preview cards (a 2×2 tile grid and four stacked rows in the answer hues) in a radio group after Sound Effects, lighter than the theme picker; selected = primary border + 2px primary ring. The helper line `Tự chuyển sang danh sách khi đáp án quá dài.` / `Long answers automatically switch to the stacked layout.` explains the fallback.
 
 ---
 
@@ -691,15 +760,32 @@ A strict 4px/8px modular spacing scale guarantees visual rhythm:
 
 ## 16. Screen Design Specifications
 
+### 16.0 Primary Navigation (Home / Test / Settings)
+Tango has exactly three root destinations: **Trang chủ / Home** (`/`), **Kiểm tra / Test** (`/quiz/mixed-config`, the Global Mixed Test builder), and **Cài đặt / Settings** (`/settings`). They are existing canonical routes; primary navigation never adds routes.
+
+- **Mobile (< 640px): floating clay bottom bar** (`MobileBottomNav`), mounted once at the app level and shown **only on the three root destinations**.
+  - Inset 12px from the screen edges, lifted 10px above `env(safe-area-inset-bottom)`, max width 480px, 72px tall, `bg-surface`, `--border-subtle`, `--shadow-clay-card`, 26px radius. Three equal-width destinations, each a ≥ 48px touch target.
+  - Icons are bolder than regular line icons (Tabler stroke 2.4 inactive, 2.7 active): `IconHome`, `IconCards`, `IconSettings`.
+  - Active destination: the icon sits on a small raised `--primary-surface` puck, the label turns `--primary` and bold, and the tab carries `aria-current="page"` (never color alone). Inactive: `--text-secondary` icon and semibold label. No filled navigation slab, no underline.
+  - Press model: `usePressFeedback` (explicit `data-pressed`, drag-out cancels, never CSS `:active`); reduced motion keeps the state change without animating.
+  - **Pressed state uses stable icon-puck geometry.** Only the small icon puck reacts: it moves down 2px and swaps to the shallower `--shadow-clay-pressed` (an inactive tab's puck shows as a recessed `--bg-surface-elevated` puck of the same size). The full tab cell never gains a pressed background, and the platform tap highlight is suppressed, so rest → pressed → active keeps one shape instead of a full-cell slab collapsing into a puck. Labels do not react to the press.
+  - Tapping the current destination does nothing (no navigation, no history entry, no transition).
+  - Root screens reserve the bar's height (`--tango-bottom-nav-space`) so content and mobile sticky action bars (e.g. the Test `Bắt đầu kiểm tra` bar) always sit above it.
+  - **Hidden on every deeper or focused flow:** Book Study View, Category, Learn by Type, Lesson Detail/Items, Category/Book test setup, the **Active Quiz** (never shows global navigation), Review, Results, Content Management, Add/Manage/Import, and dialogs (dialogs always render above it).
+- **Tablet / Desktop (≥ 640px): no bottom bar.** The Home top bar carries a compact header navigation (the Tango cat wordmark left; Home · Test · Settings right as quiet pill links with icon + label, the current one on a `--primary-surface` pill with `aria-current="page"`). The Test root keeps its back arrow to Home and Settings keeps its centered panel with a close button.
+- **Root screens on mobile have no back arrow** whose only purpose is returning Home (Test and Settings are peers of Home). Deeper screens keep their normal back hierarchy (`goUp` / `goBack`, browser Back, dialog history, and the quiz Back guard are unchanged).
+- Home no longer owns a Test CTA and the mobile Home top bar no longer owns a Settings button.
+- **Root entrance transition.** Switching between two different root destinations (Home ↔ Test ↔ Settings, by tab, header link, or browser Back/Forward) lifts the new screen's content into place: `translateY(40px)` → `0`, opacity `0.88` → `1`, 240ms, `cubic-bezier(0.22, 1, 0.36, 1)`. Only the screen's own sections move (top bar, content, sticky action bar); the bottom nav, the fixed ambience layer, and the desktop backdrop stay stationary. The transition never applies to first load, to tapping the current destination, or to entering/leaving any deeper route, quiz flow, management screen, or dialog. Navigation is never delayed for it. Under `prefers-reduced-motion: reduce` it is removed entirely (instant switch). Implemented once at the app level (`.tango-root-enter`), so future root destinations inherit it without screen-specific CSS.
+
 ### 16.1 Home Screen (Safe Study Hub)
 > Home is the reference implementation of the baseline, not a layout template for other screens (see [Canonical Cross-Screen UI Baseline](#canonical-cross-screen-ui-baseline)).
 
-Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts and the Test action are secondary.
+Home follows Tango's content hierarchy: **Study Book → Category → Lesson → StudyItem**. Study Books are the primary content; category shortcuts are secondary. Test and Settings are primary navigation destinations (§16.0), not Home content.
 
-- **Top Bar:** Opaque theme canvas (`bg-page`) with **no divider line**, so it belongs to each theme instead of reading as a separate panel. Content scrolling under it fades out through a 14px `--bg-page` feather (`.tango-topbar::after`) instead of a hard cut; zero translucent frosted glass or blur. Contains only the `TANGO` wordmark and a tactile `rounded-full` `IconSettings` button (48px). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
+- **Top Bar:** Opaque theme canvas (`bg-page`) with **no divider line**, so it belongs to each theme instead of reading as a separate panel. Content scrolling under it fades out through a 14px `--bg-page` feather (`.tango-topbar::after`) instead of a hard cut; zero translucent frosted glass or blur. On mobile it contains only the Tango cat wordmark (B1; Home / Test / Settings live in the floating bottom bar); from `sm` up it adds the compact header navigation (§16.0). No theme status or theme control: theme selection lives only in Settings (§16.5). Content Management is reached through Settings.
 - **No visible greeting, no visible section labels:** Home renders no greeting line and no visible "Giáo trình" / "Học theo loại" headings. Semantic structure is kept with visually hidden headings (`sr-only` `h1` for the page and `h2` per section).
-- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Test = short action label with a `+` affordance. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. Theme controls remain Settings-only.
-- **Composition order:** Study Books → Vocabulary / Kanji shortcuts → Test.
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage. Vocabulary / Kanji = Japanese glyph + localized category name. Lesson/item counts are deferred to Book Study View, Learn by Type, and other detail screens. Avoid redundant icon + glyph + title combinations. Theme controls remain Settings-only.
+- **Composition order:** Study Books → Vocabulary / Kanji shortcuts. There is no Test tile on Home.
 - **Study Books (primary, visually dominant):**
   - Home previews only the **first 2 books** as large neutral clay cards (`bg-surface`, `shadow-clay-card`): a large 3:4 cover (`w-24` mobile, `w-28` tablet, `w-32` desktop), the title (`text-lg`/`sm:text-xl`), and one Study Coverage bar with its percentage. No lesson/item counts on Home.
   - When more than 2 books exist, a compact dashed-outline bridge `Xem tất cả ⌄` / `View all ⌄` is centered under the cards (≈62% width on mobile, naturally sized on desktop, 48px tall, `rounded-2xl`, `border-dashed border-border-strong`, `text-text-secondary`, `aria-expanded`, `aria-controls`). It reveals the remaining books in place and then reads `Thu gọn` / `Show less`. With 2 or fewer books it is not rendered.
@@ -709,10 +795,9 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Fallback cover: theme-aware primary-tinted placeholder with a spine band and `IconBook` (no emojis).
   - Tapping opens the **Book Study View**. (Never triggers edit/delete).
 - **Vocabulary / Kanji shortcuts (secondary):** A 2-column row of equal-height, symmetrical semantic clay tiles (`min-h-[112px]`, `sm:min-h-[128px]`) below the books, smaller than the book cards. Fixed corners: the Japanese category name (`語彙` / `漢字`, `font-japanese`, `lang="ja"`, `aria-hidden`, `--category-*-icon`) pinned top-left, the study-card illustration (`VocabularyIllustration` / `KanjiIllustration`, `currentColor`) pinned top-right, and the localized name (`Từ vựng` / `Hán tự`) pinned bottom-left. Glyph and label use `whitespace-nowrap`; on narrow phones (< 380px) the glyph and illustration shrink instead of wrapping, so the 2-column layout stays clean at 360px. Surfaces keep `--category-vocabulary-*` and `--category-kanji-*`. No counts; the button's `aria-label` carries the localized name.
-- **Test (compact CTA):** Raised primary CTA (§3.1: solid `--cta-*` surface, `--cta-depth` lip, visibly pressed for at least 100ms before navigating), the short label `Kiểm tra` / `Test`, and a round `IconPlus` puck (`--cta-puck-*`) that signals "create / configure a test". The accessible name is explicit: `aria-label="Tạo bài kiểm tra"` / `"Create test"`. Route: `mixed_quiz_config`. Full width under the shortcuts on mobile/tablet; the narrower track of the shortcut row on desktop (`lg:grid-cols-[3fr_2fr]`). It never outweighs the books.
 - **Ambience:** The restrained per-theme Japanese ambience layer (§8.2) sits behind all Home content.
-- **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: visible books, Vocabulary, Kanji, Test.
-- **Zero-Book Empty State:** The same primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, *"Chưa có giáo trình nào."*, the Settings → Content Management hint, and a tactile `[IconSettings] Cài đặt` button. Never a large floating card. Never places an "+ Add Book" button directly on Home.
+- **Interaction:** All interactive cards and buttons follow the canonical clay recipe (§3.1): `.clay-interactive` for pointer-gated hover lift, `usePressFeedback` for explicit pressed depth, and the primary focus ring with 2px page offset. Arrow-key order: visible books, Vocabulary, Kanji.
+- **Zero-Book Empty State:** The same primary book area renders a compact recessed clay shelf (`bg-surface-elevated`, `shadow-clay-pressed`): icon puck, *"Chưa có giáo trình nào."*, and the Settings → Content Management hint. No extra Settings button (Settings is a primary destination). Never a large floating card. Never places an "+ Add Book" button directly on Home.
 - **Strict Study-Only Rule:** Zero Add, Import, Edit, or Delete controls appear on Home. Administrative and destructive actions reside strictly in **Settings → Quản lý nội dung (Content Management)** (see [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md)).
 
 ### 16.2 Lesson List & Category Screens
@@ -731,7 +816,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Kanji / Expression: `36px–40px` bold, high-contrast text.
   - Subprompt (if kana reading or clue): `16px` muted text.
 - **Answer Stage (Bottom Thumb Reach):**
-  - 4 full-width stacked answer buttons (height `56px–64px`).
+  - 4 answer buttons (height `56px–64px`) in a 2×2 grid or 4 full-width stacked rows, per the answer layout preference and its per-question fallback (§12.4).
   - Colors: Positional Amber, Blue, Violet, Rose hues.
   - Text: `18px–20px` centered, bold/medium weight.
   - Strictly **NO** letters, numbers, or keyboard badges printed.
@@ -743,21 +828,32 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Vietnamese definition.
   - Hán Việt reading (if present; section hidden cleanly if absent).
 - Dismiss CTA: Full-width button `[ Đã hiểu — Tiếp tục ]` (triggers on `Enter`/`Space`).
+- **Inline style** (Settings "Hiển thị lời giải khi sai" = `Dưới đáp án` / `Inline`): the same content, in the normal page flow directly below the whole answer area (after the 2×2 grid or the last stacked answer, or after the written-answer input), spanning the full answer width and never a grid cell. Dashed `--error-border` edge on `--error-surface`, `rounded-2xl`, comfortable padding, no modal shadow. No dialog, backdrop, blur, history marker, or focus trap; announced through a polite live region. **Stable stage:** the HUD, prompt, and answers form one viewport-tall stage that never changes during feedback; the explanation is rendered after that stage, so it extends the page downward instead of shrinking the prompt area (the prompt and answers never move). Its entrance is a subtle fade-up (opacity 0→1, 8px→0, 200ms, `cubic-bezier(0.22, 1, 0.36, 1)`; fade only under reduced motion); the stage itself never animates. Continue takes focus without scrolling, and the page scrolls only as far as needed to reveal the start of the explanation (its first 120px, like `block: 'nearest'`; instant under reduced motion), keeping the answers in view; the rest is reachable by normal scrolling. The written-answer Check button keeps its space (hidden and inert) during feedback so the input does not move. Wrong answers never auto-advance; correct answers keep the 750ms auto-advance.
 
 ### 16.5 Settings Screen
-- Full-screen route on mobile; centered modal card (`max-w-lg`) on tablet and desktop (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)).
+- On mobile a **root destination** (§16.0): full-screen, no back arrow, bottom navigation visible with Settings active. Centered modal card (`max-w-lg`) with a close button on tablet and desktop (see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md)).
 - **Language Section:** Segmented clay toggle: `[ Tiếng Việt ]` | `[ English ]`.
 - **Theme Section (Chủ đề màu sắc):**
-  - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
-  - The previews display the §9 palettes (Cool Pearl, Midnight Ink, Warm Blossom Paper).
-  - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
-  - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
+  - Exactly three card slots, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, and a third slot that normally shows `Sakura` (the standard themes). Light and Dark never move, resize, fade, reflow, or animate.
+  - **Easter-egg reveal:** a small round icon toggle on the right of the section title row (a smirking Tango cat drawn as SVG; accessible name and tooltip `Xem thêm chủ đề` / `More themes`) swaps **only the third slot** from Sakura to `Mèo mập 😺` / `Meo's World` with a vertical casino-reel transition: Sakura exits downward while Meo's World drops in from above (≈320ms, `cubic-bezier(0.22, 1, 0.36, 1)`, about 104% of the slot height, with a light fade). The toggle icon then becomes a pink sakura blossom (`Quay lại Sakura` / `Back to Sakura`) and pressing it reverses the reel: Meo's World rises out and Sakura comes back up from below. Both cards share the slot's cell (stable size) and the travel is clipped to the slot, so nothing else on the page moves. It is a vertical slot transition, not a horizontal carousel; the hidden card is `aria-hidden` and not focusable. The toggle is a real button: 48px touch target around a 36px clay puck, explicit pressed depth (`usePressFeedback`, drag-out cancels), a hover lift on fine pointers only, a focus-visible ring, and a small pop when its icon swaps (only after a press). Reduced motion swaps instantly with no vertical travel and no icon pop.
+  - **Revealing never selects:** the toggle only changes which card the third slot shows; the user taps the Meo's World card to choose it. The reveal state is not persisted. If the persisted theme is `meo`, Settings opens with Meo's World revealed and the sakura toggle showing; pressing Back then keeps Meo's World active while its card is temporarily hidden. Arrow keys move the radio selection among the three visible cards only.
+  - The previews display the §9 palettes (Cool Pearl, Midnight Ink, Warm Blossom Paper, and the §9.4 Meo's World cat palette, whose honey canvas, orange/cream palette, and cat-eared mini navigation make it read as a different world).
+  - Each card renders a miniature of the **current** Tango shell in its own theme's tokens: a tiny top bar with the cat wordmark, the Vocabulary (`語`) / Kanji (`漢`) category cards, and a 3-item Home / Test / Settings navigation with Home active, plus the localized theme name. Simple shapes only (no stale Home CTA bar, no text paragraphs); the canvas motif hints at the ambience, and Meo's World adds only the mini navigation's brown outline and cat ears.
+  - Selected state: primary border plus a 2px primary ring (a shape cue, never a color change alone), no check badge; the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
   - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
   - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.
 - **Sound Effects Section (Âm thanh hiệu ứng):**
   - Segmented toggle: `[ Off / On ]` (Tắt / Bật).
   - Default: **Off** (Tắt). Never plays audio until explicitly enabled.
   - Persisted in local storage (`tango_v1_preferences.soundEnabled`).
+- **Answer Layout Section (Bố cục đáp án):**
+  - Two compact preview cards in a radio group: `Lưới 2×2` / `2×2 Grid` (default) and `Danh sách` / `Stacked`, with the helper line `Tự chuyển sang danh sách khi đáp án quá dài.` / `Long answers automatically switch to the stacked layout.`
+  - Persisted in local storage (`tango_v1_preferences.answerLayout`); behavior and fallback in §12.4.
+- **Incorrect Answer Feedback Section (Hiển thị lời giải khi sai / Incorrect answer feedback):**
+  - Two compact preview cards in a radio group, same treatment as the answer layout cards: `Cửa sổ` / `Popup` (default) and `Dưới đáp án` / `Inline`.
+  - Popup preview: the answer tiles dimmed behind a small floating explanation panel (solid border, surface fill, soft clay shadow), a separate layer. Inline preview: the answer tiles stay as they are with a **dashed** explanation box directly below them; the dashed edge keeps the explanation visually distinct from answer buttons. Both panels show a short error-colored heading line and two text lines. Semantic tokens only, so the previews read in Light, Dark, Sakura, and Meo's World.
+  - Persisted in local storage (`tango_v1_preferences.incorrectFeedback`: `'popup' | 'inline'`, default `popup`; missing or unknown stored values load as `popup`).
+  - The quiz runner applies it to every wrong answer (multiple choice and written): Popup opens the explanation sheet (§16.4); Inline shows the same content below the answers (§16.4).
 - **Nội dung học Section (Study Content):**
   - Row button linking to Content Management (`Quản lý giáo trình và bài học`).
 
@@ -766,7 +862,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
 - **Danger Zone (Vùng nguy hiểm):** Bordered with a muted semantic warning/error line.
 - **Destructive Confirmation Dialog:**
   - High-emphasis modal with semi-opaque backdrop (`backdrop-blur-sm`).
-  - Destructive action button: Semantic error red token (`--error`, `--error-surface`, `--error-border`).
+  - Destructive action button: Semantic error tokens (`--error-surface` fill, `--error-border` edge, `--error-text` label; `--error-text` keeps AA contrast in every theme).
   - Cancel button: Neutral surface, visually distinct, safe spacing from delete button, holds initial focus.
   - Never default-focus the destructive action; `Enter` does not execute deletion.
   - See [`docs/CONTENT_LIBRARY_SPEC.md`](./CONTENT_LIBRARY_SPEC.md) for UX dialog specifications.
@@ -777,7 +873,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
 
 1. **Contrast Ratio Compliance:**
    - All primary text against its surface meets **WCAG AA (minimum 4.5:1)**; large Japanese prompt text meets **WCAG AAA (minimum 7:1)**.
-   - Text inside the 4 positional answer buttons is specifically chosen to exceed 5.5:1 contrast against its respective hue background in all three themes.
+   - Text inside the 4 positional answer buttons is specifically chosen to exceed 5.5:1 contrast against its respective hue background in all four themes.
 2. **Never Color Alone:**
    - Answer selection and correctness never rely solely on color shifts. Every state change includes structural rings, icon indicators (`IconCheck` / `IconX`), and text descriptions.
 3. **Screen Reader Semantic Hierarchy:**
@@ -831,6 +927,8 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --error: #DC2626;
   --error-surface: #FEF2F2;
   --error-border: #FCA5A5;
+  --success-text: #047857;
+  --error-text: #B91C1C;
   --warning: #D97706;
 
   /* 4 Positional Answer Choices */
@@ -893,6 +991,8 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --error: #EF4444;
   --error-surface: #7F1D1D;
   --error-border: #B91C1C;
+  --success-text: #A7F3D0;
+  --error-text: #FECACA;
   --warning: #F59E0B;
 
   /* 4 Positional Answer Choices (Muted Rich Dark Hues) */
@@ -955,6 +1055,8 @@ Below is the concrete CSS token definition matrix to be implemented in `src/inde
   --error: #DC2626;
   --error-surface: #FEF2F2;
   --error-border: #FCA5A5;
+  --success-text: #047857;
+  --error-text: #B91C1C;
   --warning: #D97706;
 
   /* 4 Positional Answer Choices (Blossom Garden Harmony) */
@@ -1008,7 +1110,7 @@ When implementing any screen or component in Tango, verify it against the [Canon
 - [ ] Are multiple-choice answer buttons completely free of `A/B/C/D`, `1/2/3/4`, or keyboard hint tags?
 - [ ] Does the element look soft, tactile, and restrained—avoiding bloated cartoon 3D or generic, flat, template-like styling?
 - [ ] Are mobile touch targets at least 48px high (and quiz answer buttons at least 56px)?
-- [ ] Does the layout work seamlessly across Light, Dark, and Sakura themes?
+- [ ] Does the layout work seamlessly across Light, Dark, and Sakura themes (and Meo's World, §9.4)?
 - [ ] Is motion restrained (70–220ms for UI) and compliant with `prefers-reduced-motion`?
 - [ ] Do press states come from `usePressFeedback` (never `:active`), with hover gated to fine pointers?
 - [ ] Is the clay level right (content card / secondary control / raised primary CTA / flat list)?

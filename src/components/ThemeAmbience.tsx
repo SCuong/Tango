@@ -1,16 +1,23 @@
 import React from 'react';
+import { useAppState } from '../hooks/useAppState';
+import meoWorldMobile from '../assets/meo/meo-world-mobile.png';
+import meoWorldDesktop from '../assets/meo/meo-world-desktop.png';
 
 /**
- * Restrained Japanese ambience behind Home content (see DESIGN_SYSTEM §8.2).
+ * Restrained Japanese ambience behind Home content (see DESIGN_SYSTEM §8.2), plus the Meo's World
+ * cat environment (§9.4).
  *
- * All three scenes are rendered; `src/index.css` shows only the one matching the active
+ * All four scenes are rendered; `src/index.css` shows only the one matching the active
  * `data-theme`. Colors come from the per-theme `--ambience-*` tokens (plus `--bg-page` to occlude
  * pattern rings) at low opacity. Positions are fixed in CSS (deterministic, never random), the few
  * animated elements only translate or fade very slowly, and `prefers-reduced-motion` makes the
  * layer fully static. The layer is decorative: hidden from assistive technology and inert.
  */
-export const ThemeAmbience: React.FC = () => (
-  <div aria-hidden="true" className="tango-ambience">
+export const ThemeAmbience: React.FC<{ subtle?: boolean }> = ({ subtle = false }) => (
+  <div aria-hidden="true" className={`tango-ambience${subtle ? ' tango-ambience-subtle' : ''}`}>
+    {/* Meo's World: Tango the cat takes over the canvas (edges and open areas only) */}
+    <MeoWorldScene />
+
     {/* Light: Japanese daytime — daylight through a shoji window, seigaiha waves, one mist band */}
     <div className="ambience-scene ambience-light">
       <ShojiWindow className="ambience-shoji-window" paperOpacity={0.5} lineOpacity={0.07} />
@@ -157,4 +164,45 @@ const Petal: React.FC<{ className: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 20 20" focusable="false">
     <path d="M10 2 C15 5 17 11 10 18 C3 11 5 5 10 2 Z" fill="var(--ambience-accent)" opacity="0.5" />
   </svg>
+);
+
+/**
+ * Meo's World cat environment on screens without a regular ambience (focused flows: Settings,
+ * management, import, active quiz, results). Only in Meo's World, and only its quiet edge layer:
+ * the same background artwork, softened, never behind prompts or answers on phones.
+ * `wideOnly` (Active Quiz) renders them only on laptop/desktop widths, in the outer margins.
+ */
+export const MeoEdgeAmbience: React.FC<{ wideOnly?: boolean }> = ({ wideOnly = false }) => {
+  const { state } = useAppState();
+  if (state.preferences.theme !== 'meo') return null;
+  return (
+    <div aria-hidden="true" className={`tango-ambience tango-ambience-quiet${wideOnly ? ' tango-ambience-wide-only' : ''}`}>
+      <MeoWorldScene />
+    </div>
+  );
+};
+
+/*
+ * Meo's World background: the owner's finished artwork, used as-is (src/assets/meo). Phones get
+ * the portrait composition, and from `sm` up the wide one; <picture> makes the browser download
+ * only the composition it shows, and lazy loading keeps other themes from downloading either.
+ * Sizing and placement live in src/index.css (.meo-world); the artwork is never stretched.
+ */
+const MeoWorldScene: React.FC = () => (
+  <div className="ambience-scene ambience-meo">
+    <picture className="meo-world">
+      <source media="(min-width: 640px)" srcSet={meoWorldDesktop} width={1049} height={595} />
+      <img
+        src={meoWorldMobile}
+        alt=""
+        width={484}
+        height={846}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        data-meo-world=""
+        className="meo-world-art"
+      />
+    </picture>
+  </div>
 );

@@ -13,6 +13,9 @@ import {
   ItemProgress,
   QuizSessionResult,
   UserPreferences,
+  isAnswerLayout,
+  isAppTheme,
+  isIncorrectFeedback,
 } from '../types';
 
 /**
@@ -43,6 +46,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'light',
   language: 'vi',
   soundEnabled: false,
+  answerLayout: 'grid',
+  incorrectFeedback: 'popup',
 };
 
 /**
@@ -185,15 +190,18 @@ export function loadPreferences(): UserPreferences {
   }
 
   return {
-    theme:
-      data.theme === 'dark' || data.theme === 'sakura'
-        ? data.theme
-        : DEFAULT_PREFERENCES.theme,
+    theme: isAppTheme(data.theme) ? data.theme : DEFAULT_PREFERENCES.theme,
     language: data.language === 'en' ? 'en' : DEFAULT_PREFERENCES.language,
     soundEnabled:
       typeof data.soundEnabled === 'boolean'
         ? data.soundEnabled
         : DEFAULT_PREFERENCES.soundEnabled,
+    answerLayout: isAnswerLayout(data.answerLayout)
+      ? data.answerLayout
+      : DEFAULT_PREFERENCES.answerLayout,
+    incorrectFeedback: isIncorrectFeedback(data.incorrectFeedback)
+      ? data.incorrectFeedback
+      : DEFAULT_PREFERENCES.incorrectFeedback,
   };
 }
 

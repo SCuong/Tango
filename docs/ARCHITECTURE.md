@@ -22,9 +22,9 @@ This document details the architectural design, frontend stack selection, multi-
 | **Core Framework** | **React 18 / 19 + TypeScript** with **Vite** | • Instant build and dev feedback loop via Vite.<br>• Zero SSR complexity; pure Static Single-Page Application (SPA).<br>• Predictable component-based model ideal for multi-step interactive quiz states.<br>• Full type safety for `StudyItem`, `Lesson`, and `QuizConfig`. |
 | **Styling** | **Tailwind CSS** | • Zero-runtime CSS with micro bundle size.<br>• Rapid implementation of mobile-first ergonomic spacing, touch targets (min 48px-52px), and typography.<br>• Semantic design tokens supporting theme-independent styling across Light, Dark, and Sakura themes, reflecting Tango's Soft Claymorphism system (elevation, surface tokens, and accent tokens). |
 | **Icons** | **Tabler Icons** (`@tabler/icons-react`) | • Consistent, comprehensive stroke-based iconography.<br>• Tree-shakeable, authoritative icon standard (see `docs/DESIGN_SYSTEM.md`). |
-| **State Management** | **React Hooks + Context** (with lightweight store pattern) | • Manages: (1) Active Category & Selected Lessons, (2) Active Quiz Session, (3) Local Progress.<br>• Decoupled custom hooks (`useQuiz`, `useProgress`) provide clean separation without Redux/MobX boilerplate. |
-| **Offline & PWA** | **vite-plugin-pwa** | • Zero-config Service Worker registration with Workbox.<br>• Pre-caches all static assets and lesson bundles for 100% offline study.<br>• Web App Manifest for Android/iOS home screen installation. |
-| **Testing** | **Vitest + Testing Library** | • Lightning-fast test runner sharing Vite's configuration.<br>• Verifies multi-lesson pool building, question generation, and text-matching algorithms. |
+| **State Management** | **React Hooks + Context** (with lightweight store pattern) | • `useAppState` holds the aggregated `UserStudyState` and persists each partition through `commitStudyData`; `QuizSessionContext` holds the single active quiz session; `useNavigation` owns routing.<br>• No Redux/MobX boilerplate. |
+| **Offline & PWA** | **Hand-written service worker** (`public/sw.js`) + Web App Manifest | • No extra dependency: a small service worker caches the app shell, built assets, and fonts at runtime.<br>• Registered only in production builds.<br>• Web App Manifest (`public/manifest.webmanifest`) for home screen installation. |
+| **Testing** | **Vitest** (server rendering via `react-dom/server`) | • Lightning-fast test runner sharing Vite's configuration.<br>• Verifies pool building, question generation, session runtime, cascades, importer parsing, and renders every canonical route. Interactive browser behavior is verified manually in a real browser. |
 
 ---
 
@@ -73,7 +73,9 @@ All user progress, weak-word markers, session histories, books, and mutable less
 │                          │ weak status keyed by itemId in LS    │
 │ tango_v1_history         │ QuizSessionResult records in LS      │
 │ tango_v1_preferences     │ App settings: theme, lang,           │
-│                          │ soundEnabled (default: false) in LS  │
+│                          │ soundEnabled (default: false),       │
+│                          │ answerLayout (default: grid),        │
+│                          │ incorrectFeedback (default: popup)   │
 │ tango_v1_library_init    │ Seed initialization marker in LS     │
 │ tango_v1_covers_idb      │ Binary book cover Blobs              │
 │                          │ in browser IndexedDB (object store)  │
@@ -135,10 +137,14 @@ Tango is designed to be installed on mobile phones and tablets:
   - `orientation`: `portrait-primary`
   - `theme_color`: `#4f46e5`
   - `background_color`: `#f8fafc`
-- **Caching Strategy:**
-  - **Static Assets:** Cache-first, background update (stale-while-revalidate).
-  - **Lesson Bundles (Initial Seed):** Pre-cached on install. Copied to `tango_v1_lessons` on initial library setup. Subsequent app updates or Workbox cache invalidations never overwrite `tango_v1_lessons` or resurrect intentionally deleted lessons.
-  - 100% functional offline.
+  - `icons`: the official Tango cat icon (`public/`): `icon-192.png` and `icon-512.png` (`any`), and `icon-maskable-512.png` (`maskable`: full-bleed cream with the whole cat inside the 80% safe circle, so Android masks never crop the ears or whiskers). `index.html` links `favicon-32.png` / `favicon-16.png` and the opaque `apple-touch-icon.png` (180×180). All are generated from the owner's artwork without redrawing it.
+- **Caching Strategy (`public/sw.js`):**
+  - **App shell:** `/`, the manifest, the favicon, and the 192px app icon are cached on install.
+  - **Navigations:** Network first; offline, the cached app shell is served for every route (client-side routing takes over).
+  - **Static Assets & Fonts:** Same-origin assets and Google Fonts are served from cache and refreshed in the background (stale-while-revalidate).
+  - **First visit:** resources loaded before the worker took control (built JS/CSS, fonts, the manifest, and bundled images such as the `.webp` brand wordmark; see `src/lib/offlineAssets.ts`) are posted to the worker and cached right away.
+  - **Seed lessons** are bundled into the JavaScript and copied to `tango_v1_lessons` once; cache updates never overwrite `tango_v1_lessons` or resurrect deleted lessons.
+  - After the first online visit the app is fully functional offline. Study data lives in `localStorage` / IndexedDB and is never handled by the service worker.
 
 ---
 
@@ -175,71 +181,59 @@ src/data/
 └── index.ts                   # Seed registry exporting getSeedLessons()
 ```
 
+*Current state: the seed registry (`getSeedLessons()`) is intentionally empty until approved curriculum datasets are added, so a fresh install starts with no content and learners add books and lessons through Content Management and the importer. No demo or sample data ships with the app. When seed files are added they must follow the layout above.*
+
 *Both `vocabulary/` and `kanji/` directories strictly conform to the identical `Lesson` and `StudyItem` schemas. These bundled files serve strictly as initial seed data on first initialization; runtime queries, edits, and deletions take place exclusively within `tango_v1_lessons`.*
 
 ### 7.2 Source Code Organization
 
 ```
 src/
-├── assets/                    # Static vectors, brand icons, logo SVG
-├── components/                # Reusable UI primitives (domain-agnostic)
-│   ├── Button.tsx
-│   ├── Card.tsx
-│   ├── Badge.tsx
-│   ├── Modal.tsx
-│   ├── Checkbox.tsx
-│   └── ProgressBar.tsx
-├── data/                      # Bundled lessons (vocabulary/ & kanji/)
-├── features/                  # Domain-driven feature modules
-│   ├── books/                 # Study Book cards and Book Study views (see docs/CONTENT_LIBRARY_SPEC.md)
-│   │   ├── BookCard.tsx       # Responsive book card with cover thumbnail
-│   │   ├── BookStudyView.tsx  # Book overview: Vocab & Kanji categories, Test Book CTA
-│   │   └── BookPlaceholder.tsx# Theme-aware fallback cover illustration
-│   ├── lessons/               # Category views, lesson browsers, and detail
-│   │   ├── CategoryBrowser.tsx# "Learn by Type" view grouped by Study Book
-│   │   ├── LessonList.tsx     # List of lessons for selected category inside a book
-│   │   ├── LessonDetail.tsx   # Item preview, Practice, Quick Test, Review
-│   │   └── MixedTestModal.tsx # Multi-lesson selector with checkboxes
-│   ├── content-management/    # Administrative content controls (accessed via Settings)
-│   │   ├── ContentManager.tsx # Main management screen (Books list + Lessons list)
-│   │   ├── BookEditor.tsx     # Add / Edit book modal & cover picker
-│   │   ├── LessonManager.tsx  # Dedicated lesson inspector, title/category/book editing & Danger Zone
-│   │   ├── DangerZone.tsx     # Explicit permanent delete dialogs (Hard Delete Only)
-│   │   └── LessonImporter.tsx # Authoritative import interface (see docs/IMPORT_SPEC.md)
-│   ├── quiz/                  # Shared quiz engine (used for all tests)
-│   │   ├── QuizRunner.tsx     # Active session controller
-│   │   ├── QuestionPrompt.tsx # Large typography prompt card
-│   │   ├── OptionList.tsx     # 4-choice button grid (mobile thumb-friendly)
-│   │   ├── TextInputQuiz.tsx  # Type-in answer interface
-│   │   ├── AnswerFeedback.tsx # Clean explanation sheet (Hán Việt when present)
-│   │   └── QuizSummary.tsx    # Completion screen & metrics
-│   └── review/                # Targeted review of failed words
-│       ├── MissedWordsList.tsx
-│       └── ReviewSession.tsx
-├── hooks/                     # Decoupled React hooks
-│   ├── useQuiz.ts             # Multi-lesson quiz state, timers, scoring
-│   ├── useProgress.ts         # Persistent progress read/write
-│   └── useKeyboard.ts         # Desktop keyboard shortcut listener (1-4, Enter)
-├── lib/                       # Pure utility functions (no React dependencies)
-│   ├── storage.ts             # LocalStorage & IndexedDB cover store manager
-│   ├── quizEngine.ts          # Multi-lesson pool aggregator, question generator
-│   ├── studyMetrics.ts        # Pure study metrics & browsing progress calculators
-│   ├── importer.ts            # Delimiter detection, parsing, deduplication
-│   └── textNormalization.ts   # Japanese and Vietnamese unicode matchers
-├── types/                     # Shared TypeScript domain interfaces
-│   ├── study.ts               # StudyBook, Lesson, StudyItem, StudyCategory
-│   └── quiz.ts                # QuizConfig, QuizQuestion, QuizSessionResult, QuestionType
-├── App.tsx                    # Screen router / navigation coordinator
-├── index.css                  # Tailwind directives and font stack configurations
-└── main.tsx                   # Application entry point & PWA registration
+├── components/                    # Reusable UI primitives (domain-agnostic)
+│   ├── Button.tsx                 # Primary (raised CTA) / secondary / danger / quiet buttons, IconButton
+│   ├── Screen.tsx                 # Screen shell, sticky ScreenHeader, StickyBottomBar, SectionLabel
+│   ├── ModalRoute.tsx             # Full-screen route on mobile, centered panel from sm (Settings, Add Book)
+│   ├── Dialog.tsx                 # Opaque modal / bottom sheet; Escape, focus trap, Back closes it
+│   ├── ConfirmDialog.tsx          # Destructive confirmation (Cancel holds focus)
+│   ├── FormControls.tsx           # SegmentedControl, CheckboxRow, TextField, SelectField
+│   ├── NotFoundScreen.tsx, EmptyState.tsx, ProgressBar.tsx, TopBar.tsx, ThemeAmbience.tsx
+│   └── illustrations/             # Study-card illustrations (Vocabulary / Kanji)
+├── data/                          # Bundled seed registry (one-time copy into tango_v1_lessons)
+├── features/
+│   ├── books/                     # SCREEN 01 Home, BookCard, BookCover
+│   ├── study/                     # SCREEN 02–06 (Book Study View, Category, Learn by Type, Lesson Detail, Items)
+│   ├── quiz/                      # SCREEN 07–15: QuizConfigScreen (category/book/mixed), QuizRunnerScreen,
+│   │                              #   QuizResultsScreen, QuizSessionContext (the single shared runner)
+│   ├── settings/                  # SCREEN 16 Settings
+│   └── content-management/        # SCREEN 17–27: Content Management, Add/Manage Book, Manage Lesson,
+│                                  #   ImportScreen (steps 21–24), destructive dialogs
+├── hooks/                         # useAppState, useNavigation, useI18n, usePressFeedback, useCounts
+├── lib/                           # Pure logic (no React)
+│   ├── storage.ts                 # localStorage partitions & IndexedDB cover Blob store
+│   ├── appState.ts                # Bootstrap and preference synchronization
+│   ├── routes.ts                  # Canonical route model & parser
+│   ├── i18n.ts                    # VI / EN dictionaries
+│   ├── quizEngine.ts              # Locked pool aggregator & question generator (optional review focus)
+│   ├── quizSession.ts             # Session runner: feedback, streaks, practice re-queue, results, progress
+│   ├── studyMetrics.ts            # Study Coverage / Answer Accuracy / weak counts
+│   ├── studySelectors.ts          # Library-order grouping (books, categories, Unassigned)
+│   ├── contentActions.ts          # Book/lesson mutations and ordered hard-delete cascades
+│   ├── coverImage.ts              # Cover validation, downscaling, replace with Blob cleanup
+│   ├── importer.ts                # Delimiters, RFC 4180, Markdown, headers, dedupe/merge, templates
+│   ├── xlsx.ts                    # Native .xlsx reader (DecompressionStream) and template writer
+│   ├── sound.ts                   # Optional Web Audio feedback (off by default)
+│   ├── ids.ts                     # Opaque collision-safe IDs
+│   └── textNormalization.ts       # Japanese / Vietnamese normalization
+├── types/                         # StudyBook, Lesson, StudyItem, quiz and progress models
+├── App.tsx                        # Route → screen coordinator
+├── index.css                      # Tokens, clay recipe, ambience
+└── main.tsx                       # Bootstrap + providers
 ```
 
 ### Directory Responsibilities
-- `src/features/books/`: Study Book cards on Home and the safe Book Study View.
-- `src/features/lessons/`: Category views, Lesson Detail, and multi-lesson quiz configuration.
-- `src/features/content-management/`: Protected management hub accessed via Settings. Contains `ContentManager` (overview), `BookEditor` (add/edit books and cover picker), `LessonManager` (dedicated lesson inspector responsible for editing lesson title, subtitle, switching category `vocabulary` ↔ `kanji`, reassigning parent Study Book or Unassigned, inspecting lesson items, and launching hard-delete confirmation), `LessonImporter` (authoritative import interface), and `DangerZone` (reusable hard-delete confirmation dialogs).
-- `src/features/quiz/`: The **single, reusable quiz system** that powers Practice Mode, Quick Tests, Book Tests, Mixed Tests, and Review Sessions.
-- `src/lib/quizEngine.ts`: Algorithmic engine that takes `lessonIds: string[]`, collects items, deduplicates, and generates questions.
-- `src/lib/storage.ts`: Dual-tier client storage handling `localStorage` metadata and IndexedDB binary cover blobs with cascade cleanup.
-- `src/lib/studyMetrics.ts`: Pure study metrics calculators for Study Coverage, Answer Accuracy, and Weak counts across lesson, book, and category scopes.
+- `src/features/books/` and `src/features/study/`: study-only screens. They contain no add, edit, import, or delete controls.
+- `src/features/quiz/`: the **single, reusable quiz system** powering Practice, Quick Test, Category/Book/Mixed tests, and Review Missed Words. Every entry point builds a `QuizSessionConfig` (`lessonIds`, mode, count, types, optional review focus, and the runtime-only `returnTarget` that Quiz Results returns to) and questions always come from `lib/quizEngine.ts`.
+- `src/features/content-management/`: the protected management hub reached through Settings: books, covers, lesson metadata and reassignment, the importer, and Danger Zone dialogs.
+- `src/lib/contentActions.ts`: ordered, idempotent hard-delete cascades (§4.3) and metadata-only lesson updates.
+- `src/lib/quizSession.ts`: pure runtime state for the shared runner; progress (`tango_v1_progress`) and history (`tango_v1_history`) are written once, when a session completes.
 - `src/types/`: Centralized interfaces guaranteeing strict data symmetry across all books and categories.

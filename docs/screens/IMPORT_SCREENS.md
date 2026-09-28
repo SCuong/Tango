@@ -38,7 +38,7 @@ First stage of the authoritative lesson importer. Enables pasting text or select
 
 #### Routes & Navigation:
 - **Route:** `/settings/content-management/import`
-- **Entry:** [SCREEN 17: Content Management](./SETTINGS_CONTENT_SCREENS.md#screen-17-content-management-quản-lý-nội-dung) `[IconFileImport] Thêm / Nhập bài học mới`.
+- **Entry:** [SCREEN 17: Content Management](./SETTINGS_CONTENT_SCREENS.md#screen-17-content-management-quản-lý-nội-dung) `[IconFileImport] Thêm bài học mới`.
 - **Exit:**
   - `[IconArrowLeft]` Back $\rightarrow$ SCREEN 17.
   - `[ Tiếp tục: Kiểm tra dữ liệu ]` $\rightarrow$ [SCREEN 22: Column Mapping](#screen-22-import-column-mapping--parsing-bước-2) (if headers need confirmation) or [SCREEN 23: Preview](#screen-23-import-preview--validation-bước-3) (if high confidence).

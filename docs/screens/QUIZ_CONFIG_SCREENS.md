@@ -38,11 +38,12 @@ All quiz configuration screens operate on the identical canonical question-slici
    > **Pool Deduplication Key & Lexical Groups:** Items sharing `normalized(japanese) + '::' + normalized(kana || '')` are treated as one **deduplicated lexical group**. No synthetic merged `StudyItem` is created at runtime. For a candidate `QuestionType`, the group is compatible if at least one real member can generate that type. When generating the question, the first compatible real `StudyItem` in deterministic selected-lesson/item order serves as `targetItem`.
    >
    > **Multiple-Choice Distractor Contract:** For multiple-choice question types (`kana_to_japanese`, `japanese_to_vi`, `vi_to_japanese`), 4 distinct visible options (1 correct + 3 distinct distractors) are drawn strictly from other deduplicated lexical groups in the selected pool. A multiple-choice type is compatible only if the selected pool can supply 3 distinct distractors.
-2. **Total vs Eligible Counts:** The interface explicitly communicates both: `X mục đã chọn · Y câu khả dụng` (raw selected count before filtering vs. $N$ eligible questions after deduplication and compatibility checks).
-3. **Dynamic Candidate Count Buttons:**
+2. **Question Types & Defaults:** Four types are offered as checkboxes: `Kana → Chữ Hán/Từ`, `Từ/Chữ Hán → Tiếng Việt`, `Tiếng Việt → Chữ Hán/Từ` (checked by default) and `Tiếng Việt → Viết câu trả lời` (written answer, unchecked by default). Category and Book tests start with every lesson in scope checked; the Global Mixed Test starts with no lesson checked. The count selection defaults to the smallest available fixed count (or `Tất cả (N)` when no fixed count fits) and falls back automatically when `N` shrinks.
+3. **Total vs Eligible Counts:** The interface explicitly communicates both: `X mục đã chọn · Y câu khả dụng` (raw selected count before filtering vs. $N$ eligible questions after deduplication and compatibility checks).
+4. **Dynamic Candidate Count Buttons:**
    - Candidate options `10`, `20`, `40` are rendered **strictly when `<= N`**.
    - `Tất cả (N)` button displays the exact eligible count $N$. Selecting `Tất cả` yields exactly $N$ questions (one initial question per eligible lexical group), **never** multiplying by the number of question types selected.
-4. **$N = 0$ Empty / Zero State:**
+5. **$N = 0$ Empty / Zero State:**
    - When 0 lessons are checked or selected types yield 0 eligible items:
      - Fixed count buttons (`10`, `20`, `40`) are hidden.
      - `Tất cả (0)` is **never rendered**.
@@ -204,9 +205,10 @@ The most expansive quiz builder in Tango. Combines arbitrary lessons across all 
 
 #### Routes & Navigation:
 - **Route:** `/quiz/mixed-config`
-- **Entry:** [SCREEN 01: Home](./STUDY_SCREENS.md#screen-01-home--study-hub) `[ [IconBolt] Kiểm tra tổng hợp ]`.
+- **Entry:** the **Kiểm tra / Test** primary destination (mobile bottom bar, or the Home header from `sm` up); see [`DESIGN_SYSTEM.md` §16.0](../DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings).
+- **Root destination:** on mobile the screen is a peer of Home and Settings: no back arrow, the bottom navigation stays visible with Test active, and the sticky Start bar sits directly above it. From `sm` up it keeps a back arrow to Home.
 - **Exit:**
-  - `[IconArrowLeft]` Back $\rightarrow$ Home (`/`).
+  - Mobile: the Home / Settings tabs of the primary navigation. Tablet/Desktop: `[IconArrowLeft]` Back or `Escape` $\rightarrow$ Home (`/`).
   - `[ [IconPlayerPlay] Bắt đầu kiểm tra ]` $\rightarrow$ [SCREEN 10: Active Quiz](./QUIZ_SESSION_SCREENS.md#screen-10-active-quiz--practice-session) (`/quiz/session`).
 
 #### Grouping Hierarchy:
@@ -221,7 +223,7 @@ The most expansive quiz builder in Tango. Combines arbitrary lessons across all 
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ [IconArrowLeft]  Kiểm tra tổng hợp            │
+│ Kiểm tra tổng hợp                             │  <- root: no back arrow
 ├───────────────────────────────────────────────┤
 │ 中級へ行こう                                  │
 │   Từ vựng                                     │
@@ -251,6 +253,7 @@ MOBILE (< 640px)
 │ [X] Tiếng Việt → Chữ Hán/Từ                   │
 │                                               │
 │ [StickyBottomBar: [IconPlayerPlay] Bắt đầu ]  │
+│ (floating primary nav: Trang chủ · [Kiểm tra] · Cài đặt) │
 └───────────────────────────────────────────────┘
 
 DESKTOP (> 1024px - max-w-4xl Centered)

@@ -181,11 +181,11 @@ Selected Lesson IDs: ["vocab-01", "vocab-02", "kanji-01"]
 ### 5.2 Quick Test (Kiểm tra tính điểm)
 - **Purpose:** Assessment, time-boxed retention check.
 - **Question Counts:** Dynamic candidate options (`10`, `20`, `40` shown only when `<= N`) plus `Tất cả (N)`. Exactly $N$ initial questions for $N$ eligible lexical groups when selecting `Tất cả`. If $N = 0$, count buttons are hidden and the $N = 0$ empty state is shown.
-- **HUD Elements:**
+- **HUD Elements** (see [SCREEN 10](./screens/QUIZ_SESSION_SCREENS.md#screen-10-active-quiz--practice-session)):
   - Question progress (`4 / 20`)
-  - Running score
   - Streak counter (`[IconFlame] 5`)
   - Elapsed time counter
+  - The score (`17 / 20`) and accuracy are shown on the Results screen, keeping the HUD minimal.
 
 ---
 

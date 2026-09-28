@@ -34,7 +34,9 @@ The focused study environment where questions are answered. Minimalist, high con
 - Optional sub-prompt for reading disambiguation.
 
 #### Bottom Thumb-Zone Area (4 Positional Answer Choices):
-- Stacked 4 choices with positional identity:
+- **Answer layout preference** (Settings, default **Grid**): a 2×2 grid or 4 stacked rows. Grid falls back to Stacked for the whole question when any answer is too long for a 2×2 card (more than about 2 lines of Vietnamese/English, a Japanese answer that would wrap, or an unbreakable word) or the screen is too narrow; the fallback is per question and never overwrites the saved preference. Written-answer questions are unaffected. Details: [`DESIGN_SYSTEM.md` §12.4](../DESIGN_SYSTEM.md#124-answer-layout-preference-grid-22--stacked-14).
+- In the grid, all four cards share one height and keep reading order (1 2 / 3 4); feedback rings and icons behave exactly as in the stacked layout, with no layout change when feedback appears.
+- 4 choices with positional identity:
   - Choice 1: Amber tint
   - Choice 2: Sky Blue tint
   - Choice 3: Violet tint
@@ -48,7 +50,22 @@ The focused study environment where questions are answered. Minimalist, high con
 
 #### Wireframes:
 ```text
-MOBILE (< 640px)
+MOBILE (< 640px) — GRID (default, short answers)
+┌───────────────────────────────────────────────┐
+│ [IconX]   ━━━━━━━░░░░░░░░░░   4/20   [IconFlame] 4 │
+├───────────────────────────────────────────────┤
+│                                               │
+│               りょこう                        │
+│                                               │
+│ ┌────────────────────┐ ┌────────────────────┐ │
+│ │      du lịch       │ │      thực tế       │ │
+│ └────────────────────┘ └────────────────────┘ │
+│ ┌────────────────────┐ ┌────────────────────┐ │
+│ │      lễ nghi       │ │     cảnh quan      │ │
+│ └────────────────────┘ └────────────────────┘ │
+└───────────────────────────────────────────────┘
+
+MOBILE (< 640px) — STACKED (preference, or the grid's long-answer fallback)
 ┌───────────────────────────────────────────────┐
 │ [IconX]   ━━━━━━━░░░░░░░░░░   4/20   [IconFlame] 4 │
 ├───────────────────────────────────────────────┤
@@ -113,9 +130,13 @@ DESKTOP (> 1024px - max-w-xl Centered Study Canvas)
   - Selected wrong choice: Red ring (`--error`, `#DC2626`) and `[IconX]`.
   - True correct choice: Simultaneously highlighted with Emerald Green ring and `[IconCheck]`.
 - **Sound Effects:** Gentle low-frequency tone (<200ms) if sound enabled.
-- **Explanation Container:**
-  - **Mobile (< 640px):** Slides in from the bottom as an interactive `BottomSheet`.
-  - **Desktop (> 1024px):** Renders as an overlay card centered directly below the prompt.
+- **Explanation Container** — chosen in Settings ("Hiển thị lời giải khi sai", `tango_v1_preferences.incorrectFeedback`):
+  - **Popup (`Cửa sổ`, default):**
+    - **Mobile (< 640px):** Slides in from the bottom as an interactive `BottomSheet`.
+    - **Desktop (> 1024px):** Renders as an overlay card centered directly below the prompt.
+    - Modal dialog: backdrop, focus trap, Continue focused, and a history marker so browser Back asks to exit (SCREEN 13).
+  - **Inline (`Dưới đáp án`):** the same content directly below the whole answer area (after the 2×2 grid, the last stacked answer, or the written-answer input), full answer width, never a grid cell. A dashed error-surface box in the normal page flow: no dialog, backdrop, blur, history marker, or focus trap; announced politely. The HUD, prompt, and answers are a stable one-viewport stage: the explanation is added after it and extends the page downward, so the prompt and answers do not move (no reflow). It fades up subtly (200ms; fade only under reduced motion). Continue takes focus, and the page scrolls only enough to reveal the start of the explanation (instant under reduced motion); the rest, including Continue, is reachable by normal scrolling. The answer highlights (red wrong, green correct, muted others) and the answer layout stay as they are; for written answers the Check button keeps its space during feedback, so the input stays put.
+  - Both styles share one content block and the same `Đã hiểu — Tiếp tục` action; wrong answers never auto-advance.
 - **Content:**
   - Status: `[IconX] Chưa chính xác`
   - Word: `旅行` (Japanese)
@@ -139,6 +160,17 @@ MOBILE BOTTOM SHEET
 │                                               │
 │ [ [IconArrowRight] Đã hiểu — Tiếp tục ]       │
 └───────────────────────────────────────────────┘
+
+INLINE (below the answers)
+│ [ 旅行 ✕ ]              [ 実際 ]              │
+│ [ 礼儀 ✓ ]              [ 景観 ]              │
+│ ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ │
+│ ┆ [IconX] Chưa chính xác                    ┆ │
+│ ┆ 礼儀                                      ┆ │
+│ ┆ れいぎ                                    ┆ │
+│ ┆ Nghĩa: lễ nghi                            ┆ │
+│ ┆ [ Đã hiểu — Tiếp tục ]                    ┆ │
+│ └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ │
 ```
 
 ---
@@ -156,6 +188,7 @@ Prevents accidental abandonment of an ongoing quiz session.
   - Actions:
     - Primary Button: `[ Tiếp tục học ]` (receives initial focus)
     - Secondary Button: `[ Thoát ]` (neutral outline)
+- **Browser Back** during an active session opens this dialog instead of leaving; `Escape` and the HUD `[IconX]` open it too. `Thoát` returns to the screen that started the session and discards the session (no progress or history is written).
 
 ---
 
@@ -173,7 +206,24 @@ Post-quiz assessment metrics and mistake review triggers.
 #### Actions:
 1. `[IconRefresh] Ôn lại các từ đã sai (3 từ)` — High-emphasis primary button (only rendered if mistakes exist).
 2. `[IconRotateClockwise] Làm lại bài kiểm tra` — Secondary button.
-3. `[IconHome] Về trang chủ` — Tertiary button.
+3. **Contextual return** — quiet tertiary button: returns to the study context the quiz started from (see *Return context* below), e.g. `[IconArrowLeft] Về Hán tự`.
+
+#### Return context:
+Quiz Results returns to the quiz's originating study context, not always Home.
+
+| Quiz started from | Returns to | VI | EN | Icon |
+|---|---|---|---|---|
+| Category Quiz Config (SCREEN 07) | `/book/:bookId/category/:category` | `Về Từ vựng` / `Về Hán tự` | `Back to Vocabulary` / `Back to Kanji` | `IconArrowLeft` |
+| Book Quiz Config (SCREEN 08) | `/book/:bookId` | `Về giáo trình` | `Back to book` | `IconArrowLeft` |
+| Lesson Practice / Quick Test / lesson Review (SCREEN 05) | `/lesson/:lessonId` | `Về bài học` | `Back to lesson` | `IconArrowLeft` |
+| Mixed Quiz Config, the Test root (SCREEN 09) | `/quiz/mixed-config` | `Về Kiểm tra` | `Back to Test` | `IconCards` |
+| Unknown (no metadata) | `/` | `Về trang chủ` | `Back to Home` | `IconHome` |
+
+- **Explicit runtime metadata:** each entry point sets `QuizSessionConfig.returnTarget` (a typed, restricted subset of the app routes) when the session starts. It is never inferred from question types, answers, or lessons, never passed to the quiz engine, and never written to `tango_v1_history`.
+- **Preserved across Retry and Review Missed:** Retry reuses the same config; Review Missed launched from Results carries the ORIGINAL return target (Kanji → Test → Results → Review Missed → Results → `Về Hán tự`), never the previous Results screen.
+- **Fallback = Home** when the metadata is missing (an old or test-created session).
+- **History:** the return action goes back through browser history to the existing origin entry when it is an earlier in-app screen, so browser Back from the origin never bounces into Results or the quiz session; after a deep link or reload it replaces Results with the origin instead.
+- **Keyboard:** `Escape` takes the same contextual return; `Enter` (focus on the page) still starts Review Missed.
 
 #### Responsive Adaptation:
 - **Mobile (< 640px):** 2x2 metric cards, stacked action buttons.
@@ -185,6 +235,7 @@ Post-quiz assessment metrics and mistake review triggers.
 
 #### Purpose:
 Launches a targeted review session containing only items failed in the recent quiz or marked weak in history.
-- Reuses SCREEN 10 (Quiz Runner) scoped strictly to `missedItemIds`.
-- Once all weak items are answered correctly, returns gracefully to SCREEN 14 or Home.
+- Reuses SCREEN 10 (Quiz Runner) scoped strictly to `missedItemIds` (from Results) or to the lesson's weak items (from Lesson Detail), using the engine's review focus (see [`docs/DATA_MODEL.md` §4.3](../DATA_MODEL.md)).
+- A correct answer in a review session clears the item's weak flag.
+- Once all weak items are answered correctly, returns gracefully to SCREEN 14, whose return action still leads to the original quiz's study context (or Home when there is none).
 - **Empty State:** If launched when 0 items are weak, displays: *"Tuyệt vời! Bạn không có từ nào cần ôn lại."*.

@@ -1,8 +1,12 @@
 import React from 'react';
-import { IconSettings } from '@tabler/icons-react';
 import { useNavigation } from '../hooks/useNavigation';
 import { useI18n } from '../hooks/useI18n';
-import { CLAY_PRESSED_CLASSES, usePressFeedback } from '../hooks/usePressFeedback';
+import { DesktopPrimaryNav } from './PrimaryNav';
+import tangoWordmark from '../assets/brand/tango-wordmark.webp';
+
+/** Intrinsic size of the brand asset (keeps the aspect ratio and avoids layout shift). */
+const WORDMARK_WIDTH = 488;
+const WORDMARK_HEIGHT = 176;
 
 export interface TopBarProps {
   className?: string;
@@ -11,8 +15,6 @@ export interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
   const { navigate } = useNavigation();
   const { t } = useI18n();
-  const { isPressed: isSettingsPressed, pressHandlers: settingsPressHandlers } =
-    usePressFeedback();
 
   return (
     <header
@@ -22,23 +24,23 @@ export const TopBar: React.FC<TopBarProps> = ({ className = '' }) => {
         <button
           type="button"
           onClick={() => navigate({ type: 'home' })}
-          className="inline-flex items-center min-h-touch px-2 font-bold text-xl tracking-wider text-text-primary hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page rounded-xl"
+          className="inline-flex items-center min-h-touch px-1.5 -ml-1.5 flat-interactive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page rounded-xl"
           aria-label={t('nav.home')}
         >
-          TANGO
+          {/* Canonical Tango cat wordmark (DESIGN_SYSTEM B1); the button carries the accessible name */}
+          <img
+            src={tangoWordmark}
+            alt=""
+            width={WORDMARK_WIDTH}
+            height={WORDMARK_HEIGHT}
+            draggable={false}
+            className="tango-wordmark block h-10 sm:h-11 w-auto select-none"
+          />
         </button>
 
-        {/* Settings button (theme and language are chosen only inside Settings) */}
-        <button
-          type="button"
-          {...settingsPressHandlers}
-          onClick={() => navigate({ type: 'settings' })}
-          aria-label={t('nav.settings')}
-          title={t('nav.settings')}
-          className={`clay-interactive clay-hover-surface flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border-subtle text-text-primary ${isSettingsPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-page min-h-touch`}
-        >
-          <IconSettings size={22} stroke={2} aria-hidden="true" />
-        </button>
+        {/* Primary navigation from sm up; on mobile the floating bottom nav takes this role.
+            No theme status or control here: theme selection lives only in Settings. */}
+        <DesktopPrimaryNav active="home" />
       </div>
     </header>
   );

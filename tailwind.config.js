@@ -35,11 +35,13 @@ export default {
         success: {
           DEFAULT: 'var(--success)',
           surface: 'var(--success-surface)',
+          text: 'var(--success-text)',
         },
         error: {
           DEFAULT: 'var(--error)',
           surface: 'var(--error-surface)',
           border: 'var(--error-border)',
+          text: 'var(--error-text)',
         },
         warning: 'var(--warning)',
         answer: {

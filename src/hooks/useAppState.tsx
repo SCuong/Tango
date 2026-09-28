@@ -18,7 +18,13 @@ import {
   type ReactNode,
 } from 'react';
 import { UserPreferences, UserStudyState } from '../types';
-import { savePreferences } from '../lib/storage';
+import {
+  saveBooks,
+  saveHistory,
+  saveLessons,
+  savePreferences,
+  saveProgress,
+} from '../lib/storage';
 import {
   loadUserStudyState,
   mergePreferences,
@@ -28,10 +34,22 @@ import {
 /**
  * Public minimal interface exposed by useAppState.
  */
+export type StudyDataPatch = Partial<
+  Pick<UserStudyState, 'books' | 'lessons' | 'progressByItem' | 'recentResults'>
+>;
+
 export interface AppStateContextValue {
   state: UserStudyState;
   reloadState: () => void;
   updatePreferences: (patch: Partial<UserPreferences>) => void;
+  /**
+   * Persists the given partitions one by one, each to its own storage key, then updates
+   * in-memory state. Partitions are not written atomically: if a later write fails
+   * (e.g. QuotaExceededError), the partitions already written stay persisted and are applied
+   * to in-memory state, the failed and remaining partitions are left unchanged, and the
+   * error is rethrown to the caller. If the first write fails, nothing changes.
+   */
+  commitStudyData: (patch: StudyDataPatch) => void;
 }
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
@@ -85,13 +103,47 @@ export const AppStateProvider: FC<AppStateProviderProps> = ({
     setState(nextState);
   }, []);
 
+  const commitStudyData = useCallback((patch: StudyDataPatch) => {
+    // Partitions are written one by one; if a later write fails, in-memory state still reflects
+    // the partitions that were persisted, so a stale copy never overwrites stored data later.
+    const persisted: StudyDataPatch = {};
+    const commit = () => {
+      const nextState: UserStudyState = { ...stateRef.current, ...persisted };
+      stateRef.current = nextState;
+      setState(nextState);
+    };
+    try {
+      if (patch.books) {
+        saveBooks(patch.books);
+        persisted.books = patch.books;
+      }
+      if (patch.lessons) {
+        saveLessons(patch.lessons);
+        persisted.lessons = patch.lessons;
+      }
+      if (patch.progressByItem) {
+        saveProgress(patch.progressByItem);
+        persisted.progressByItem = patch.progressByItem;
+      }
+      if (patch.recentResults) {
+        saveHistory(patch.recentResults);
+        persisted.recentResults = patch.recentResults;
+      }
+    } catch (error) {
+      if (Object.keys(persisted).length > 0) commit();
+      throw error;
+    }
+    commit();
+  }, []);
+
   const contextValue = useMemo<AppStateContextValue>(
     () => ({
       state,
       reloadState,
       updatePreferences,
+      commitStudyData,
     }),
-    [state, reloadState, updatePreferences]
+    [state, reloadState, updatePreferences, commitStudyData]
   );
 
   return (

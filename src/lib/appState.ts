@@ -7,7 +7,7 @@
  * - docs/DESIGN_SYSTEM.md (§§8, 9, 18)
  */
 
-import { Lesson, UserPreferences, UserStudyState } from '../types';
+import { Lesson, UserPreferences, UserStudyState, isAnswerLayout, isAppTheme, isIncorrectFeedback } from '../types';
 import {
   loadBooks,
   loadLessons,
@@ -61,10 +61,7 @@ export function mergePreferences(
   current: UserPreferences,
   patch: Partial<UserPreferences>
 ): UserPreferences {
-  const theme =
-    patch.theme === 'dark' || patch.theme === 'sakura' || patch.theme === 'light'
-      ? patch.theme
-      : current.theme;
+  const theme = isAppTheme(patch.theme) ? patch.theme : current.theme;
 
   const language =
     patch.language === 'en' || patch.language === 'vi'
@@ -76,16 +73,26 @@ export function mergePreferences(
       ? patch.soundEnabled
       : current.soundEnabled;
 
+  const answerLayout = isAnswerLayout(patch.answerLayout)
+    ? patch.answerLayout
+    : current.answerLayout;
+
+  const incorrectFeedback = isIncorrectFeedback(patch.incorrectFeedback)
+    ? patch.incorrectFeedback
+    : current.incorrectFeedback;
+
   return {
     theme,
     language,
     soundEnabled,
+    answerLayout,
+    incorrectFeedback,
   };
 }
 
 /**
  * Synchronizes appearance theme and interface language to the document root element:
- * - `document.documentElement.dataset.theme` is set to 'light' | 'dark' | 'sakura'
+ * - `document.documentElement.dataset.theme` is set to 'light' | 'dark' | 'sakura' | 'meo'
  * - `document.documentElement.lang` is set to 'vi' | 'en'
  *
  * Safe for execution in non-browser/SSR/Node environments.
@@ -97,10 +104,7 @@ export function applyDocumentPreferences(
     return;
   }
 
-  const validTheme =
-    preferences.theme === 'dark' || preferences.theme === 'sakura'
-      ? preferences.theme
-      : 'light';
+  const validTheme = isAppTheme(preferences.theme) ? preferences.theme : 'light';
 
   if (document.documentElement.dataset) {
     document.documentElement.dataset.theme = validTheme;

@@ -11,13 +11,56 @@ export interface ItemProgress {
   isMarkedWeak: boolean;          // Persisted weak/review flag; read selectors consume it as-is
 }
 
-export type AppTheme = 'light' | 'dark' | 'sakura';
+/**
+ * Light / Dark / Sakura are the standard themes; 'meo' (Mèo mập 😺 / Meo's World) is the special
+ * easter-egg theme revealed in the third Settings theme slot.
+ */
+export type AppTheme = 'light' | 'dark' | 'sakura' | 'meo';
+
+/** Every accepted theme identifier, in theme-picker order. */
+export const APP_THEMES: readonly AppTheme[] = ['light', 'dark', 'sakura', 'meo'];
+
+/** True for a supported theme identifier (unknown stored values fall back to the default). */
+export function isAppTheme(value: unknown): value is AppTheme {
+  return typeof value === 'string' && (APP_THEMES as readonly string[]).includes(value);
+}
 export type AppLanguage = 'vi' | 'en';
 
+/**
+ * How 4-option multiple-choice answers are laid out: a 2×2 grid (default) or stacked 1×4 rows.
+ * Grid falls back to stacked per question when an answer is too long or the screen too narrow;
+ * that fallback never changes the saved preference.
+ */
+export type AnswerLayout = 'grid' | 'stacked';
+
+/** Every accepted answer layout, in Settings order. */
+export const ANSWER_LAYOUTS: readonly AnswerLayout[] = ['grid', 'stacked'];
+
+/** True for a supported answer layout (missing or unknown stored values fall back to 'grid'). */
+export function isAnswerLayout(value: unknown): value is AnswerLayout {
+  return typeof value === 'string' && (ANSWER_LAYOUTS as readonly string[]).includes(value);
+}
+
+/**
+ * How the explanation of an incorrect answer is shown: a separate popup layer (the current quiz
+ * behavior, default) or inline below the answers.
+ */
+export type IncorrectFeedback = 'popup' | 'inline';
+
+/** Every accepted incorrect-answer feedback style, in Settings order. */
+export const INCORRECT_FEEDBACK_STYLES: readonly IncorrectFeedback[] = ['popup', 'inline'];
+
+/** True for a supported feedback style (missing or unknown stored values fall back to 'popup'). */
+export function isIncorrectFeedback(value: unknown): value is IncorrectFeedback {
+  return typeof value === 'string' && (INCORRECT_FEEDBACK_STYLES as readonly string[]).includes(value);
+}
+
 export interface UserPreferences {
-  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura'
+  theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura' | 'meo'
   language: AppLanguage;         // 'vi' (default) | 'en'
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
+  answerLayout: AnswerLayout;    // 'grid' (default) | 'stacked'
+  incorrectFeedback: IncorrectFeedback; // 'popup' (default) | 'inline'
 }
 
 /**

@@ -2,7 +2,7 @@
 
 This document defines the functional UX flows, screen layouts, interaction patterns, and ergonomics for Tango across mobile and desktop form factors.
 
-> **Visual Design System Reference:** For the complete, authoritative design token architecture, Soft Claymorphism specifications, Light/Dark/Sakura palettes, typography, and Tabler Icons, see [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
+> **Visual Design System Reference:** For the complete, authoritative design token architecture, Soft Claymorphism specifications, Light/Dark/Sakura palettes (plus the special Meo's World theme), typography, and Tabler Icons, see [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
 >
 > **Screen-by-Screen Specification Reference:** For the exhaustive, authoritative 27-screen wireframes, routes, responsive layouts (Mobile, Tablet, Desktop), touch targets, and keyboard shortcuts, see [`docs/SCREEN_SPEC.md`](./SCREEN_SPEC.md).
 
@@ -29,7 +29,7 @@ The Home screen is dedicated purely to reading and studying. Administrative, imp
 ```text
 MOBILE (< 640px)
 ┌───────────────────────────────────────────────┐
-│ TANGO                           [IconSettings]│  <- no divider line
+│ TANGO                                         │  <- wordmark only on mobile
 │ ┌───────────────────────────────────────────┐ │
 │ │ ┌─────────┐  中級へ行こう 日本語の文型と │ │  <- first 2 books only:
 │ │ │  Cover  │  表現55 第2版                │ │     large 3:4 cover, title,
@@ -48,19 +48,17 @@ MOBILE (< 640px)
 │ │ 語彙         [あ]  │ │ 漢字         [字]  │ │  <- glyph + name + illustration
 │ │ Từ vựng            │ │ Hán tự             │ │
 │ └────────────────────┘ └────────────────────┘ │
-│ ┌───────────────────────────────────────────┐ │
-│ │ Kiểm tra                              (+) │ │  <- "Tạo bài kiểm tra"
-│ └───────────────────────────────────────────┘ │
 │            (quiet theme ambience behind)      │
+│  ╭ Trang chủ · Kiểm tra · Cài đặt ╮  (floating) │
 └───────────────────────────────────────────────┘
 ```
 
-- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts and the Test action are secondary.
-- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Test = short label `Kiểm tra` with a `+` affordance. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
-- **Top Bar:** Wordmark `TANGO` and `[IconSettings]` only, with no divider line. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
+- **Hierarchy:** Study Book → Category → Lesson → StudyItem. Study Books are the primary, visually dominant content; Vocabulary / Kanji shortcuts are secondary.
+- **Progressive disclosure:** Home shows identity + progress + primary actions, not inventory statistics. Study Book = cover + title + Study Coverage (first 2 books, the rest behind `Xem tất cả`). Vocabulary / Kanji = Japanese glyph + localized category name + illustration. Lesson/item counts are deferred to detail screens. No visible section labels or greeting. Theme controls remain Settings-only.
+- **Primary navigation:** Home / Test / Settings as a root-only floating bottom bar on mobile and compact header links from `sm` up (see [`DESIGN_SYSTEM.md` §16.0](./DESIGN_SYSTEM.md#160-primary-navigation-home--test--settings)).
+- **Top Bar:** The Tango cat wordmark (plus the header navigation from `sm` up), with no divider line. No theme status or theme control (theme is chosen only in Settings). Content Management is accessed from the Study Content section inside Settings.
 - **Study Book cards:** The first 2 books as large cards (3:4 cover, title up to 3 lines with full title on hover, Study Coverage). A centered, compact dashed `Xem tất cả` / `View all` bridge reveals the rest in place when more than 2 exist. Tapping a book opens its **Book Study View**. (Never triggers edit/delete). Reordering books is not available on Home; it belongs to the future full Books list / management view.
 - **Vocabulary / Kanji shortcuts:** Equal-height `語彙 Từ vựng` and `漢字 Hán tự` tiles (glyph top-left, illustration top-right, label bottom-left, no wrapping) to browse lessons by category across all textbooks.
-- **Kiểm tra (+):** Compact CTA (accessible name "Tạo bài kiểm tra" / "Create test") that opens the global multi-lesson test builder.
 - **Ambience:** A restrained per-theme Japanese scene sits quietly behind the content (see [`docs/DESIGN_SYSTEM.md` §8.2](./DESIGN_SYSTEM.md#82-restrained-japanese-ambience-explicit-exception)).
 - **Strict Safety Rule:** Zero Add, Import, Edit, or Delete controls on Home.
 
@@ -104,7 +102,7 @@ Selecting a lesson opens the **Lesson Detail view**, offering:
 
 ### Screen 3: Mixed Multi-Lesson Test (Kiểm tra tổng hợp)
 
-A dedicated, mobile-friendly configuration modal/screen allowing users to combine any set of lessons across textbooks and categories:
+A dedicated, mobile-friendly configuration screen (`/quiz/mixed-config`, see [SCREEN 09](./screens/QUIZ_CONFIG_SCREENS.md)) allowing users to combine any set of lessons across textbooks and categories:
 
 ```text
 KIỂM TRA TỔNG HỢP
@@ -219,15 +217,15 @@ Nghĩa:
 
 - **Celebration Header:** "Hoàn thành bài kiểm tra!"
 - **Metrics Grid (2x2):**
-  - **Điểm số:** 450 pts
-  - **Độ chính xác:** 85% (17/20)
+  - **Số câu đúng:** 17 / 20
+  - **Độ chính xác:** 85%
   - **Chuỗi đúng dài nhất:** 8 liên tiếp
   - **Thời gian:** 1 phút 40 giây
 - **Missed Items Section:** Displays cards for failed items.
 - **Action Buttons:**
   1. **"Ôn lại các từ đã sai (3 từ)"** (High-emphasis primary button).
   2. **"Làm lại bài kiểm tra"** (Secondary button).
-  3. **"Về trang chủ"** (Tertiary button).
+  3. **Contextual return** (Tertiary button): back to where the quiz started, e.g. **"Về Hán tự"**, **"Về giáo trình"**, **"Về bài học"**, **"Về Kiểm tra"**; **"Về trang chủ"** only when the origin is unknown (see [QUIZ_SESSION_SCREENS SCREEN 14](./screens/QUIZ_SESSION_SCREENS.md#screen-14-quiz-results-summary)).
 
 ---
 
@@ -244,9 +242,9 @@ Nghĩa:
 A clean, minimalist preferences modal/sheet:
 - **Language (Ngôn ngữ):** Segmented control `[ Tiếng Việt ]` | `[ English ]`.
 - **Theme (Giao diện):**
-  - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`.
-  - Each card renders a miniature of its own theme using that theme's tokens: page background, a surface card, and the primary accent (e.g. a small accent bar or button), plus the localized theme name.
-  - Selected state: primary focus-style ring and an `IconCheck` badge (never color alone); the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
+  - Three visual preview cards, never a plain text toggle: `Sáng / Light`, `Tối / Dark`, `Sakura`; a small round cat toggle in the section header swaps only the third slot (Sakura) for the special fourth theme `Mèo mập 😺` / `Meo's World` with a vertical reel transition, without selecting it (see [`DESIGN_SYSTEM.md` §16.5](./DESIGN_SYSTEM.md#165-settings-screen)).
+  - Each card renders a miniature of the **current** Tango shell in its own theme's tokens: a tiny top bar with the cat wordmark, the Vocabulary (`語`) / Kanji (`漢`) category cards, and a 3-item Home / Test / Settings navigation with Home active, plus the localized theme name. Simple shapes only (no stale Home CTA bar, no text paragraphs); the canvas motif hints at the ambience, and Meo's World adds only the mini navigation's brown outline and cat ears.
+  - Selected state: primary border plus a 2px primary ring (a shape cue, never a color change alone), no check badge; the option is a real radio choice (`role="radiogroup"` / `role="radio"`, `aria-checked`).
   - Selecting a card applies the theme immediately and persists it to `tango_v1_preferences.theme`.
   - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control.
 - **Sound Effects (Âm thanh hiệu ứng):** Segmented toggle `[ Off / On ]` (Default: **Off** / Tắt). Never plays sound unless explicitly enabled.
@@ -260,7 +258,7 @@ A clean, minimalist preferences modal/sheet:
 A protected administrative screen accessed intentionally via **Settings → Quản lý giáo trình và bài học**:
 - **Giáo trình (Study Books):** List of textbooks with `[ Quản lý ]` inspector and `[IconPlus] Thêm giáo trình`.
 - **Bài học (Lessons):** Lesson rows inside book management provide `[ Quản lý ]`, opening a dedicated **Quản lý bài học (Lesson Management)** view. There are **strictly no inline adjacent delete buttons** on lesson rows.
-- **Thêm bài mới:** `[IconFileImport] Thêm / Nhập bài học mới` (launches lesson importer with target book selector).
+- **Thêm bài mới:** `[IconFileImport] Thêm bài học mới` (launches lesson importer with target book selector).
 - **Danger Zone (Vùng nguy hiểm):** Located deep inside individual book and lesson management views.
 - **Hard Delete Only:** Deleting a book or lesson permanently removes records and related data via an ordered, idempotent cascade. No soft delete, no recycle bin, no trash folder.
 - **Accidental Tap Safeguards:** Requires explicit modal confirmation clearly stating book/lesson name and total items; delete button is visually separated with semantic error styling and never default focused.
@@ -301,8 +299,8 @@ A protected administrative screen accessed intentionally via **Settings → Qu�
 
 | Component / Screen | Mobile (< 640px) | Tablet (640px - 1024px) | Desktop (> 1024px) |
 |---|---|---|---|
-| **Home Screen** | First 2 large Study Book cards (+ `Xem tất cả`), 2-col Vocabulary/Kanji tiles, full-width Test (+) CTA | 2-column Study Book grid, shortcut row | 2-column Study Book grid (max-w-4xl), one row of Vocabulary/Kanji tiles + Test (+) CTA |
-| **Mixed Test Selector**| Full-screen modal, stacked checkboxes | Centered modal (max-w-lg) | Centered modal (max-w-xl) |
+| **Home Screen** | First 2 large Study Book cards (+ `Xem tất cả`), 2-col Vocabulary/Kanji tiles, floating Home/Test/Settings nav | 2-column Study Book grid, shortcut row, header nav | 2-column Study Book grid (max-w-4xl), one row of Vocabulary/Kanji tiles, header nav |
+| **Mixed Test Selector**| Full-screen route, stacked checkboxes, sticky Start bar | Centered 2-column route (`max-w-4xl`) | Centered 2-column route (`max-w-4xl`), sticky settings panel |
 | **Lesson List** | Single column list | 2-column grid | 2-column grid (max-w-4xl) |
 | **Quiz Container** | Full screen (100% width, 16px padding) | Centered canvas (max-w-lg) | Centered canvas (max-w-xl) |
 | **Option Buttons** | Full width stacked, 56px height | Full width stacked, 58px height | Full width stacked (clean content-only, no indices) |
