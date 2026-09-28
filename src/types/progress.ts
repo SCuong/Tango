@@ -26,10 +26,26 @@ export function isAppTheme(value: unknown): value is AppTheme {
 }
 export type AppLanguage = 'vi' | 'en';
 
+/**
+ * How 4-option multiple-choice answers are laid out: a 2×2 grid (default) or stacked 1×4 rows.
+ * Grid falls back to stacked per question when an answer is too long or the screen too narrow;
+ * that fallback never changes the saved preference.
+ */
+export type AnswerLayout = 'grid' | 'stacked';
+
+/** Every accepted answer layout, in Settings order. */
+export const ANSWER_LAYOUTS: readonly AnswerLayout[] = ['grid', 'stacked'];
+
+/** True for a supported answer layout (missing or unknown stored values fall back to 'grid'). */
+export function isAnswerLayout(value: unknown): value is AnswerLayout {
+  return typeof value === 'string' && (ANSWER_LAYOUTS as readonly string[]).includes(value);
+}
+
 export interface UserPreferences {
   theme: AppTheme;               // 'light' (default) | 'dark' | 'sakura' | 'meo'
   language: AppLanguage;         // 'vi' (default) | 'en'
   soundEnabled: boolean;         // Default: false (strictly OFF until user enables)
+  answerLayout: AnswerLayout;    // 'grid' (default) | 'stacked'
 }
 
 /**

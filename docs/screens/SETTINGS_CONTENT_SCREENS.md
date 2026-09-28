@@ -47,6 +47,11 @@ App preferences management and intentional gateway to administrative content ope
      - Theme selection exists **only** in Settings. Home and other study screens show no theme status or theme control; do not add a theme toggle to any TopBar.
      - The previews use the canonical palettes and ambience identities (Light — Cool Pearl, Dark — Midnight Ink, Sakura — Warm Blossom Paper, Meo's World — the special cat theme of §9.4) defined in [`docs/DESIGN_SYSTEM.md` §9 / §16.5](../DESIGN_SYSTEM.md#9-theme-palette-specifications).
    - **Sound Effects:** Segmented control `[ Off / Tắt ]` | `[ On / Bật ]` (Default: **Off**)
+   - **Answer layout (Bố cục đáp án):** two compact preview cards in a radio group after Sound Effects (arrow keys move the selection; touch targets of at least 48px):
+     - `Lưới 2×2` / `2×2 Grid` (default) and `Danh sách` / `Stacked`; selected = primary border + 2px primary ring.
+     - Helper line: `Tự chuyển sang danh sách khi đáp án quá dài.` / `Long answers automatically switch to the stacked layout.`
+     - Persists immediately to `tango_v1_preferences.answerLayout`. A failed save shows the localized Settings save error and keeps the previous selection.
+     - Applies only to 4-option multiple-choice questions; Grid falls back to Stacked per question when an answer is too long or the screen too narrow, without changing the saved preference ([`DESIGN_SYSTEM.md` §12.4](../DESIGN_SYSTEM.md#124-answer-layout-preference-grid-22--stacked-14)).
 2. **Nội dung học (Study Content):**
    - Clickable row: `Quản lý giáo trình và bài học` $\rightarrow$ navigates to [SCREEN 17: Content Management](#screen-17-content-management-quản-lý-nội-dung).
 
@@ -71,6 +76,13 @@ SETTINGS PANEL
 │                                               │
 │ Âm thanh hiệu ứng                             │
 │ [ (•) Tắt (Off) ]      [ ( ) Bật (On) ]       │
+│                                               │
+│ Bố cục đáp án                                 │
+│ Tự chuyển sang danh sách khi đáp án quá dài.  │
+│ ┌───────────────────┐  ┌───────────────────┐  │
+│ │ ▣▣  Lưới 2×2      │  │ ▤   Danh sách     │  │
+│ │ ▣▣  (selected)    │  │ ▤                 │  │
+│ └───────────────────┘  └───────────────────┘  │
 │                                               │
 │ NỘI DUNG HỌC                                  │
 │ ┌───────────────────────────────────────────┐ │

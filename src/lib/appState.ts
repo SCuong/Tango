@@ -7,7 +7,7 @@
  * - docs/DESIGN_SYSTEM.md (§§8, 9, 18)
  */
 
-import { Lesson, UserPreferences, UserStudyState, isAppTheme } from '../types';
+import { Lesson, UserPreferences, UserStudyState, isAnswerLayout, isAppTheme } from '../types';
 import {
   loadBooks,
   loadLessons,
@@ -73,10 +73,15 @@ export function mergePreferences(
       ? patch.soundEnabled
       : current.soundEnabled;
 
+  const answerLayout = isAnswerLayout(patch.answerLayout)
+    ? patch.answerLayout
+    : current.answerLayout;
+
   return {
     theme,
     language,
     soundEnabled,
+    answerLayout,
   };
 }
 

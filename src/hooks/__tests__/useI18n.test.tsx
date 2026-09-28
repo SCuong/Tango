@@ -11,6 +11,7 @@ describe('src/hooks/useI18n.ts', () => {
       theme: 'light',
       language: 'vi',
       soundEnabled: false,
+      answerLayout: 'grid',
     },
     books: {},
     lessons: {},

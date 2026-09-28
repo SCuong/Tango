@@ -34,7 +34,9 @@ The focused study environment where questions are answered. Minimalist, high con
 - Optional sub-prompt for reading disambiguation.
 
 #### Bottom Thumb-Zone Area (4 Positional Answer Choices):
-- Stacked 4 choices with positional identity:
+- **Answer layout preference** (Settings, default **Grid**): a 2×2 grid or 4 stacked rows. Grid falls back to Stacked for the whole question when any answer is too long for a 2×2 card (more than about 2 lines of Vietnamese/English, a Japanese answer that would wrap, or an unbreakable word) or the screen is too narrow; the fallback is per question and never overwrites the saved preference. Written-answer questions are unaffected. Details: [`DESIGN_SYSTEM.md` §12.4](../DESIGN_SYSTEM.md#124-answer-layout-preference-grid-22--stacked-14).
+- In the grid, all four cards share one height and keep reading order (1 2 / 3 4); feedback rings and icons behave exactly as in the stacked layout, with no layout change when feedback appears.
+- 4 choices with positional identity:
   - Choice 1: Amber tint
   - Choice 2: Sky Blue tint
   - Choice 3: Violet tint
@@ -48,7 +50,22 @@ The focused study environment where questions are answered. Minimalist, high con
 
 #### Wireframes:
 ```text
-MOBILE (< 640px)
+MOBILE (< 640px) — GRID (default, short answers)
+┌───────────────────────────────────────────────┐
+│ [IconX]   ━━━━━━━░░░░░░░░░░   4/20   [IconFlame] 4 │
+├───────────────────────────────────────────────┤
+│                                               │
+│               りょこう                        │
+│                                               │
+│ ┌────────────────────┐ ┌────────────────────┐ │
+│ │      du lịch       │ │      thực tế       │ │
+│ └────────────────────┘ └────────────────────┘ │
+│ ┌────────────────────┐ ┌────────────────────┐ │
+│ │      lễ nghi       │ │     cảnh quan      │ │
+│ └────────────────────┘ └────────────────────┘ │
+└───────────────────────────────────────────────┘
+
+MOBILE (< 640px) — STACKED (preference, or the grid's long-answer fallback)
 ┌───────────────────────────────────────────────┐
 │ [IconX]   ━━━━━━━░░░░░░░░░░   4/20   [IconFlame] 4 │
 ├───────────────────────────────────────────────┤

@@ -210,6 +210,10 @@ export const VI_DICTIONARY = {
   'settings.themeBack': 'Quay lại Sakura',
   'settings.sound': 'Âm thanh hiệu ứng',
   'settings.soundDesc': 'Âm chạm nhẹ khi trả lời câu hỏi.',
+  'settings.answerLayout': 'Bố cục đáp án',
+  'settings.answerLayoutDesc': 'Tự chuyển sang danh sách khi đáp án quá dài.',
+  'preferences.answerLayout.grid': 'Lưới 2×2',
+  'preferences.answerLayout.stacked': 'Danh sách',
   'settings.studyContent': 'Nội dung học',
   'settings.manageContent': 'Quản lý giáo trình và bài học',
 
@@ -565,6 +569,10 @@ export const EN_DICTIONARY: Record<TranslationKey, string> = {
   'settings.themeBack': 'Back to Sakura',
   'settings.sound': 'Sound effects',
   'settings.soundDesc': 'A soft tap when you answer.',
+  'settings.answerLayout': 'Answer layout',
+  'settings.answerLayoutDesc': 'Long answers automatically switch to the stacked layout.',
+  'preferences.answerLayout.grid': '2×2 Grid',
+  'preferences.answerLayout.stacked': 'Stacked',
   'settings.studyContent': 'Study Content',
   'settings.manageContent': 'Manage books and lessons',
 

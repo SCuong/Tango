@@ -16,7 +16,7 @@ import {
 function state(language: AppLanguage): UserStudyState {
   return {
     version: 1,
-    preferences: { theme: 'light', language, soundEnabled: false },
+    preferences: { theme: 'light', language, soundEnabled: false, answerLayout: 'grid' },
     books: {},
     lessons: {},
     progressByItem: {},

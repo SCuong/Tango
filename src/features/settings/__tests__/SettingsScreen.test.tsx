@@ -6,7 +6,7 @@ import { applyPreferenceChange } from '../SettingsScreen';
 
 const initialState: UserStudyState = {
   version: 1,
-  preferences: { theme: 'light', language: 'vi', soundEnabled: false },
+  preferences: { theme: 'light', language: 'vi', soundEnabled: false, answerLayout: 'grid' },
   books: {},
   lessons: {},
   progressByItem: {},
@@ -76,6 +76,6 @@ describe('Settings preference persistence failures', () => {
       removeItem: () => undefined,
     });
     expect(applyPreferenceChange(ctx!.updatePreferences, { soundEnabled: true })).toBe(true);
-    expect(JSON.parse(saved[0])).toEqual({ theme: 'light', language: 'vi', soundEnabled: true });
+    expect(JSON.parse(saved[0])).toEqual({ theme: 'light', language: 'vi', soundEnabled: true, answerLayout: 'grid' });
   });
 });

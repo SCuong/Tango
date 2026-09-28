@@ -40,7 +40,7 @@ const unassigned: Lesson = {
 function makeState(language: AppLanguage = 'vi'): UserStudyState {
   return {
     version: 1,
-    preferences: { theme: 'light', language, soundEnabled: false },
+    preferences: { theme: 'light', language, soundEnabled: false, answerLayout: 'grid' },
     books: { [book.id]: book },
     lessons: { [vocab.id]: vocab, [unassigned.id]: unassigned },
     progressByItem: {

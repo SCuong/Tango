@@ -70,11 +70,13 @@ describe('storage.ts', () => {
         theme: 'light',
         language: 'vi',
         soundEnabled: false,
+        answerLayout: 'grid',
       });
       expect(loadPreferences()).toEqual({
         theme: 'light',
         language: 'vi',
         soundEnabled: false,
+        answerLayout: 'grid',
       });
     });
   });
@@ -162,12 +164,14 @@ describe('storage.ts', () => {
         theme: 'sakura',
         language: 'en',
         soundEnabled: true,
+        answerLayout: 'grid',
       });
 
       expect(loadPreferences()).toEqual({
         theme: 'sakura',
         language: 'en',
         soundEnabled: true,
+        answerLayout: 'grid',
       });
 
       // Partial / invalid values safely sanitize back to defaults
@@ -179,7 +183,28 @@ describe('storage.ts', () => {
         theme: 'light',
         language: 'vi',
         soundEnabled: false,
+        answerLayout: 'grid',
       });
+    });
+
+    it('keeps the answer layout inside tango_v1_preferences, falling back to grid', () => {
+      // Stored before the preference existed: no answerLayout field
+      localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify({ theme: 'dark', language: 'en', soundEnabled: true }));
+      expect(loadPreferences()).toEqual({ theme: 'dark', language: 'en', soundEnabled: true, answerLayout: 'grid' });
+
+      // Unknown values never reach the app
+      for (const answerLayout of ['list', 'GRID', 2, null, {}]) {
+        localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify({ theme: 'light', answerLayout }));
+        expect(loadPreferences().answerLayout).toBe('grid');
+      }
+
+      // Both layouts round-trip through the existing key (no new storage key)
+      savePreferences({ theme: 'light', language: 'vi', soundEnabled: false, answerLayout: 'stacked' });
+      expect(JSON.parse(localStorage.getItem(STORAGE_KEYS.PREFERENCES)!).answerLayout).toBe('stacked');
+      expect(loadPreferences().answerLayout).toBe('stacked');
+      savePreferences({ theme: 'light', language: 'vi', soundEnabled: false, answerLayout: 'grid' });
+      expect(loadPreferences().answerLayout).toBe('grid');
+      expect(Object.values(STORAGE_KEYS).filter((key) => key.includes('layout'))).toEqual([]);
     });
 
     it('marks library initialized', () => {

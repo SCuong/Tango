@@ -13,6 +13,7 @@ import {
   ItemProgress,
   QuizSessionResult,
   UserPreferences,
+  isAnswerLayout,
   isAppTheme,
 } from '../types';
 
@@ -44,6 +45,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'light',
   language: 'vi',
   soundEnabled: false,
+  answerLayout: 'grid',
 };
 
 /**
@@ -192,6 +194,9 @@ export function loadPreferences(): UserPreferences {
       typeof data.soundEnabled === 'boolean'
         ? data.soundEnabled
         : DEFAULT_PREFERENCES.soundEnabled,
+    answerLayout: isAnswerLayout(data.answerLayout)
+      ? data.answerLayout
+      : DEFAULT_PREFERENCES.answerLayout,
   };
 }
 

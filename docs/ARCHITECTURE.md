@@ -73,7 +73,8 @@ All user progress, weak-word markers, session histories, books, and mutable less
 │                          │ weak status keyed by itemId in LS    │
 │ tango_v1_history         │ QuizSessionResult records in LS      │
 │ tango_v1_preferences     │ App settings: theme, lang,           │
-│                          │ soundEnabled (default: false) in LS  │
+│                          │ soundEnabled (default: false),       │
+│                          │ answerLayout (default: grid) in LS   │
 │ tango_v1_library_init    │ Seed initialization marker in LS     │
 │ tango_v1_covers_idb      │ Binary book cover Blobs              │
 │                          │ in browser IndexedDB (object store)  │

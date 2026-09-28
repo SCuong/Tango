@@ -638,7 +638,7 @@ The visible quiz button displays **ONLY the answer content**, centered with clea
 └──────────────────────────────────────────────┘
 ```
 
-The four choices are distinguished organically by their physical stacked layout and their subtle positional color identity. They look like a clean, tactile deck of study cards rather than a formal classroom paper exam.
+The four choices are distinguished organically by their physical layout (stacked rows, or the 2×2 grid of §12.4) and their subtle positional color identity. They look like a clean, tactile deck of study cards rather than a formal classroom paper exam.
 
 *Keyboard Accessibility Note:* Desktop keyboard number keys (`1`, `2`, `3`, `4`) continue to function silently in the background for rapid answering, but no visual numbers are stamped on the buttons.
 
@@ -675,6 +675,29 @@ To complement the Soft Claymorphism aesthetic, Tango supports optional, gentle a
   - NO voice clips or speech synthesis.
   - NO repetitive clicks on ordinary navigation or button taps.
 - **Full Visual Parity:** Visual indicators (`IconCheck`, `IconX`, emerald/crimson rings, toast) remain 100% complete and authoritative. The application is fully usable with sound disabled.
+
+### 12.4 Answer Layout Preference (Grid 2×2 / Stacked 1×4)
+A Settings preference (`tango_v1_preferences.answerLayout`: `'grid' | 'stacked'`, default **`grid`**) controls how **4-option multiple-choice** answers are laid out. It never applies to written-answer questions, the explanation sheet, results, or quiz configuration; a question with any other option count uses the stacked layout.
+
+```text
+GRID 2×2 (default)            STACKED 1×4
+┌───────────┬───────────┐     ┌───────────────────────┐
+│  du lịch  │  thực tế  │     │        du lịch        │
+├───────────┼───────────┤     ├───────────────────────┤
+│  lễ nghi  │ cảnh quan │     │        thực tế        │
+└───────────┴───────────┘     ├───────────────────────┤
+                              │        lễ nghi        │
+                              ├───────────────────────┤
+                              │       cảnh quan       │
+                              └───────────────────────┘
+```
+
+- **Grid:** two equal columns, the same 12px gap, and one shared card height for the whole question (`auto-rows-fr`). Every card keeps the 56px minimum answer height, centers its text both ways, and keeps its positional hue in reading order (1 2 / 3 4), so the silent `1`–`4` keys map exactly as before. Feedback icons sit in the card's top-right corner inside the padding, so feedback never moves the text or the layout.
+- **Stacked:** the canonical four full-width rows (§11), unchanged; long answers wrap naturally.
+- **Automatic per-question fallback:** Grid falls back to Stacked for the **entire** question when any answer is too long for a 2×2 card or the answer area is too narrow for a readable grid. The fallback never overwrites the saved preference; the next question (or a wider window) may use the grid again.
+  - The decision is render-aware, not a character count: a hidden, zero-height, `aria-hidden` replica of the grid cards (same fonts, sizes, and padding) is measured in a layout effect, before paint, so the grid never flashes before switching. A width change of the answer area re-measures.
+  - Vietnamese / English answers may take up to **2 lines**; Japanese answers must fit on **1 line** (they are single words without spaces, so a wrap would split the word). An unbreakable word wider than the card, or a card text column narrower than 96px, also means stacked. Readability always outranks forcing the grid.
+- **Settings control:** two compact preview cards (a 2×2 tile grid and four stacked rows in the answer hues) in a radio group after Sound Effects, lighter than the theme picker; selected = primary border + 2px primary ring. The helper line `Tự chuyển sang danh sách khi đáp án quá dài.` / `Long answers automatically switch to the stacked layout.` explains the fallback.
 
 ---
 
@@ -792,7 +815,7 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Kanji / Expression: `36px–40px` bold, high-contrast text.
   - Subprompt (if kana reading or clue): `16px` muted text.
 - **Answer Stage (Bottom Thumb Reach):**
-  - 4 full-width stacked answer buttons (height `56px–64px`).
+  - 4 answer buttons (height `56px–64px`) in a 2×2 grid or 4 full-width stacked rows, per the answer layout preference and its per-question fallback (§12.4).
   - Colors: Positional Amber, Blue, Violet, Rose hues.
   - Text: `18px–20px` centered, bold/medium weight.
   - Strictly **NO** letters, numbers, or keyboard badges printed.
@@ -821,6 +844,9 @@ Home follows Tango's content hierarchy: **Study Book → Category → Lesson →
   - Segmented toggle: `[ Off / On ]` (Tắt / Bật).
   - Default: **Off** (Tắt). Never plays audio until explicitly enabled.
   - Persisted in local storage (`tango_v1_preferences.soundEnabled`).
+- **Answer Layout Section (Bố cục đáp án):**
+  - Two compact preview cards in a radio group: `Lưới 2×2` / `2×2 Grid` (default) and `Danh sách` / `Stacked`, with the helper line `Tự chuyển sang danh sách khi đáp án quá dài.` / `Long answers automatically switch to the stacked layout.`
+  - Persisted in local storage (`tango_v1_preferences.answerLayout`); behavior and fallback in §12.4.
 - **Nội dung học Section (Study Content):**
   - Row button linking to Content Management (`Quản lý giáo trình và bài học`).
 

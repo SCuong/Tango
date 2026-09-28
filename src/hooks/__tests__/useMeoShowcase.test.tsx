@@ -24,7 +24,7 @@ afterEach(() => {
 function state(theme: AppTheme): UserStudyState {
   return {
     version: 1,
-    preferences: { theme, language: 'vi', soundEnabled: false },
+    preferences: { theme, language: 'vi', soundEnabled: false, answerLayout: 'grid' },
     books: {},
     lessons: {},
     progressByItem: {},

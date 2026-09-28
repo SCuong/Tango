@@ -7,7 +7,7 @@ import {
   IconMoodHappy,
   IconX,
 } from '@tabler/icons-react';
-import { QuestionType, QuizQuestion } from '../../types';
+import { AnswerLayout, QuestionType, QuizQuestion } from '../../types';
 import { useAppState } from '../../hooks/useAppState';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useI18n } from '../../hooks/useI18n';
@@ -25,6 +25,7 @@ import { Dialog, dismissModalHistory } from '../../components/Dialog';
 import { Screen, ScreenHeader, isDialogOpen } from '../../components/Screen';
 import { MeoEdgeAmbience } from '../../components/ThemeAmbience';
 import { formatMeanings } from '../study/LessonItems';
+import { AnswerChoices, GRID_ANSWER_PADDING, answerTextClasses } from './AnswerChoices';
 import { useQuizSession } from './QuizSessionContext';
 
 /** Correct answers advance automatically after this delay (QUIZ_SESSION_SCREENS SCREEN 11). */
@@ -274,19 +275,23 @@ const ActiveQuiz: React.FC<{ session: QuizSessionState }> = ({ session }) => {
         {/* Answer stage: thumb zone */}
         <section className="pb-2">
           {question.options ? (
-            <div className="grid gap-3">
-              {question.options.map((option, index) => (
+            <AnswerChoices
+              requested={state.preferences.answerLayout}
+              options={question.options}
+              japanese={JAPANESE_ANSWER_TYPES.includes(question.type)}
+              renderOption={(option, index, layout) => (
                 <AnswerOption
                   key={`${question.id}-${index}`}
                   index={index}
                   text={option}
                   japanese={JAPANESE_ANSWER_TYPES.includes(question.type)}
+                  layout={layout}
                   state={optionState(option, question, lastAnswer, inFeedback)}
                   disabled={inFeedback}
                   onSelect={() => submit(option)}
                 />
-              ))}
-            </div>
+              )}
+            />
           ) : (
             <WrittenAnswer
               key={question.id}
@@ -329,10 +334,12 @@ const AnswerOption: React.FC<{
   index: number;
   text: string;
   japanese: boolean;
+  /** Grid cards center their text with the feedback icon in the corner; stacked rows keep it at the end. */
+  layout: AnswerLayout;
   state: OptionVisualState;
   disabled: boolean;
   onSelect: () => void;
-}> = ({ index, text, japanese, state, disabled, onSelect }) => {
+}> = ({ index, text, japanese, layout, state, disabled, onSelect }) => {
   const { t } = useI18n();
   const { isPressed, pressHandlers } = usePressFeedback();
   const ring =
@@ -341,6 +348,8 @@ const AnswerOption: React.FC<{
       : state === 'wrong'
         ? 'ring-[3px] ring-error'
         : '';
+  const grid = layout === 'grid';
+  const iconClass = grid ? 'absolute right-1.5 top-1.5' : 'absolute right-4 top-1/2 -translate-y-1/2';
   return (
     <button
       type="button"
@@ -351,19 +360,19 @@ const AnswerOption: React.FC<{
         if (!disabled) onSelect();
       }}
       aria-label={t('quiz.optionAria', { answer: text })}
-      className={`clay-interactive relative w-full min-h-answer sm:min-h-[58px] px-12 py-3 rounded-xl border text-center ${ANSWER_POSITION_CLASSES[index]} ${!disabled && isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${ring} ${state === 'muted' ? 'opacity-60' : ''} ${disabled ? 'cursor-default' : ''} ${FOCUS_RING}`}
+      className={`clay-interactive relative w-full min-h-answer sm:min-h-[58px] ${grid ? `${GRID_ANSWER_PADDING} flex items-center justify-center` : 'px-12'} py-3 rounded-xl border text-center ${ANSWER_POSITION_CLASSES[index]} ${!disabled && isPressed ? CLAY_PRESSED_CLASSES : 'shadow-clay-card'} ${ring} ${state === 'muted' ? 'opacity-60' : ''} ${disabled ? 'cursor-default' : ''} ${FOCUS_RING}`}
     >
       <span
         lang={japanese ? 'ja' : undefined}
-        className={`${japanese ? 'font-japanese text-xl sm:text-[1.375rem]' : 'text-lg sm:text-xl'} font-semibold leading-snug break-words`}
+        className={`${answerTextClasses(japanese)} break-words${grid ? ' min-w-0 max-w-full' : ''}`}
       >
         {text}
       </span>
       {(state === 'correct' || state === 'reveal') && (
-        <IconCheck size={22} stroke={2.75} aria-hidden="true" className="absolute right-4 top-1/2 -translate-y-1/2 text-success" />
+        <IconCheck size={grid ? 18 : 22} stroke={2.75} aria-hidden="true" className={`${iconClass} text-success`} />
       )}
       {state === 'wrong' && (
-        <IconX size={22} stroke={2.75} aria-hidden="true" className="absolute right-4 top-1/2 -translate-y-1/2 text-error" />
+        <IconX size={grid ? 18 : 22} stroke={2.75} aria-hidden="true" className={`${iconClass} text-error`} />
       )}
     </button>
   );
