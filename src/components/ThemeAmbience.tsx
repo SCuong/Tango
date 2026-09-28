@@ -191,12 +191,12 @@ export const MeoEdgeAmbience: React.FC<{ wideOnly?: boolean }> = ({ wideOnly = f
 const MeoWorldScene: React.FC = () => (
   <div className="ambience-scene ambience-meo">
     <picture className="meo-world">
-      <source media="(min-width: 640px)" srcSet={meoWorldDesktop} width={1048} height={594} />
+      <source media="(min-width: 640px)" srcSet={meoWorldDesktop} width={1049} height={595} />
       <img
         src={meoWorldMobile}
         alt=""
-        width={483}
-        height={845}
+        width={484}
+        height={846}
         loading="lazy"
         decoding="async"
         draggable={false}

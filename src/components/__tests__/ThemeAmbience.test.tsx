@@ -27,11 +27,11 @@ describe("Meo's World background artwork", () => {
     const picture = scene.match(/<picture class="meo-world">([\s\S]*?)<\/picture>/);
     expect(picture).not.toBeNull();
     // The browser downloads only the composition it shows
-    expect(picture![1]).toMatch(/<source media="\(min-width: 640px\)" srcSet="[^"]*meo-world-desktop[^"]*\.png" width="1048" height="594"\/>/);
+    expect(picture![1]).toMatch(/<source media="\(min-width: 640px\)" srcSet="[^"]*meo-world-desktop[^"]*\.png" width="1049" height="595"\/>/);
     const img = picture![1].match(/<img[^>]*>/)![0];
     expect(img).toMatch(/src="[^"]*meo-world-mobile[^"]*\.png"/);
-    expect(img).toContain('width="483"');
-    expect(img).toContain('height="845"');
+    expect(img).toContain('width="484"');
+    expect(img).toContain('height="846"');
     expect(img).toContain('alt=""');
     expect(img).toContain('loading="lazy"');
     expect(img).toContain('draggable="false"');
