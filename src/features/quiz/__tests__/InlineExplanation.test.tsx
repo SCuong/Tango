@@ -1,11 +1,19 @@
 import React from 'react';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import { renderToString } from 'react-dom/server';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { App } from '../../../App';
 import { AppStateProvider } from '../../../hooks/useAppState';
 import { NavigationProvider } from '../../../hooks/useNavigation';
 import { QuizSessionContextValue, QuizSessionProvider, useQuizSession } from '../QuizSessionContext';
-import { CORRECT_AUTO_ADVANCE_MS, InlineExplanation, QuizRunnerScreen } from '../QuizRunnerScreen';
+import {
+  CORRECT_AUTO_ADVANCE_MS,
+  INLINE_REVEAL_PX,
+  InlineExplanation,
+  QuizRunnerScreen,
+  inlineRevealScroll,
+} from '../QuizRunnerScreen';
 import { dismissModalHistory } from '../../../components/Dialog';
 import { AnswerLayout, IncorrectFeedback, QuestionType, QuizQuestion, StudyItem, UserStudyState } from '../../../types';
 import { QuizSessionState, answerCurrentQuestion, createQuizSession } from '../../../lib/quizSession';
@@ -97,14 +105,14 @@ describe('incorrect-answer feedback at runtime', () => {
     expect(html).not.toContain('tango-backdrop');
     expect(html).not.toContain('backdrop-blur');
     const section = inlineSection(html);
-    expect(section).toMatch(/class="mt-4 rounded-2xl border border-dashed border-error-border bg-error-surface/);
+    expect(section).toMatch(/class="tango-inline-reveal [^"]*rounded-2xl border border-dashed border-error-border bg-error-surface/);
     expect(section).not.toMatch(/fixed|absolute|shadow-clay/);
-    // It follows the four answers (after them in document order) inside the answer stage
+    // It follows the four answers (after them in document order), below the quiz stage
     expect(html.indexOf('data-inline-explanation=""')).toBeGreaterThan(html.lastIndexOf('aria-label="Lựa chọn: '));
     // Labelled by its own title and announced politely
     const titleId = section.match(/aria-labelledby="([^"]+)"/)![1];
     expect(section).toContain(`id="${titleId}"`);
-    expect(html).toMatch(/<div aria-live="polite" data-inline-explanation-region=""><section/);
+    expect(html).toMatch(/<div aria-live="polite" data-inline-explanation-region="" class="w-full max-w-xl mx-auto px-4"><section/);
   });
 
   it('inline shows exactly the same study explanation as the popup', () => {
@@ -168,6 +176,12 @@ describe('incorrect-answer feedback at runtime', () => {
     expect(text(section)).toContain('Bạn đã trả lời: sai');
     expect(text(section)).toContain('実際');
     expect(html.indexOf('data-inline-explanation=""')).toBeGreaterThan(html.indexOf('</form>'));
+    // The Check button keeps its space during feedback (hidden and inert), so the input never moves
+    const check = html.match(/<button[^>]*data-written-check=""[^>]*>/)![0];
+    expect(check).toContain('disabled=""');
+    expect(check).toContain('aria-hidden="true"');
+    expect(check).toContain('tabindex="-1"');
+    expect(check).toMatch(/class="[^"]*invisible/);
     // Popup style keeps the sheet for written answers too
     expect(render('popup', session([WRITTEN], 'sai'))).toContain('data-tango-dialog="true"');
   });
@@ -179,8 +193,11 @@ describe('incorrect-answer feedback at runtime', () => {
     expect(container).toBeGreaterThan(-1);
     expect(html).toContain('grid grid-cols-2 auto-rows-fr gap-3');
     // The answer container (grid included) is fully closed before the explanation starts
-    const containerOpen = html.lastIndexOf('<div', container);
-    expect(divDepth(html, containerOpen, html.lastIndexOf('<div', region))).toBe(0);
+    const stage = html.indexOf('<div data-quiz-stage=""');
+    expect(stage).toBeGreaterThan(-1);
+    expect(container).toBeGreaterThan(stage);
+    // The stage (answers and grid included) is fully closed before the explanation region starts
+    expect(divDepth(html, stage, html.lastIndexOf('<div', region))).toBe(0);
     // Feedback states on the answers are kept
     expect(html).toContain('ring-error');
     expect(html).toContain('ring-success');
@@ -191,8 +208,46 @@ describe('incorrect-answer feedback at runtime', () => {
     const html = render('inline', session([MC, MC_NEXT], 'du lịch'), 'stacked');
     const container = html.indexOf('data-answer-layout="stacked"');
     const region = html.indexOf('data-inline-explanation-region');
-    expect(divDepth(html, html.lastIndexOf('<div', container), html.lastIndexOf('<div', region))).toBe(0);
+    const stage = html.indexOf('<div data-quiz-stage=""');
+    expect(container).toBeGreaterThan(stage);
+    expect(divDepth(html, stage, html.lastIndexOf('<div', region))).toBe(0);
     expect(region).toBeGreaterThan(html.lastIndexOf('aria-label="Lựa chọn: '));
+  });
+
+  it('keeps the quiz stage identical before and after the inline explanation appears', () => {
+    const stageOf = (html: string) => {
+      const start = html.indexOf('<div data-quiz-stage=""');
+      const region = html.indexOf('<div aria-live="polite" data-inline-explanation-region=""');
+      return { open: html.slice(start, html.indexOf('>', start) + 1), closedBeforeRegion: divDepth(html, start, region) === 0 };
+    };
+    const before = render('inline', session([MC, MC_NEXT]));
+    const after = render('inline', session([MC, MC_NEXT], 'du lịch'));
+    // One viewport-tall flex stage with the HUD, prompt (flex-1), and answers; nothing added inside it
+    expect(stageOf(before).open).toBe('<div data-quiz-stage="" class="min-h-[100dvh] flex flex-col">');
+    expect(stageOf(after).open).toBe(stageOf(before).open);
+    expect(stageOf(before).closedBeforeRegion).toBe(true);
+    expect(stageOf(after).closedBeforeRegion).toBe(true);
+    // Before feedback the region is empty, so the page is exactly one viewport tall
+    expect(before).toContain('data-inline-explanation-region="" class="w-full max-w-xl mx-auto px-4"></div>');
+  });
+
+  it('scrolls only as far as needed to reveal the start of the explanation', () => {
+    // Already visible: no scroll at all
+    expect(inlineRevealScroll(300, 280, 844)).toBe(0);
+    // Just below the fold: reveal its first ${INLINE_REVEAL_PX}px (+16px margin), not the whole box
+    expect(inlineRevealScroll(852, 300, 844)).toBe(852 + INLINE_REVEAL_PX + 16 - 844);
+    expect(inlineRevealScroll(852, 300, 844)).toBeLessThan(300);
+    // A short box is revealed completely
+    expect(inlineRevealScroll(800, 60, 844)).toBe(800 + 60 + 16 - 844);
+  });
+
+  it('reveals the explanation with a subtle fade-up, and only a short fade under reduced motion', () => {
+    const css = readFileSync(resolve(__dirname, '../../../index.css'), 'utf-8');
+    expect(css).toMatch(/\.tango-inline-reveal \{\s*animation: tango-inline-reveal 200ms cubic-bezier\(0\.22, 1, 0\.36, 1\) both;/);
+    expect(css).toMatch(/@keyframes tango-inline-reveal \{\s*from \{ opacity: 0; transform: translateY\(8px\); \}/);
+    const reduced = css.match(/Inline explanation: no translation[\s\S]*?\}/)![0];
+    expect(reduced).toContain('animation-name: tango-inline-reveal-fade !important');
+    expect(css).toMatch(/@keyframes tango-inline-reveal-fade \{\s*from \{ opacity: 0; \}\s*to \{ opacity: 1; \}/);
   });
 
   it('popup keeps its dialog; closing history is safe when no popup marker exists', async () => {

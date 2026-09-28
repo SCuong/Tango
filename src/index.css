@@ -805,6 +805,11 @@
     animation: showcase-hold-pop 240ms ease-out forwards;
   }
 
+  /* Inline incorrect-answer explanation: a subtle entrance below the unchanged quiz stage */
+  .tango-inline-reveal {
+    animation: tango-inline-reveal 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
   /* Mobile full-screen route panels let the cat world show around their content */
   @media (max-width: 639px) {
     [data-theme="meo"] .tango-route-panel {
@@ -905,6 +910,16 @@
   --meo-paw-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-14 -17 28 31'%3E%3Cpath d='M-9 8C-9-1-4-4 0-4S9-1 9 8C9 12 5 13 0 11C-5 13-9 12-9 8Z'/%3E%3Cellipse cx='-10' cy='-7' rx='3.4' ry='4.2'/%3E%3Cellipse cx='-3.6' cy='-12' rx='3.4' ry='4.2'/%3E%3Cellipse cx='3.6' cy='-12' rx='3.4' ry='4.2'/%3E%3Cellipse cx='10' cy='-7' rx='3.4' ry='4.2'/%3E%3C/svg%3E");
 }
 
+@keyframes tango-inline-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes tango-inline-reveal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @keyframes showcase-hold-grow {
   from { opacity: 0; transform: scale(0.5); }
   to { opacity: 0.55; transform: scale(1); }
@@ -976,6 +991,11 @@
 
   .tango-showcase-hold {
     display: none !important;
+  }
+
+  /* Inline explanation: no translation, only a very short fade */
+  .tango-inline-reveal {
+    animation-name: tango-inline-reveal-fade !important;
   }
 
   /* Root switches are instant: no movement */

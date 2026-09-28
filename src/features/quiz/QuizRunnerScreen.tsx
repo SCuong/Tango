@@ -204,114 +204,126 @@ const ActiveQuiz: React.FC<{ session: QuizSessionState }> = ({ session }) => {
   const japanesePrompt = JAPANESE_PROMPT_TYPES.includes(question.type);
 
   return (
-    <div className="min-h-[100dvh] bg-page text-text-primary flex flex-col">
+    <div className="min-h-[100dvh] bg-page text-text-primary">
       {/* Meo's World only, wide screens only: static cats in the outer margins, never behind the prompt or answers */}
       <MeoEdgeAmbience wideOnly />
-      {/* Top HUD: exit, progress, counter, streak (and timer in test mode) */}
-      <header className="relative w-full pt-[env(safe-area-inset-top)]">
-        <div className="max-w-xl mx-auto px-4 h-16 flex items-center gap-3">
-          <IconButton label={t('quiz.exit')} icon={<IconX size={22} stroke={2} />} onClick={() => setExitOpen(true)} />
-          <div className="flex-1 min-w-0">
-            <div
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={total}
-              aria-valuenow={answeredCount}
-              aria-label={t('quiz.progressAria', { current: position, total })}
-              className="h-2.5 rounded-full bg-surface-elevated border border-border-subtle overflow-hidden"
-            >
+      {/*
+        Stable quiz stage: HUD, prompt, and answers fill exactly one viewport and never change size
+        during feedback. The inline explanation is rendered after the stage, so it extends the page
+        downward instead of shrinking the prompt area and pushing the prompt and answers upward.
+      */}
+      <div data-quiz-stage="" className="min-h-[100dvh] flex flex-col">
+        {/* Top HUD: exit, progress, counter, streak (and timer in test mode) */}
+        <header className="relative w-full pt-[env(safe-area-inset-top)]">
+          <div className="max-w-xl mx-auto px-4 h-16 flex items-center gap-3">
+            <IconButton label={t('quiz.exit')} icon={<IconX size={22} stroke={2} />} onClick={() => setExitOpen(true)} />
+            <div className="flex-1 min-w-0">
               <div
-                className="h-full bg-primary rounded-full transition-[width] duration-300 ease-out"
-                style={{ width: `${total > 0 ? (answeredCount / total) * 100 : 0}%` }}
-              />
-            </div>
-          </div>
-          <span className="text-sm font-semibold text-text-secondary tabular-nums whitespace-nowrap" aria-hidden="true">
-            {position} / {total}
-          </span>
-          <span
-            className="inline-flex items-center gap-1 text-sm font-semibold text-text-secondary tabular-nums"
-            aria-label={t('quiz.streakAria', { count: session.streak })}
-          >
-            <IconFlame size={18} stroke={2} aria-hidden="true" className={session.streak > 0 ? 'text-warning' : ''} />
-            <span aria-hidden="true">{session.streak}</span>
-          </span>
-          {session.config.mode === 'test' && <QuizTimer session={session} />}
-        </div>
-      </header>
-
-      {/* During correct feedback a tap anywhere on the canvas advances */}
-      <main
-        className="relative flex-1 w-full max-w-xl mx-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col"
-        onClick={correctFeedback ? goNext : undefined}
-      >
-        {/* Prompt stage: dominant upper half */}
-        <section className="flex-1 min-h-[180px] flex flex-col items-center justify-center text-center py-6 relative">
-          <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-text-muted mb-3">
-            {t(`quiz.instruction.${question.type}`)}
-          </p>
-          <h1
-            lang={japanesePrompt ? 'ja' : undefined}
-            className={`${japanesePrompt ? 'font-japanese' : 'font-sans'} font-bold text-text-primary text-[1.875rem] sm:text-[2.5rem] leading-tight break-words max-w-full`}
-          >
-            {question.prompt}
-          </h1>
-          {question.subPrompt && (
-            <p lang="ja" className="font-japanese mt-2 text-base text-text-secondary">
-              {question.subPrompt}
-            </p>
-          )}
-          <div className="h-12 mt-4 flex items-center justify-center" aria-live="polite">
-            {correctFeedback && (
-              <span
-                role="status"
-                className="inline-flex items-center gap-1.5 rounded-full bg-success-surface text-success-text border border-success px-4 py-1.5 text-sm font-semibold"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={total}
+                aria-valuenow={answeredCount}
+                aria-label={t('quiz.progressAria', { current: position, total })}
+                className="h-2.5 rounded-full bg-surface-elevated border border-border-subtle overflow-hidden"
               >
-                <IconCheck size={18} stroke={2.5} aria-hidden="true" />
-                {t('quiz.correct')}
-              </span>
-            )}
-          </div>
-        </section>
-
-        {/* Answer stage: thumb zone */}
-        <section className="pb-2">
-          {question.options ? (
-            <AnswerChoices
-              requested={state.preferences.answerLayout}
-              options={question.options}
-              japanese={JAPANESE_ANSWER_TYPES.includes(question.type)}
-              renderOption={(option, index, layout) => (
-                <AnswerOption
-                  key={`${question.id}-${index}`}
-                  index={index}
-                  text={option}
-                  japanese={JAPANESE_ANSWER_TYPES.includes(question.type)}
-                  layout={layout}
-                  state={optionState(option, question, lastAnswer, inFeedback)}
-                  disabled={inFeedback}
-                  onSelect={() => submit(option)}
+                <div
+                  className="h-full bg-primary rounded-full transition-[width] duration-300 ease-out"
+                  style={{ width: `${total > 0 ? (answeredCount / total) * 100 : 0}%` }}
                 />
-              )}
-            />
-          ) : (
-            <WrittenAnswer
-              key={question.id}
-              inFeedback={inFeedback}
-              lastAnswer={lastAnswer}
-              onSubmit={submit}
-            />
-          )}
-          {/* Inline style: the explanation follows the whole answer area, never inside the grid */}
-          {feedbackStyle === 'inline' && (
-            <div aria-live="polite" data-inline-explanation-region="">
-              {incorrectFeedback && (
-                <InlineExplanation key={question.id} question={question} lastAnswer={lastAnswer} onContinue={goNext} />
+              </div>
+            </div>
+            <span className="text-sm font-semibold text-text-secondary tabular-nums whitespace-nowrap" aria-hidden="true">
+              {position} / {total}
+            </span>
+            <span
+              className="inline-flex items-center gap-1 text-sm font-semibold text-text-secondary tabular-nums"
+              aria-label={t('quiz.streakAria', { count: session.streak })}
+            >
+              <IconFlame size={18} stroke={2} aria-hidden="true" className={session.streak > 0 ? 'text-warning' : ''} />
+              <span aria-hidden="true">{session.streak}</span>
+            </span>
+            {session.config.mode === 'test' && <QuizTimer session={session} />}
+          </div>
+        </header>
+
+        {/* During correct feedback a tap anywhere on the canvas advances */}
+        <main
+          className="relative flex-1 w-full max-w-xl mx-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col"
+          onClick={correctFeedback ? goNext : undefined}
+        >
+          {/* Prompt stage: dominant upper half */}
+          <section className="flex-1 min-h-[180px] flex flex-col items-center justify-center text-center py-6 relative">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-text-muted mb-3">
+              {t(`quiz.instruction.${question.type}`)}
+            </p>
+            <h1
+              lang={japanesePrompt ? 'ja' : undefined}
+              className={`${japanesePrompt ? 'font-japanese' : 'font-sans'} font-bold text-text-primary text-[1.875rem] sm:text-[2.5rem] leading-tight break-words max-w-full`}
+            >
+              {question.prompt}
+            </h1>
+            {question.subPrompt && (
+              <p lang="ja" className="font-japanese mt-2 text-base text-text-secondary">
+                {question.subPrompt}
+              </p>
+            )}
+            <div className="h-12 mt-4 flex items-center justify-center" aria-live="polite">
+              {correctFeedback && (
+                <span
+                  role="status"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-success-surface text-success-text border border-success px-4 py-1.5 text-sm font-semibold"
+                >
+                  <IconCheck size={18} stroke={2.5} aria-hidden="true" />
+                  {t('quiz.correct')}
+                </span>
               )}
             </div>
+          </section>
+
+          {/* Answer stage: thumb zone */}
+          <section className="pb-2">
+            {question.options ? (
+              <AnswerChoices
+                requested={state.preferences.answerLayout}
+                options={question.options}
+                japanese={JAPANESE_ANSWER_TYPES.includes(question.type)}
+                renderOption={(option, index, layout) => (
+                  <AnswerOption
+                    key={`${question.id}-${index}`}
+                    index={index}
+                    text={option}
+                    japanese={JAPANESE_ANSWER_TYPES.includes(question.type)}
+                    layout={layout}
+                    state={optionState(option, question, lastAnswer, inFeedback)}
+                    disabled={inFeedback}
+                    onSelect={() => submit(option)}
+                  />
+                )}
+              />
+            ) : (
+              <WrittenAnswer
+                key={question.id}
+                inFeedback={inFeedback}
+                lastAnswer={lastAnswer}
+                onSubmit={submit}
+              />
+            )}
+          </section>
+        </main>
+      </div>
+
+      {/* Inline style: the explanation follows the whole answer area (full width, never a grid cell) */}
+      {feedbackStyle === 'inline' && (
+        <div
+          aria-live="polite"
+          data-inline-explanation-region=""
+          className="w-full max-w-xl mx-auto px-4"
+        >
+          {incorrectFeedback && (
+            <InlineExplanation key={question.id} question={question} lastAnswer={lastAnswer} onContinue={goNext} />
           )}
-        </section>
-      </main>
+        </div>
+      )}
 
       <ExplanationSheet
         open={incorrectFeedback && feedbackStyle === 'popup' && !exitOpen && !exitingRef.current}
@@ -432,11 +444,20 @@ const WrittenAnswer: React.FC<{
         placeholder={t('quiz.answerPlaceholder')}
         className={`w-full min-h-answer rounded-xl bg-surface border px-4 text-center font-japanese text-xl text-text-primary placeholder:text-text-muted placeholder:font-sans placeholder:text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${ring}`}
       />
-      {!inFeedback && (
-        <Button type="submit" variant="primary" size="lg" fullWidth disabled={value.trim() === ''}>
-          {t('quiz.check')}
-        </Button>
-      )}
+      {/* During feedback the button keeps its space (hidden and inert) so the prompt and input never move */}
+      <Button
+        type="submit"
+        variant="primary"
+        size="lg"
+        fullWidth
+        disabled={inFeedback || value.trim() === ''}
+        className={inFeedback ? 'invisible' : ''}
+        aria-hidden={inFeedback || undefined}
+        tabIndex={inFeedback ? -1 : undefined}
+        data-written-check=""
+      >
+        {t('quiz.check')}
+      </Button>
     </form>
   );
 };
@@ -527,6 +548,19 @@ const ExplanationContent = React.forwardRef<
   );
 });
 
+/** How much of the inline explanation's start (title and word) must be on screen when it appears. */
+export const INLINE_REVEAL_PX = 120;
+
+/**
+ * Downward scroll (px) that brings the start of the inline explanation into view, like
+ * `block: 'nearest'` limited to its first `INLINE_REVEAL_PX`: 0 when that part is already visible,
+ * so the page never jumps more than needed and the answers stay in view.
+ */
+export function inlineRevealScroll(top: number, height: number, viewportHeight: number, margin = 16): number {
+  const needed = top + Math.min(height, INLINE_REVEAL_PX) + margin - viewportHeight;
+  return needed > 0 ? Math.ceil(needed) : 0;
+}
+
 /** SCREEN 12 — explanation popup: bottom sheet on mobile, centered card from `sm` up. */
 const ExplanationSheet: React.FC<{
   open: boolean;
@@ -554,9 +588,10 @@ const ExplanationSheet: React.FC<{
 
 /**
  * SCREEN 12 — inline explanation (Settings: "Dưới đáp án" / Inline): the same content in the normal
- * page flow, directly below the whole answer area, in a dashed error-surface box. No dialog,
- * backdrop, history marker, or focus trap. When it appears, Continue takes focus (without
- * scrolling) and the box scrolls into view only if it is not already visible.
+ * page flow, below the stable quiz stage (so the prompt and answers never move), in a dashed
+ * error-surface box. No dialog, backdrop, history marker, or focus trap. When it appears, Continue
+ * takes focus (without scrolling) and the page scrolls only as far as needed to reveal the start of
+ * the explanation (its title and word), gently, and instantly under reduced motion.
  */
 export const InlineExplanation: React.FC<{
   question: QuizQuestion;
@@ -571,7 +606,8 @@ export const InlineExplanation: React.FC<{
     if (!section) return;
     continueRef.current?.focus({ preventScroll: true });
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    section.scrollIntoView?.({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+    const delta = inlineRevealScroll(section.getBoundingClientRect().top, section.offsetHeight, window.innerHeight);
+    if (delta > 0) window.scrollBy({ top: delta, behavior: reduceMotion ? 'auto' : 'smooth' });
   }, []);
   return (
     <section
@@ -579,7 +615,7 @@ export const InlineExplanation: React.FC<{
       aria-labelledby={titleId}
       data-inline-explanation=""
       onClick={(e) => e.stopPropagation()}
-      className="mt-4 rounded-2xl border border-dashed border-error-border bg-error-surface px-4 py-4 sm:px-5 sm:py-5"
+      className="tango-inline-reveal mb-[max(1.5rem,env(safe-area-inset-bottom))] rounded-2xl border border-dashed border-error-border bg-error-surface px-4 py-4 sm:px-5 sm:py-5"
     >
       <ExplanationContent ref={continueRef} titleId={titleId} question={question} lastAnswer={lastAnswer} onContinue={onContinue} />
     </section>
