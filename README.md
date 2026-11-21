@@ -54,3 +54,7 @@ Four columns in this order, or any order with a header row:
 | ファストフード | ふぁすとふーど | | Đồ ăn nhanh |
 
 Hán Việt is optional. Multiple meanings can be separated with commas or semicolons.
+
+## Artwork
+
+The cat artwork (the Tango wordmark, the app icons in `public/` and the Meo's World backgrounds in `src/assets/meo/`) was created by the project owner.
