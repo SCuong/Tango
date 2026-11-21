@@ -3,7 +3,7 @@
  *
  * Governed by:
  * - docs/IMPORT_SPEC.md (§§5.2, 9, 14)
- * - PROJECT_RULES.md (§4 Dependency Discipline)
+ * - CONTRIBUTING.md (§3 Dependency Discipline)
  *
  * An .xlsx file is a ZIP of XML parts. This module reads the ZIP central directory, inflates
  * entries with the browser-native `DecompressionStream('deflate-raw')`, and extracts cell text

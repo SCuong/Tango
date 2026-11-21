@@ -1,6 +1,6 @@
-# Tango Project Rules & Repository Hygiene
+# Contributing to Tango
 
-This document defines the persistent rules, standards, and Git hygiene constraints for the **Tango** repository. Every contributor and coding session must strictly adhere to these guidelines.
+This document defines the persistent rules, standards, and Git hygiene constraints for the **Tango** repository. Contributors should follow to these guidelines.
 
 ---
 
@@ -27,7 +27,6 @@ Maintain strict repository hygiene at all times. Distinguish clearly between fil
 - Safe template environment files (e.g., `.env.example`, `.env.template`)
 
 ### Never Push (Must Stay Strictly Local)
-- `.agents/` directory (strictly local skills, prompts, and tools)
 - Secrets, private keys, API credentials, access tokens, or certificates
 - `.env` and `.env.*` files containing real secrets or production keys
 - Local-only tooling, custom runner scripts, or personal configurations
@@ -37,16 +36,7 @@ Maintain strict repository hygiene at all times. Distinguish clearly between fil
 
 ---
 
-## 3. AI & Agent Guidelines
-
-- **Local-Only Tooling:** AI tools and local agent environments may be utilized locally to assist development.
-- **No AI Footprint in Repo:** Do NOT add AI agent directories, AI configurations, agent system prompts, automated AI workflow configs, AI SDKs, AI marketing badges, or references to specific AI assistants (Gemini, Claude, Codex, Cursor, etc.) to the repository unless explicitly requested by the project owner.
-- **Isolation of `.agents/`:** The `.agents/` folder must remain strictly local and ignored by Git. Never copy files from `.agents/` into tracked application directories.
-- **Clean Project Identity:** The public repository must present as a clean, professionally maintained software application authored and structured following standard engineering practices.
-
----
-
-## 4. Development & Workflow Rules
+## 3. Development & Workflow Rules
 
 - **Check Rules First:** Review this file before proposing or implementing significant architectural changes.
 - **Simplicity First:** Prefer straightforward, maintainable, and readable solutions over clever or convoluted abstractions.
@@ -58,9 +48,8 @@ Maintain strict repository hygiene at all times. Distinguish clearly between fil
 
 ---
 
-## 5. UI / UX Standards
+## 4. UI / UX Standards
 
-- **Design Guidance:** The local skill `.agents/skills/ui-ux-pro-max` may be referenced locally for UX patterns, typography, color palettes, and component design principles. The skill itself must never be committed.
 - **Design System First:** Before any UI implementation, read `docs/DESIGN_SYSTEM.md`, especially its **Canonical Cross-Screen UI Baseline**. It is the single source of truth for Tango's visual and interaction language. Screen-specific docs may specialize it for their purpose but must never redefine it.
 - **Mobile-First Usability:** Mobile responsiveness is a first-class requirement. Touch targets (minimum 48px; quiz answers 56px), thumb reachability, and mobile viewport ergonomics must be validated at ~360px and ~390px alongside desktop layouts.
 - **Typographic & Cultural Clarity:** Japanese typography (Kanji, Furigana, Kana) and Vietnamese diacritics must render legibly across devices with appropriate font stacks and spacing.
@@ -68,7 +57,7 @@ Maintain strict repository hygiene at all times. Distinguish clearly between fil
 
 ---
 
-## 6. Modern Web & PWA Standards
+## 5. Modern Web & PWA Standards
 
 - **Asset Optimization:** Store static media in clean formats (SVG for icons/vectors, WebP/AVIF for photos). Keep bundle size lean.
 - **Offline & Storage Integrity:** Local persistence (e.g., IndexedDB, `localStorage`) must feature resilient schema handling to prevent data corruption during app updates.

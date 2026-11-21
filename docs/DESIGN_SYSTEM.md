@@ -3,7 +3,7 @@
 This document is the authoritative visual design system and UX specification for **Tango**. All future UI implementation, component authoring, styling, and asset creation must strictly adhere to the tokens, ergonomic rules, and aesthetic standards established here.
 
 Before building or modifying user-facing components, contributors must consult:
-1. `PROJECT_RULES.md`
+1. `CONTRIBUTING.md`
 2. `docs/DESIGN_SYSTEM.md` (this document), starting with the [Canonical Cross-Screen UI Baseline](#canonical-cross-screen-ui-baseline)
 3. Relevant screen and product specifications (`docs/SCREEN_SPEC.md`, `docs/screens/*.md`, `docs/CONTENT_LIBRARY_SPEC.md`, `docs/PRODUCT_SPEC.md`, `docs/UI_UX.md`, `docs/IMPORT_SPEC.md`)
 
